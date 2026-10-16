@@ -29,6 +29,8 @@ jobs:
         run: python3 native-godot/tools/vendor_cc0_characters.py
       - name: Vendor verified CC0 furniture glTF and PBR atlas
         run: python3 native-godot/tools/vendor_cc0_furniture.py
+      - name: Vendor Poly Haven CC0 PBR photogrammetry (1K)
+        run: python3 native-godot/tools/vendor_polyhaven_realistic.py
       - name: Validate source, GLB and audio manifests
         run: python3 native-godot/tests/verify_native_release.py
       - name: Import assets and verify GDScript parse
