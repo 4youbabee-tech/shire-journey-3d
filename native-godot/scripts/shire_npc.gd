@@ -17,6 +17,7 @@ var look_at_player := false
 var closeness := 99.0
 var action := "resting"
 var seed_value := 0
+var follow_player := false
 
 func configure(id_value: String, label: String, occupation: String, origin: Vector3, workplace: Vector3, palette: Color, seed_number: int) -> void:
     profile_id=id_value
@@ -53,7 +54,10 @@ func make_part(where: Vector3, size_value: Vector3, color: Color, shape: int) ->
 func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: float, game_seconds: float) -> void:
     closeness=global_position.distance_to(player_pos)
     var target:=home
-    if rain:
+    if follow_player:
+        target = player_pos + Vector3(1.4, 0.0, 1.4) if closeness > 2.4 else position
+        action = "accompanying"
+    elif rain:
         target=home
         action="sheltering"
     elif game_hour>=7.0 and game_hour<12.0:
@@ -79,7 +83,8 @@ func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: f
         var distance:=current.distance_to(target2)
         if distance>.3:
             # Far-off characters still advance their schedule; animation is distance-culled.
-            var step:=minf(distance,delta*travel_speed * (2.0 if closeness>32 else 1.0))
+            var stride := (8.2 if closeness > 12.0 else 5.1) if follow_player else travel_speed * (2.0 if closeness > 32 else 1.0)
+            var step:=minf(distance,delta*stride)
             var direction:=(target2-current).normalized()
             position.x+=direction.x*step
             position.z+=direction.y*step
