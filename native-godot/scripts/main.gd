@@ -4,6 +4,7 @@ extends Node3D
 const WorldScript=preload("res://scripts/shire_world.gd")
 const PlayerScript=preload("res://scripts/player.gd")
 const NPCScript=preload("res://scripts/shire_npc.gd")
+const AnimalScript=preload("res://scripts/shire_animal.gd")
 const ClockScript=preload("res://scripts/shire_clock.gd")
 const WeatherScript=preload("res://scripts/shire_weather.gd")
 const DialogueScript=preload("res://scripts/shire_dialogue.gd")
@@ -13,6 +14,8 @@ var frodo: ShirePlayer
 var clock: ShireClock
 var weather: ShireWeather
 var npcs: Dictionary={}
+var animals: Array[ShireAnimal]=[]
+var last_animal_tick:=0.0
 var hud: CanvasLayer
 var top_label: Label
 var quest_label: Label
@@ -46,10 +49,13 @@ func _ready() -> void:
     shire.name="LivingHobbiton"
     add_child(shire)
     frodo=PlayerScript.new()
-    frodo.position=_ground(-20,-9)
+    frodo.position=_ground(-20,-35)
     frodo.position.y+=.25
     add_child(frodo)
+    frodo.yaw=PI
+    frodo.rotation.y=PI
     _people()
+    _animals()
     _soundscape()
     _interface()
     _refresh_story_entities()
@@ -104,6 +110,17 @@ func _people() -> void:
         npc.configure(str(p[0]),str(p[1]),str(p[2]),_ground(float(p[3]),float(p[4])),_ground(float(p[5]),float(p[6])),p[7],i)
         npcs[str(p[0])]=npc
         add_child(npc)
+
+func _animals() -> void:
+    # Hens explore fields, rabbits flee from footsteps, butterflies avoid rain.
+    for i in range(19):
+        var kind: String="hen" if i<9 else "rabbit" if i<14 else "butterfly"
+        var x: float=-44.0+float(i%7)*9.5
+        var z: float=13.0+float(i%4)*11.0 if i<9 else -32.0+float(i%6)*5.0
+        var pet: ShireAnimal=AnimalScript.new()
+        pet.setup(kind,_ground(x,z),i)
+        animals.append(pet)
+        add_child(pet)
 
 func _soundscape() -> void:
     ambience=AudioStreamPlayer.new()
@@ -207,7 +224,9 @@ func _menu_choice(item: String) -> void:
         "New Journey":
             _pause(false)
             _new_game()
-            frodo.position=_ground(-20,-9)+Vector3.UP*.25
+            frodo.position=_ground(-20,-35)+Vector3.UP*.25
+            frodo.yaw=PI
+            frodo.rotation.y=PI
 
 func _pause(value: bool) -> void:
     paused_by_user=value
@@ -249,6 +268,13 @@ func _process(dt: float) -> void:
     autosave+=dt
     elapsed_show+=dt
     last_npc_update+=dt
+    last_animal_tick+=dt
+    if last_animal_tick>.12:
+        var sim_time:=last_animal_tick
+        last_animal_tick=0.0
+        var rain_now:=weather.is_raining(clock.elapsed)
+        for pet in animals:
+            pet.tick(clock.hour_value(),rain_now,frodo.position,sim_time,clock.elapsed,shire)
     if autosave>26.0:
         autosave=0.0
         save_game(false)
@@ -405,7 +431,8 @@ func save_game(notify: bool=true) -> void:
         "schema":2,"clock":clock.pack(),"stage":stage,
         "flags":quest_flags.duplicate(true),"weather_seed":weather.seed,
         "player":{"pos":[frodo.position.x,frodo.position.y,frodo.position.z],"yaw":frodo.yaw,"camera_first":frodo.first_person},
-        "npcs":people_state}
+        "npcs":people_state,
+        "animals":animals.map(func(pet): return pet.pack())}
     var file:=FileAccess.open(SAVE_FILE,FileAccess.WRITE)
     if file:
         file.store_string(JSON.stringify(game_state))
@@ -445,6 +472,11 @@ func load_game() -> void:
     for key in npcs:
         if restored.get(key) is Dictionary:
             npcs[key].unpack(restored[key])
+    var animal_data=raw.get("animals",[])
+    if animal_data is Array:
+        for index in range(mini(animals.size(),animal_data.size())):
+            if animal_data[index] is Dictionary:
+                animals[index].unpack(animal_data[index])
     _refresh_story_entities()
     _update_quest()
     _show_notice("Saved journey loaded", "تم استرجاع الرحلة")

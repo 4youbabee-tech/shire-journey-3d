@@ -9,6 +9,7 @@ var world_environment : WorldEnvironment
 var river : MeshInstance3D
 var wheel : Node3D
 var lanterns : Array[OmniLight3D] = []
+var chimney_smoke : Array[CPUParticles3D] = []
 var weather_particles : Array[MeshInstance3D] = []
 var rng:=RandomNumberGenerator.new()
 var materials: Dictionary={}
@@ -66,13 +67,13 @@ func _lighting() -> void:
     env.reflected_light_source=Environment.REFLECTION_SOURCE_BG
     env.tonemap_mode=Environment.TONE_MAPPER_FILMIC
     env.fog_enabled=true
-    env.fog_density=.005
-    env.fog_light_color=Color("a9bcb0")
+    env.fog_density=.0023
+    env.fog_light_color=Color("778e82")
     world_environment.environment=env
     sun=DirectionalLight3D.new()
     sun.rotation_degrees=Vector3(-38,-32,0)
     sun.light_color=Color("ffdfaa")
-    sun.light_energy=1.4
+    sun.light_energy=.95
     sun.shadow_enabled=true
     sun.directional_shadow_max_distance=65.0
     add_child(sun)
@@ -114,7 +115,7 @@ func _terrain() -> void:
             var d=Vector3(x,elevation(x,z+STEP),z+STEP)
             for v in [a,d,b,b,d,c]:
                 var hue=.045*sin(v.x*.11+v.z*.05)+.05*cos(v.z*.19)
-                var color:=Color(.26+hue,.39+hue,.19+hue*.7)
+                var color:=Color(.89+hue*.15,.93+hue*.10,.86+hue*.13)
                 tool.set_color(color)
                 tool.set_uv(Vector2(v.x,v.z)*.05)
                 tool.add_vertex(v)
@@ -124,7 +125,12 @@ func _terrain() -> void:
     node.mesh=mesh
     var grassy:=StandardMaterial3D.new()
     grassy.vertex_color_use_as_albedo=true
-    grassy.roughness=.94
+    grassy.albedo_texture=load("res://assets/textures/grass_albedo.png")
+    grassy.normal_enabled=true
+    grassy.normal_texture=load("res://assets/textures/grass_normal.png")
+    grassy.normal_scale=.28
+    grassy.roughness=.93
+    grassy.texture_repeat=BaseMaterial3D.TEXTURE_REPEAT_ENABLED
     node.material_override=grassy
     add_child(node)
     var collider:=StaticBody3D.new()
@@ -149,11 +155,20 @@ func _path(a: Vector2,b: Vector2,width: float) -> void:
         var q1:=q+normal*width*.5
         var q2:=q-normal*width*.5
         for v in [p1,q1,p2,p2,q1,q2]:
-            surface.add_vertex(Vector3(v.x,elevation(v.x,v.y)+.06,v.y))
+            surface.set_uv(Vector2(v.x,v.y)*.18)
+            surface.add_vertex(Vector3(v.x,elevation(v.x,v.y)+.085,v.y))
     surface.generate_normals()
     var node:=MeshInstance3D.new()
     node.mesh=surface.commit()
-    node.material_override=material(Color("907752"))
+    var earth:=StandardMaterial3D.new()
+    earth.albedo_texture=load("res://assets/textures/path_albedo.png")
+    earth.normal_enabled=true
+    earth.normal_texture=load("res://assets/textures/path_normal.png")
+    earth.normal_scale=.35
+    earth.roughness=.92
+    earth.texture_repeat=BaseMaterial3D.TEXTURE_REPEAT_ENABLED
+    earth.cull_mode=BaseMaterial3D.CULL_DISABLED
+    node.material_override=earth
     add_child(node)
 
 func _lanes() -> void:
@@ -224,6 +239,8 @@ func _hobbit_hole(where: Vector2, scale_factor: float, main_house: bool) -> void
     ring.rotation.x=PI/2.0
     ring.material_override=material(Color("bd995a"))
     house.add_child(ring)
+    # A single arched facade mesh saves draw calls vs. separate stone blocks.
+    _stone_arch(house)
     var knob:=sph(house,Vector3(.50,1.13,-3.96),Vector3(.12,.12,.12),Color("d6b16e"))
     knob.material_override=material(Color("dfb568"),.26)
     for side in [-1.0,1.0]:
@@ -243,6 +260,7 @@ func _hobbit_hole(where: Vector2, scale_factor: float, main_house: bool) -> void
     # Stone chimney with chimney cap and raised planting beds.
     box(house,Vector3(2.2,3.06,1.1),Vector3(.78,2.45,.82),Color("857a64"))
     box(house,Vector3(2.2,4.30,1.1),Vector3(1.05,.25,1.05),Color("655b4e"))
+    _smoke(house,Vector3(2.2,4.50,1.1))
     for i in range(12):
         var x=-3.6+float(i)*.65
         box(house,Vector3(x,.3,-4.7),Vector3(.12,.52,.11),Color("ad8752"))
@@ -252,6 +270,61 @@ func _hobbit_hole(where: Vector2, scale_factor: float, main_house: bool) -> void
         flowers.position=Vector3(-3.3+float(i)*1.04,0.18,-4.48)
         flowers.scale=Vector3.ONE*.72
         house.add_child(flowers)
+
+func _smoke(house: Node3D, chimney: Vector3) -> void:
+    # Real CPU particles: smoke from inhabited hearths, suppressed by heavy rain.
+    var p:=CPUParticles3D.new()
+    p.amount=18
+    p.lifetime=4.8
+    p.speed_scale=.65
+    p.direction=Vector3(0,1,0)
+    p.spread=14.0
+    p.gravity=Vector3(.06,.18,0)
+    p.initial_velocity_min=.20
+    p.initial_velocity_max=.48
+    p.scale_amount_min=.23
+    p.scale_amount_max=.55
+    var smoke_mesh:=SphereMesh.new()
+    smoke_mesh.radius=.28
+    smoke_mesh.height=.56
+    var mat:=StandardMaterial3D.new()
+    mat.albedo_color=Color(.45,.45,.43,.23)
+    mat.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA
+    mat.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
+    mat.depth_draw_mode=BaseMaterial3D.DEPTH_DRAW_DISABLED
+    smoke_mesh.material=mat
+    p.mesh=smoke_mesh
+    p.position=chimney
+    p.emitting=true
+    house.add_child(p)
+    chimney_smoke.append(p)
+
+func _stone_arch(house: Node3D) -> void:
+    var tool:=SurfaceTool.new()
+    tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+    var pieces:=30
+    for i in range(pieces):
+        var a=TAU*float(i)/pieces
+        var b=TAU*float(i+1)/pieces
+        var mid_color:=Color("a89a7a") if i%3==0 else Color("b5a58b") if i%3==1 else Color("93866d")
+        var inner:=1.18
+        var outer:=1.49
+        var verts:=[Vector3(sin(a)*inner,1.15+cos(a)*inner,-4.07),
+                    Vector3(sin(b)*inner,1.15+cos(b)*inner,-4.07),
+                    Vector3(sin(a)*outer,1.15+cos(a)*outer,-4.07),
+                    Vector3(sin(b)*outer,1.15+cos(b)*outer,-4.07)]
+        for v in [verts[0],verts[2],verts[1],verts[1],verts[2],verts[3]]:
+            tool.set_color(mid_color)
+            tool.add_vertex(v)
+    tool.generate_normals()
+    var arch:=MeshInstance3D.new()
+    arch.mesh=tool.commit()
+    var stone:=StandardMaterial3D.new()
+    stone.vertex_color_use_as_albedo=true
+    stone.cull_mode=BaseMaterial3D.CULL_DISABLED
+    stone.roughness=.95
+    arch.material_override=stone
+    house.add_child(arch)
 
 func _import(name: String, point: Vector3, factor: float) -> Node3D:
     var scene:=load("res://assets/models/%s.glb" % name) as PackedScene
@@ -368,12 +441,14 @@ func _farm_fields() -> void:
 func update_environment(time_of_day: float, night_lighting: float, weather_type: String, weather_strength: float, delta: float) -> void:
     day_factor=night_lighting
     sun.rotation_degrees=Vector3(-10.0-65.0*night_lighting, -35.0+time_of_day*5.0,0)
-    sun.light_energy=.10+1.50*night_lighting*(1.0-weather_strength*.35)
+    sun.light_energy=.10+.95*night_lighting*(1.0-weather_strength*.42)
     sun.light_color=Color("ffd49c").lerp(Color("e5eff7"),1.0-night_lighting)
     var env:=world_environment.environment
-    env.ambient_light_energy=.26+.70*night_lighting*(1.0-weather_strength*.27)
-    env.fog_density=.005 + (.018 if weather_type=="fog" else .007 if weather_type=="mist" else .002)*weather_strength
+    env.ambient_light_energy=.20+.45*night_lighting*(1.0-weather_strength*.30)
+    env.fog_density=.0023 + (.017 if weather_type=="fog" else .008 if weather_type=="mist" else .002)*weather_strength
     for lamp in lanterns:
         lamp.light_energy=1.4*(1.0-smoothstep(.3,.7,night_lighting))
+    for smoke in chimney_smoke:
+        smoke.emitting=weather_type not in ["heavy_rain", "storm"]
     if is_instance_valid(wheel):
         wheel.rotation.z+=delta*.23

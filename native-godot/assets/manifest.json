@@ -96,6 +96,38 @@
       "provenance": "ORIGINAL-GAME",
       "generator": "scripts/generate_models.py",
       "licensed_external_asset": false
+    },
+    {
+      "path": "assets/textures/grass_albedo.png",
+      "bytes": 526562,
+      "sha256": "fe0a1c933fc1051f56e220d2aa2e10d2aeb9ae90c5d74713a315fef55590b81c",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/make_pbr_ground.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/textures/grass_normal.png",
+      "bytes": 1005691,
+      "sha256": "e4b9fe8ccd8bfa039a99d18664d4025eba7952bec35494c9784239089ce924c7",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/make_pbr_ground.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/textures/path_albedo.png",
+      "bytes": 757254,
+      "sha256": "8f3a04247ccbc18431f08956a3c878aa336ea3fcb9eb20f7fd3a0cc1dc6fada7",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/make_pbr_ground.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/textures/path_normal.png",
+      "bytes": 1037893,
+      "sha256": "00db5783d03d4b8c83c3c48027d302a9c5fff3089d36282a0015cfc5f004f6de",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/make_pbr_ground.py",
+      "licensed_external_asset": false
     }
   ]
 }
