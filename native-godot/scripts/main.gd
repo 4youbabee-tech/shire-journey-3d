@@ -684,6 +684,7 @@ func _enter_cottage(entry: Array) -> void:
     cottage_interior.position=INTERIOR_ORIGIN
     add_child(cottage_interior)
     inside_cottage=true
+    frodo.footsteps.on_wood=true
     frodo.first_person=true
     shire.visible=false
     for key in npcs: npcs[key].visible=false
@@ -703,6 +704,7 @@ func _exit_cottage() -> void:
     if not inside_cottage:
         return
     inside_cottage=false
+    frodo.footsteps.on_wood=false
     frodo.position=exterior_return
     frodo.velocity=Vector3.ZERO
     frodo.yaw=PI
@@ -761,6 +763,7 @@ func _enter_bag_end() -> void:
     exterior_return = frodo.position
     camera_before_bag_end = frodo.first_person
     inside_bag_end = true
+    frodo.footsteps.on_wood=true
     frodo.first_person = true
     shire.visible = false
     for key in npcs:
@@ -782,6 +785,7 @@ func _exit_bag_end() -> void:
     if not inside_bag_end:
         return
     inside_bag_end = false
+    frodo.footsteps.on_wood=false
     frodo.position = exterior_return
     frodo.velocity = Vector3.ZERO
     frodo.yaw = PI
