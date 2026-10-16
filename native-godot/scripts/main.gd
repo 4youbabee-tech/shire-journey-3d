@@ -363,13 +363,14 @@ func _process(dt: float) -> void:
         save_game(false)
     if inside_bag_end or inside_cottage:
         top_label.text=("Bag End" if inside_bag_end else current_cottage_name)+" | منزل الهوبيت  •  "+clock.stamp()
+        quest_label.text="Explore Bag End | استكشف باغ إند" if inside_bag_end else "Explore this Hobbiton home | استكشف منزل الهوبيت"
         if start_notice_timer>0.0:
             start_notice_timer-=dt
         else:
             if inside_bag_end: _interior_prompt()
             else: _cottage_prompt()
         if int(elapsed_show)%2==0:
-            fps_label.text="%d fps | Bag End interior" % Engine.get_frames_per_second()
+            fps_label.text="%d fps | %s" % [Engine.get_frames_per_second(),"Bag End" if inside_bag_end else current_cottage_name]
         return
     var w:=weather.type_at(clock.elapsed)
     if last_npc_update>.10:
@@ -635,6 +636,7 @@ func _exit_cottage() -> void:
     current_cottage_name=""
     stream_audio.volume_db=-17.0
     _refresh_story_entities()
+    _update_quest()
     _show_notice("Back outside in Hobbiton","عدت إلى هوبيتون")
 
 func _cottage_prompt() -> void:
@@ -713,6 +715,7 @@ func _exit_bag_end() -> void:
         bag_end_interior = null
     stream_audio.volume_db = -17.0
     _refresh_story_entities()
+    _update_quest()
     _show_notice("Back in Hobbiton", "عدت إلى هوبيتون")
 
 func _interior_action() -> String:
