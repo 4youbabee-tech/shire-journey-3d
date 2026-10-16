@@ -1,6 +1,7 @@
 class_name ShirePlayer
 extends CharacterBody3D
 const AvatarScript = preload("res://scripts/shire_avatar.gd")
+const FootstepsScript=preload("res://scripts/shire_footsteps.gd")
 ## WASD + mouse, Shift sprint, Space jump, V camera. Frodo is original controlled actor.
 var speed := 5.2
 var gravity := 16.0
@@ -9,6 +10,7 @@ var yaw := 0.0
 var pitch := -0.18
 var visual : Node3D
 var avatar: ShireAvatar
+var footsteps: ShireFootsteps
 var camera : Camera3D
 var head_pivot : Node3D
 var body_parts : Array[Node3D] = []
@@ -30,6 +32,8 @@ func _ready() -> void:
     avatar.name="FrodoAvatar"
     visual.add_child(avatar)
     avatar.build("frodo",Color("7c513c"),13,true)
+    footsteps=FootstepsScript.new()
+    add_child(footsteps)
     head_pivot=Node3D.new()
     head_pivot.position=Vector3(0, 1.38, 0)
     add_child(head_pivot)
@@ -87,3 +91,4 @@ func _physics_process(dt: float) -> void:
     else:
         visual.position.y=move_toward(visual.position.y,0.0,dt*2.0)
     avatar.animate_walk(direction.length()>0.05,Time.get_ticks_msec()*.001,dt,0.0)
+    footsteps.tick(Vector2(velocity.x,velocity.z).length(),is_on_floor(),active,dt)
