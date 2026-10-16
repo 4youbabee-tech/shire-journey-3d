@@ -106,6 +106,8 @@ func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: f
             position.y=float(terrain_height.call(position.x,position.z))
         else:
             position.y=home.y if distance<=.3 else lerpf(position.y,target.y,minf(delta*2.0,1.0))
+    # Social encounters trigger short animated gestures without starting canonical dialogue.
+    body.social_gesture = not look_at_player and not walking and action in ["socializing","visiting"] and closeness < 26.0 and fposmod(game_seconds+float(seed_value)*.73,13.0)<2.5
     body.animate_walk(walking,game_seconds+float(seed_value)*.08,delta,closeness,follow_player)
     visible=closeness<100.0
     # This node is updated by the world scheduler; disabling _process does not stop its simulation.

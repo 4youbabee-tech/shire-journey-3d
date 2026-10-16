@@ -9,6 +9,19 @@ var is_imported := false
 var external_animation: AnimationPlayer
 var idle_clip := ""
 var walk_clip := ""
+var talk_clip := ""
+var greet_clip := ""
+var working_clip := ""
+var imported_visual: Node3D
+var face_mouth: MeshInstance3D
+var eyelids: Array[MeshInstance3D] = []
+var _facial_meshes: Array[MeshInstance3D] = []
+var emotion := "content"
+var speech_remaining := 0.0
+var speech_length := 0.0
+var speaking := false
+var social_gesture := false
+var _actor_seed := 0.0
 var playing_walk := false
 var _sphere_mesh: SphereMesh
 var _capsule_mesh: CapsuleMesh
@@ -26,7 +39,7 @@ func _mat(tint: Color, gloss: bool = false) -> StandardMaterial3D:
     _mats[id] = result
     return result
 
-func _piece(parent: Node3D, kind: int, at: Vector3, size: Vector3, tint: Color, gloss: bool = false) -> void:
+func _piece(parent: Node3D, kind: int, at: Vector3, size: Vector3, tint: Color, gloss: bool = false) -> MeshInstance3D:
     var part := MeshInstance3D.new()
     if kind == 1:
         part.mesh = _capsule_mesh
@@ -39,6 +52,7 @@ func _piece(parent: Node3D, kind: int, at: Vector3, size: Vector3, tint: Color, 
     part.material_override = _mat(tint, gloss)
     part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
     parent.add_child(part)
+    return part
 
 func _setup_meshes() -> void:
     _sphere_mesh = SphereMesh.new()
@@ -51,6 +65,7 @@ func _setup_meshes() -> void:
 
 func build(character_id: String, cloth: Color, seed_number: int, rich_detail: bool = false) -> void:
     _setup_meshes()
+    _actor_seed = float(seed_number)*0.47
     # Higher-detail freely licensed assets can be dropped in without modifying gameplay.
     # Never fetch an unlicensed actor likeness or film model.
     const CC0_HEROES := {"frodo":"Rogue", "sam":"Rogue", "bilbo":"Rogue_Hooded", "gandalf":"Mage"}
@@ -62,6 +77,7 @@ func build(character_id: String, cloth: Color, seed_number: int, rich_detail: bo
                 var scene: Node = (imported as PackedScene).instantiate()
                 if scene is Node3D:
                     add_child(scene)
+                    imported_visual = scene
                     scene.scale=Vector3.ONE*(0.7 if character_id!="gandalf" else 0.92)
                     is_imported = true
                     var animator: Node = scene.find_child("AnimationPlayer",true,false)
@@ -70,7 +86,13 @@ func build(character_id: String, cloth: Color, seed_number: int, rich_detail: bo
                         for clip in external_animation.get_animation_list():
                             if idle_clip.is_empty() and str(clip).to_lower().contains("idle"): idle_clip=str(clip)
                             if walk_clip.is_empty() and str(clip).to_lower().contains("walk"): walk_clip=str(clip)
+                            if talk_clip.is_empty() and ("talk" in str(clip).to_lower() or "interact" in str(clip).to_lower()): talk_clip=str(clip)
+                            if greet_clip.is_empty() and ("wave" in str(clip).to_lower() or "greet" in str(clip).to_lower()): greet_clip=str(clip)
+                            if working_clip.is_empty() and ("work" in str(clip).to_lower() or "look" in str(clip).to_lower()): working_clip=str(clip)
                         if not idle_clip.is_empty(): external_animation.play(idle_clip)
+                    for child in scene.find_children("*","MeshInstance3D",true,false):
+                        if child is MeshInstance3D and child.mesh != null and child.mesh.get_blend_shape_count() > 0:
+                            _facial_meshes.append(child)
                     return
                 scene.free()
     var hair_choices := [Color("33231b"),Color("553b29"),Color("7b5533"),Color("3c3028"),Color("976b3c")]
@@ -103,10 +125,13 @@ func build(character_id: String, cloth: Color, seed_number: int, rich_detail: bo
     for side in [-1.0,1.0]:
         _piece(face_detail,0,Vector3(side*.147,1.443,-.304),Vector3(.056,.055,.035),Color("fcf8e9"))
         _piece(face_detail,0,Vector3(side*.147,1.445,-.333),Vector3(.027,.035,.018),Color("342d28"),true)
+        var lid: MeshInstance3D = _piece(face_detail,0,Vector3(side*.147,1.443,-.348),Vector3(.068,.046,.023),skin)
+        lid.visible = false
+        eyelids.append(lid)
         _piece(face_detail,0,Vector3(side*.147,1.528,-.310),Vector3(.081,.023,.026),hair)
         _piece(face_detail,0,Vector3(side*.14,1.302,-.289),Vector3(.094,.052,.040),skin.lightened(.08))
     _piece(face_detail,0,Vector3(0,1.368,-.346),Vector3(.087,.090,.097),skin.darkened(.03))
-    _piece(face_detail,0,Vector3(0,1.245,-.343),Vector3(.090,.018,.021),Color("945f56"))
+    face_mouth = _piece(face_detail,0,Vector3(0,1.245,-.343),Vector3(.090,.018,.021),Color("945f56"))
     for index in range(5):
         var wave: float=float(index)-2.0
         _piece(face_detail,0,Vector3(wave*.12,1.635-absf(wave)*.034,-.21),Vector3(.15,.10,.20),hair)
@@ -127,14 +152,61 @@ func build(character_id: String, cloth: Color, seed_number: int, rich_detail: bo
         _piece(arm_pivot,0,Vector3(side*.03,-.53,-.01),Vector3(.14,.14,.15),skin)
     set_detail_range(0.0)
 
+func begin_speaking(mood_name: String, duration: float = 2.5) -> void:
+    emotion = mood_name
+    speaking = true
+    speech_remaining = clampf(duration, .4, 9.0)
+    speech_length = speech_remaining
+    social_gesture = false
+
+func end_speaking() -> void:
+    speaking = false
+    speech_remaining = 0.0
+    emotion = "content"
+
+func _face_pose(seconds: float, delta: float, distance: float) -> void:
+    var blink: bool = fposmod(seconds + _actor_seed, 5.35) < .12
+    var mouth_amount: float = 0.0
+    if speaking and speech_remaining > 0.0:
+        mouth_amount = .25 + absf(sin(seconds * 14.1 + _actor_seed))* .68
+    for lid in eyelids:
+        lid.visible = blink
+    if is_instance_valid(face_mouth):
+        face_mouth.scale.y = lerpf(face_mouth.scale.y, .018 + mouth_amount*.095, minf(delta*14.0,1.0))
+        var tilt: float = .075 if emotion == "warm" else -.065 if emotion in ["uneasy","distant"] else 0.0
+        face_mouth.rotation.z = lerpf(face_mouth.rotation.z, tilt, minf(delta*5.0,1.0))
+    for part in _facial_meshes:
+        var mesh = part.mesh
+        if mesh == null:
+            continue
+        for i in range(mesh.get_blend_shape_count()):
+            var channel: String=str(mesh.get_blend_shape_name(i)).to_lower()
+            var target: float=0.0
+            if "blink" in channel:
+                target = 1.0 if blink else 0.0
+            elif "smile" in channel or "happy" in channel:
+                target = .72 if emotion in ["warm","content"] and speaking else 0.0
+            elif "sad" in channel or "frown" in channel:
+                target = .6 if emotion in ["uneasy","wistful","distant"] else 0.0
+            elif "jaw" in channel or "mouth_open" in channel or "viseme" in channel:
+                target = mouth_amount
+            else:
+                continue
+            part.set_blend_shape_value(i,lerpf(part.get_blend_shape_value(i),target,minf(delta*10.0,1.0)))
+    if is_instance_valid(imported_visual):
+        var nod: float=.026*sin(seconds*4.1+_actor_seed) if speaking else .008*sin(seconds*1.2+_actor_seed)
+        imported_visual.rotation.x=lerpf(imported_visual.rotation.x,nod,minf(delta*4.0,1.0))
+
 func set_detail_range(distance: float) -> void:
     if face_detail != null:
         face_detail.visible = distance < 19.0
 
 func animate_walk(walking: bool, seconds: float, delta: float, distance: float, companion: bool = false) -> void:
+    speech_remaining=maxf(0.0,speech_remaining-delta)
+    _face_pose(seconds,delta,distance)
     if is_imported:
         if is_instance_valid(external_animation):
-            var clip: String = walk_clip if walking else idle_clip
+            var clip: String = walk_clip if walking else talk_clip if speech_remaining>0.0 and not talk_clip.is_empty() else greet_clip if social_gesture and not greet_clip.is_empty() else working_clip if social_gesture and not working_clip.is_empty() else idle_clip
             if not clip.is_empty() and external_animation.has_animation(clip):
                 if external_animation.current_animation != clip:
                     external_animation.play(clip,0.20)
@@ -143,7 +215,7 @@ func animate_walk(walking: bool, seconds: float, delta: float, distance: float, 
     if distance > 35.0:
         return
     var gait: float=seconds*(9.0 if companion else 6.0)
-    var amplitude: float=.43 if walking else .026
+    var amplitude: float=.43 if walking else .18 if speech_remaining>0.0 else .09 if social_gesture else .026
     for i in range(legs.size()):
         var phase: float=gait+float(i)*PI
         var swing: float=sin(phase)*amplitude

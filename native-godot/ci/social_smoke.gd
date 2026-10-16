@@ -83,6 +83,11 @@ func _run_smoke() -> void:
     var companion = load("res://scripts/shire_npc.gd").new()
     get_root().add_child(companion)
     companion.configure("sam", "Samwise Gamgee", "gardener", Vector3.ZERO, Vector3(8, 0, 8), Color("787b49"), 1)
+    companion.body.begin_speaking("warm",3.0)
+    if not companion.body.speaking or companion.body.speech_remaining<2.9:
+        push_error("NPC conversation performance not active")
+        quit(31)
+        return
     companion.follow_player = true
     if not companion.body.is_imported and (companion.legs.size() != 2 or companion.arms.size() != 2 or companion.body.get_child_count() < 8):
         push_error("NPC rigged limbs missing")
@@ -102,6 +107,11 @@ func _run_smoke() -> void:
     if walking_route.is_empty() or walking_route.back().distance_to(Vector2(41,8))>.001 or walking_route.size()<2:
         push_error("Road path between Bag End and Water Bridge missing")
         quit(21)
+        return
+    companion.body.end_speaking()
+    if companion.body.speaking or companion.body.speech_remaining>0.0:
+        push_error("NPC conversation performance did not stop")
+        quit(32)
         return
     companion.follow_player=false
     companion.home=Vector3.ZERO

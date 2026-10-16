@@ -515,6 +515,7 @@ func _begin_conversation(npc: ShireNPC) -> void:
     Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
     dialogue_panel.visible=true
     npc.look_at_player=true
+    npc.body.begin_speaking("content",1.2)
     dialogue_title.text=npc.display_name+"  •  "+npc.job
     dialogue_text.text="A neighbour waits to hear what you have to say."
     dialogue_ar.text="أحد أهل الشاير يصغي إلى حديثك."
@@ -544,6 +545,7 @@ func _choose_topic(topic: String) -> void:
     dialogue_title.text=str(reply["speaker"])
     dialogue_text.text=str(reply["en"])
     dialogue_ar.text=str(reply["ar"])
+    talking.body.begin_speaking(str(reply["mood"]),clampf(str(reply["en"]).length()/17.0,1.1,8.0))
     talking.remember(topic,clock.day_index(),7 if topic in ["friendship","favour"] else 3)
     _story_effect(talking.profile_id,"help" if topic=="favour" and str(social.favours.get(talking.profile_id,""))=="done" else topic)
     _topics()
@@ -576,7 +578,9 @@ func _story_effect(who: String,topic: String) -> void:
     _update_quest()
 
 func _end_conversation() -> void:
-    if is_instance_valid(talking):talking.look_at_player=false
+    if is_instance_valid(talking):
+        talking.look_at_player=false
+        talking.body.end_speaking()
     talking=null
     in_conversation=false
     dialogue_panel.visible=false

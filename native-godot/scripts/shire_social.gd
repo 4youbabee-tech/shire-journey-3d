@@ -89,6 +89,9 @@ func reply(npc: ShireNPC, topic: String, stage: int, day: int, hour: float, weat
             elif mood == "uneasy":
                 en = "That rain sounds fierce. Come out of the wind for a moment."
                 ar = "المطر شديد اليوم. تعالَ بعيداً عن الرياح قليلاً."
+            elif str(favours.get(id,"")) == "done":
+                en = "Frodo, you helped me before. I have not forgotten that kindness."
+                ar = "يا فرودو، ساعدتني من قبل. لم أنسَ تلك الطيبة."
             else:
                 en = "Hullo, Frodo. The lanes are pleasant when one has company."
                 ar = "أهلاً فرودو. تصبح الدروب أجمل برفقة الأصدقاء."
