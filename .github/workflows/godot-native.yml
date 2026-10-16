@@ -23,7 +23,7 @@ jobs:
           use-dotnet: false
           include-templates: true
       - name: Check Python asset dependencies
-        run: python3 -m pip install --user numpy trimesh pillow
+        run: python3 -m pip install --user numpy trimesh pillow pillow
       - name: Validate source, GLB and audio manifests
         run: python3 native-godot/tests/verify_native_release.py
       - name: Import assets and verify GDScript parse
