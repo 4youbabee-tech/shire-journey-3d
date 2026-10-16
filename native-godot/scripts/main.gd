@@ -11,7 +11,6 @@ const DialogueScript=preload("res://scripts/shire_dialogue.gd")
 const SocialScript=preload("res://scripts/shire_social.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
-var social: ShireSocial
 var shire: ShireWorld
 var frodo: ShirePlayer
 var clock: ShireClock
