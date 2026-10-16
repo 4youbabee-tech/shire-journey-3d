@@ -293,6 +293,8 @@ func _refresh_story_entities() -> void:
         npcs["bilbo"].visible=stage<5
     if npcs.has("gandalf"):
         npcs["gandalf"].visible=stage>=3
+    if npcs.has("sam"):
+        npcs["sam"].follow_player=stage>=7 and not inside_bag_end
 
 func _objective() -> String:
     match stage:
@@ -517,6 +519,7 @@ func _enter_bag_end() -> void:
         add_child(bag_end_interior)
     exterior_return = frodo.position
     inside_bag_end = true
+    frodo.first_person = true
     shire.visible = false
     for key in npcs:
         npcs[key].visible = false
@@ -642,6 +645,8 @@ func load_game() -> void:
     frodo._update_camera()
     if data.get("inside_bag_end",false)==true:
         _enter_bag_end()
+        frodo.first_person = true
+        frodo._update_camera()
     var restored: Dictionary=raw.get("npcs",{})
     for key in npcs:
         if restored.get(key) is Dictionary:
