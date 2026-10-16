@@ -69,6 +69,13 @@ func _run_smoke() -> void:
         push_error("Daily friendship cooldown not preserved after save/load")
         quit(7)
         return
+    if OS.get_environment("GITHUB_ACTIONS") == "true":
+        var floor_pbr: StandardMaterial3D=ShireSurfaceMaterials.floor_wood()
+        var plaster_pbr: StandardMaterial3D=ShireSurfaceMaterials.plaster_walls()
+        if floor_pbr.albedo_texture == null or floor_pbr.normal_texture == null or plaster_pbr.albedo_texture == null or plaster_pbr.normal_texture == null:
+            push_error("Interior photogrammetric floor/plaster PBR texture maps missing")
+            quit(38)
+            return
     # Bag End is an actual scene graph with reachable exploration hotspots.
     var interior = load("res://scripts/shire_bag_end.gd").new()
     get_root().add_child(interior)

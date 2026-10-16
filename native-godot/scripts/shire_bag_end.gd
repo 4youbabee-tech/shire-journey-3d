@@ -33,7 +33,14 @@ func _block(at: Vector3, size: Vector3, color: String, collision: bool = false) 
     var shape := BoxMesh.new()
     shape.size = size
     mesh.mesh = shape
-    mesh.material_override = _mat(color)
+    if color == "8c6847":
+        mesh.material_override = ShireSurfaceMaterials.floor_wood()
+    elif color in ["aa8e65","bc9d73","b99a70"]:
+        mesh.material_override = ShireSurfaceMaterials.plaster_walls()
+    elif color in ["5a3926","664329"]:
+        mesh.material_override = ShireSurfaceMaterials.wooden_trim()
+    else:
+        mesh.material_override = _mat(color)
     if collision:
         var static_body := StaticBody3D.new()
         static_body.position = at

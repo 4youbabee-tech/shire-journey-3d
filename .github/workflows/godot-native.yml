@@ -31,6 +31,8 @@ jobs:
         run: python3 native-godot/tools/vendor_cc0_furniture.py
       - name: Vendor Poly Haven CC0 PBR photogrammetry (1K)
         run: python3 native-godot/tools/vendor_polyhaven_realistic.py
+      - name: Vendor Poly Haven CC0 floor and plaster PBR textures
+        run: python3 native-godot/tools/vendor_polyhaven_surfaces.py
       - name: Validate source, GLB and audio manifests
         run: python3 native-godot/tests/verify_native_release.py
       - name: Import assets and verify GDScript parse

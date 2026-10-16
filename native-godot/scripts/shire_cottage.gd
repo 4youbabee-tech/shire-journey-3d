@@ -29,7 +29,14 @@ func _block(at: Vector3, size: Vector3, tint: String, solid: bool = false) -> vo
     var geom := BoxMesh.new()
     geom.size = size
     node.mesh = geom
-    node.material_override = _material(tint)
+    if tint == "936f4c":
+        node.material_override = ShireSurfaceMaterials.floor_wood()
+    elif tint in ["c5af85","b6ab87","c0a181"]:
+        node.material_override = ShireSurfaceMaterials.plaster_walls()
+    elif tint in ["71503a","8a613d","6a503c"]:
+        node.material_override = ShireSurfaceMaterials.wooden_trim()
+    else:
+        node.material_override = _material(tint)
     if solid:
         var fixed := StaticBody3D.new()
         fixed.position = at

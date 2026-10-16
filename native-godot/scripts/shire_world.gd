@@ -116,7 +116,10 @@ func sph(parent: Node3D, point: Vector3, scale_value: Vector3, tint: Color) -> M
     node.mesh=shape
     node.position=point
     node.scale=scale_value
-    node.material_override=material(tint)
+    if tint == Color("4b7234") or tint == Color("698845"):
+        node.material_override=ShireSurfaceMaterials.roof_turf()
+    else:
+        node.material_override=material(tint)
     parent.add_child(node)
     return node
 
