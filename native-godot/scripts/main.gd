@@ -316,11 +316,6 @@ func _process(dt: float) -> void:
         var rain_now:=weather.is_raining(clock.elapsed)
         for pet in animals:
             pet.tick(clock.hour_value(),rain_now,frodo.position,sim_time,clock.elapsed,shire)
-    if not in_conversation and not paused_by_user:
-        var discovered:Dictionary=social.discover(frodo.position,clock.day_index())
-        if not discovered.is_empty():
-            _show_notice("Discovered: "+str(discovered["name"]),"اكتشفت: "+str(discovered["ar"]))
-            save_game(false)
     if autosave>26.0:
         autosave=0.0
         save_game(false)
@@ -421,9 +416,9 @@ func _topics() -> void:
     for child in choices.get_children():
         child.queue_free()
     if not is_instance_valid(talking):return
-    for topic in social.available(talking,stage):
+    for topic in social.available(talking.profile_id,stage,clock.hour_value()):
         var btn:=Button.new()
-        btn.text=social.label(topic)
+        btn.text=social.option_label(topic)
         btn.custom_minimum_size=Vector2(790,29)
         btn.add_theme_font_size_override("font_size",14)
         choices.add_child(btn)
@@ -436,13 +431,11 @@ func _topics() -> void:
 
 func _choose_topic(topic: String) -> void:
     if not is_instance_valid(talking):return
-    var reply: Dictionary=social.answer(talking,topic,weather.type_at(clock.elapsed),clock.day_index(),stage,clock.hour_value())
+    var reply: Dictionary=social.reply(talking,topic,stage,clock.day_index(),clock.hour_value(),weather.type_at(clock.elapsed))
     dialogue_title.text=str(reply["speaker"])
     dialogue_text.text=str(reply["en"])
     dialogue_ar.text=str(reply["ar"])
-    var extra:Dictionary=social.take_action(talking,topic,clock.day_index())
     talking.remember(topic,clock.day_index(),7 if topic in ["friendship","favour"] else 3)
-    if not extra.is_empty():_show_notice(str(extra["en"]),str(extra["ar"]))
     _story_effect(talking.profile_id,"help" if topic=="favour" and str(social.favours.get(talking.profile_id,""))=="done" else topic)
     _topics()
     save_game(false)
@@ -491,7 +484,7 @@ func save_game(notify: bool=true) -> void:
         "flags":quest_flags.duplicate(true),"weather_seed":weather.seed,
         "player":{"pos":[frodo.position.x,frodo.position.y,frodo.position.z],"yaw":frodo.yaw,"camera_first":frodo.first_person},
         "npcs":people_state,"social":social.pack(),
-        "animals":animals.map(func(pet): return pet.pack()),"social":social.pack()}
+        "animals":animals.map(func(pet): return pet.pack())}
     var file:=FileAccess.open(SAVE_FILE,FileAccess.WRITE)
     if file:
         file.store_string(JSON.stringify(game_state))
@@ -515,7 +508,6 @@ func load_game() -> void:
         return
     social.unpack(raw.get("social",{}))
     clock.unpack(raw.get("clock",{}))
-    if raw.get("social",{}) is Dictionary:social.unpack(raw["social"])
     stage=clampi(int(raw.get("stage",0)),0,8)
     weather.seed=int(raw.get("weather_seed",3018))
     if raw.get("flags") is Dictionary:
