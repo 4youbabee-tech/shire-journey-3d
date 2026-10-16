@@ -76,6 +76,17 @@ func _run_smoke() -> void:
             push_error("Interior photogrammetric floor/plaster PBR texture maps missing")
             quit(38)
             return
+    # All six in-game Hobbiton houses receive the same detailed silhouette kit.
+    var facade = load("res://scripts/shire_architecture.gd")
+    var sample_house := Node3D.new()
+    get_root().add_child(sample_house)
+    var detail_count: int = facade.decorate(sample_house,true)
+    var details: Node=sample_house.get_node_or_null("ShireDetailedFacade")
+    if detail_count < 12 or details == null or details.get_node_or_null("DoorArchWeatheredStone") == null or details.get_node_or_null("DoorIronRivets") == null:
+        push_error("Detailed Hobbiton architecture is incomplete")
+        quit(40)
+        return
+    sample_house.free()
     # Bag End is an actual scene graph with reachable exploration hotspots.
     var interior = load("res://scripts/shire_bag_end.gd").new()
     get_root().add_child(interior)
