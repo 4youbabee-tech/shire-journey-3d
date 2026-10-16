@@ -264,6 +264,14 @@ func _hobbit_hole(where: Vector2, scale_factor: float, main_house: bool) -> void
     sph(house,Vector3(0,1.12,-.05),Vector3(4.0,1.9,3.8),Color("6e5438"))
     sph(house,Vector3(0,2.2,.85),Vector3(4.55,.83,3.8),Color("698845"))
     ShireArchitecture.decorate(house,main_house)
+    if main_house:
+        var path_to_crafted := "res://assets/models/bag_end_crafted_portal.glb"
+        if ResourceLoader.exists(path_to_crafted):
+            var packed_portal := load(path_to_crafted) as PackedScene
+            if packed_portal != null:
+                var crafted_portal := packed_portal.instantiate() as Node3D
+                crafted_portal.name = "BagEndCraftedPortalGLB"
+                house.add_child(crafted_portal)
     # Stone porch/facade with a true circular wooden door and arched frame.
     var door:=MeshInstance3D.new()
     var disk:=CylinderMesh.new()

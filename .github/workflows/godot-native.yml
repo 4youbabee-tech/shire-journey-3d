@@ -23,6 +23,27 @@ jobs:
           version: 4.4.1
           use-dotnet: false
           include-templates: true
+      - name: Author Bag End PBR portal in Blender and export GLB
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y blender
+          blender -b --factory-startup -t 2 --python native-godot/tools/blender_build_bag_end.py
+      - name: Validate new Blender geometry and provenance
+        run: python3 native-godot/tools/verify_blender_hero_art.py
+      - name: Upload native editable Blender file
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShireJourney-Editable-BagEnd-Blender
+          path: native-godot/assets/models/bag_end_crafted_portal.blend
+          retention-days: 14
+      - name: Upload actual production GLB with SHA256 provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShireJourney-Production-BagEnd-GLB
+          path: |
+            native-godot/assets/models/bag_end_crafted_portal.glb
+            native-godot/assets/models/bag_end_crafted_portal.source.json
+          retention-days: 14
       - name: Enforce shared cinematic chapter quality evidence contract
         run: python3 native-godot/tools/audit_quality_contract.py
       - name: Check Python asset dependencies
@@ -48,6 +69,8 @@ jobs:
         run: godot --headless --path native-godot --script res://ci/social_smoke.gd
       - name: Test Bag End and cottages through save-load transitions
         run: godot --headless --path native-godot --script res://ci/interior_integration_smoke.gd
+      - name: Verify new Blender GLB is inside the playable Godot world
+        run: godot --headless --path native-godot --script res://ci/hero_art_smoke.gd
       - name: Simulate opening scene for 120 frames
         run: godot --headless --path native-godot --quit-after 120
       - name: Capture in-engine screenshot via virtual display
@@ -93,3 +116,28 @@ jobs:
           Write-Host $output
           if ($LASTEXITCODE -ne 0) { throw "Windows game exited with code $LASTEXITCODE" }
           if ($output -match 'SCRIPT ERROR|Parse Error') { throw "Godot script error in Windows smoke" }
+  publish-blender-art:
+    if: github.event_name == 'push'
+    needs: [linux-import-smoke, windows-launch-smoke]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ShireJourney-Production-BagEnd-GLB
+          path: native-godot/assets/models
+      - name: Commit verified Blender GLB after both test jobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add native-godot/assets/models/bag_end_crafted_portal.glb native-godot/assets/models/bag_end_crafted_portal.source.json
+          if git diff --cached --quiet; then
+            echo "Already committed"
+          else
+            git commit -m "art: publish verified Blender-produced Bag End GLB"
+            git push origin HEAD:$GITHUB_REF_NAME
+          fi
