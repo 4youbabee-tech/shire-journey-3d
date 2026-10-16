@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ShireJourney-Editable-BagEnd-Blender
-          path: native-godot/assets/models/bag_end_crafted_portal.blend
+          path: blender-production/bag_end_crafted_portal.blend
           retention-days: 14
       - name: Upload actual production GLB with SHA256 provenance
         uses: actions/upload-artifact@v4
@@ -60,8 +60,19 @@ jobs:
         run: python3 native-godot/tests/verify_native_release.py
       - name: Import assets and verify GDScript parse
         run: |
-          set -o pipefail
-          godot --headless --path native-godot --import --quit 2>&1 | tee /tmp/shire-import.log
+          set -euo pipefail
+          # Godot's native .blend importer may spawn Blender again and stall a
+          # headless scene import. Keep editable Blender sources outside res://.
+          if find native-godot -type f -name '*.blend' | grep -q .; then
+            echo 'FAIL: .blend source present inside Godot project import root'
+            find native-godot -type f -name '*.blend'
+            exit 1
+          fi
+          # An isolated import should not silently occupy the whole job budget.
+          # --verbose makes the last asset being scanned visible in CI logs.
+          timeout --signal=INT --kill-after=20s 10m \
+            stdbuf -oL -eL godot --headless --verbose --path native-godot --import --quit \
+            2>&1 | tee /tmp/shire-import.log
           if grep -E 'SCRIPT ERROR|Parse Error|Compile Error' /tmp/shire-import.log; then exit 1; fi
       - name: Run native clock/weather smoke
         run: godot --headless --path native-godot --script res://ci/headless_smoke.gd
