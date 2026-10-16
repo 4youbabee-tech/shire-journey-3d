@@ -23,6 +23,15 @@ var speaking := false
 var social_gesture := false
 var _actor_seed := 0.0
 var playing_walk := false
+var animation_full_detail := true
+
+func set_animation_lod(high_detail: bool) -> void:
+    animation_full_detail=high_detail
+    if is_imported and is_instance_valid(external_animation):
+        external_animation.active=high_detail
+    if face_detail != null:
+        face_detail.visible=high_detail
+
 var _sphere_mesh: SphereMesh
 var _capsule_mesh: CapsuleMesh
 var _box_mesh: BoxMesh
@@ -203,7 +212,8 @@ func set_detail_range(distance: float) -> void:
 
 func animate_walk(walking: bool, seconds: float, delta: float, distance: float, companion: bool = false) -> void:
     speech_remaining=maxf(0.0,speech_remaining-delta)
-    _face_pose(seconds,delta,distance)
+    if animation_full_detail:
+        _face_pose(seconds,delta,distance)
     if is_imported:
         if is_instance_valid(external_animation):
             var clip: String = walk_clip if walking else talk_clip if speech_remaining>0.0 and not talk_clip.is_empty() else greet_clip if social_gesture and not greet_clip.is_empty() else working_clip if social_gesture and not working_clip.is_empty() else idle_clip
