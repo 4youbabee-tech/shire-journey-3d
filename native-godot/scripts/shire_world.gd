@@ -263,6 +263,7 @@ func _hobbit_hole(where: Vector2, scale_factor: float, main_house: bool) -> void
     sph(house,Vector3(0,.95,1.0),Vector3(4.8,2.0,4.3),Color("4b7234"))
     sph(house,Vector3(0,1.12,-.05),Vector3(4.0,1.9,3.8),Color("6e5438"))
     sph(house,Vector3(0,2.2,.85),Vector3(4.55,.83,3.8),Color("698845"))
+    ShireArchitecture.decorate(house,main_house)
     # Stone porch/facade with a true circular wooden door and arched frame.
     var door:=MeshInstance3D.new()
     var disk:=CylinderMesh.new()
