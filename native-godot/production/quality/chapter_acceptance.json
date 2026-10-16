@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "standard": "WHOLE_GAME_CINEMATIC_QUALITY_STANDARD.md",
+  "chapters": {
+    "chapter_01_shire": {
+      "name": "The Shire",
+      "status": "candidate_not_final",
+      "gates": {
+        "characters": {
+          "state": "pending",
+          "evidence": [],
+          "reviewer": null
+        },
+        "animation": {
+          "state": "pending",
+          "evidence": [],
+          "reviewer": null
+        },
+        "environment": {
+          "state": "pending",
+          "evidence": [],
+          "reviewer": null
+        },
+        "architecture_interiors": {
+          "state": "pending",
+          "evidence": [],
+          "reviewer": null
+        },
+        "materials_lighting_camera": {
+          "state": "pending",
+          "evidence": [],
+          "reviewer": null
+        },
+        "audio_voice": {
+          "state": "pending",
+          "evidence": [],
+          "reviewer": null
+        },
+        "npc_narrative": {
+          "state": "pending",
+          "evidence": [],
+          "reviewer": null
+        },
+        "gameplay_polish": {
+          "state": "pending",
+          "evidence": [],
+          "reviewer": null
+        },
+        "performance_stability": {
+          "state": "pending",
+          "evidence": [],
+          "reviewer": null
+        },
+        "legal_packaging": {
+          "state": "pending",
+          "evidence": [],
+          "reviewer": null
+        }
+      }
+    }
+  },
+  "future_chapters_policy": "Copy chapter_template.json; mandatory identical ten gates for every new chapter",
+  "whole_game": {
+    "state": "pending",
+    "end_to_end_evidence": []
+  },
+  "last_review_note": "Successful Godot/Windows CI does not establish cinematic fidelity."
+}
