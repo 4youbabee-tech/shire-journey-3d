@@ -12,6 +12,7 @@ var _materials: Dictionary = {}
 func _ready() -> void:
     _build()
     ShireLicensedProps.dress_bag_end(self)
+    ShirePhotorealProps.bag_end(self)
     _hearth_sound()
 
 func _mat(hex: String, rough: float = 0.87, glow: bool = false) -> StandardMaterial3D:

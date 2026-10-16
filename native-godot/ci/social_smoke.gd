@@ -192,6 +192,17 @@ func _run_smoke() -> void:
             push_error("CC0 cottage PBR furniture failed import")
             quit(35)
             return
+    if OS.get_environment("GITHUB_ACTIONS") == "true":
+        var bag_real: Node = interior.get_node_or_null("PhotorealPBRFurniture")
+        var cottage_real: Node = home.get_node_or_null("PhotorealPBRFurniture")
+        if bag_real == null or bag_real.get_child_count() < 2:
+            push_error("Poly Haven photoreal Bag End meshes not loaded")
+            quit(36)
+            return
+        if cottage_real == null or cottage_real.get_child_count() < 2:
+            push_error("Poly Haven cottage PBR textures or geometry not loaded")
+            quit(37)
+            return
     home.free()
     interior.free()
     npc.free()
