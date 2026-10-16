@@ -28,16 +28,6 @@
   ],
   "project_optimized_512": [
     {
-      "path": "assets/external/polyhaven_leafy_grass/diffuse_1k.jpg",
-      "bytes": 1195394,
-      "sha256": "cfa40bc9d9417d1852db8753a8d5917f110c40101179f63543c382e39bc05e4a"
-    },
-    {
-      "path": "assets/external/polyhaven_leafy_grass/normal_gl_1k.jpg",
-      "bytes": 1466049,
-      "sha256": "832328216adc0a7e1f70a31d5ee48c9ab7f2152d83816122736cf42ac4b2ebd6"
-    },
-    {
       "path": "assets/external/polyhaven_leafy_grass/diffuse_512.jpg",
       "bytes": 140079,
       "sha256": "8e2afea6f6b0f513bec99ff61b738bd9ea2c37e5312695be2ef9c80733e9f93c"
