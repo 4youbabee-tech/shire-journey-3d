@@ -55,6 +55,18 @@ func _initialize() -> void:
         push_error("Daily friendship cooldown not preserved after save/load")
         quit(7)
         return
+    # Bag End is an actual scene graph with reachable exploration hotspots.
+    var interior = load("res://scripts/shire_bag_end.gd").new()
+    get_root().add_child(interior)
+    if interior.get_child_count() < 25 or interior.interaction_at(interior.EXIT) != "exit":
+        push_error("Bag End interior scene or exit interaction missing")
+        quit(8)
+        return
+    if interior.interaction_at(interior.STUDY) != "study" or interior.interaction_at(interior.PANTRY) != "pantry" or interior.interaction_at(interior.HEARTH) != "hearth":
+        push_error("Bag End study/pantry/hearth hotspots unavailable")
+        quit(9)
+        return
+    interior.free()
     npc.free()
     print("PASS: memory, 54 villagers, bilingual dialogue, once-per-day relationship and favour persistence")
     quit(0)
