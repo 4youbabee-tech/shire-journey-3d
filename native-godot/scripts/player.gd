@@ -67,7 +67,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _update_camera() -> void:
     if not is_instance_valid(camera):
         return
-    camera.position=Vector3(0,0,0) if first_person else Vector3(0.7, 0.32, 4.2)
+    camera.position=Vector3(0,0,0) if first_person else Vector3(0.45, 1.15, 3.35)
     head_pivot.rotation.x=pitch
     visual.visible=not first_person
 

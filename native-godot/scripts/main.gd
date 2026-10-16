@@ -50,11 +50,11 @@ func _ready() -> void:
     shire.name="LivingHobbiton"
     add_child(shire)
     frodo=PlayerScript.new()
-    frodo.position=_ground(-20,-35)
+    frodo.position=_ground(-30,-36)
     frodo.position.y+=.25
     add_child(frodo)
-    frodo.yaw=PI
-    frodo.rotation.y=PI
+    frodo.yaw=2.71
+    frodo.rotation.y=2.71
     _people()
     _animals()
     _soundscape()
@@ -184,10 +184,16 @@ func _interface() -> void:
     prompt_label.custom_minimum_size=Vector2(1030,35)
     hud.add_child(prompt_label)
     tutorial_label=_text("WASD Move  •  Mouse Look  •  Shift Run  •  E Talk  •  V Camera  •  F5 Save  •  Esc Menu",13,Color("ead9bb"))
-    tutorial_label.position=Vector2(18,689)
+    tutorial_label.text="WASD Move   ·   E Talk   ·   V Camera   ·   Shift Run   ·   F5 Save   ·   Esc Menu"
+    tutorial_label.position=Vector2(18,682)
+    tutorial_label.custom_minimum_size=Vector2(1070,26)
+    tutorial_label.autowrap_mode=TextServer.AUTOWRAP_OFF
     hud.add_child(tutorial_label)
     fps_label=_text("",13,Color("ddd9b0"))
-    fps_label.position=Vector2(1135,24)
+    fps_label.position=Vector2(1030,24)
+    fps_label.custom_minimum_size=Vector2(225,24)
+    fps_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
+    fps_label.autowrap_mode=TextServer.AUTOWRAP_OFF
     hud.add_child(fps_label)
     dialogue_panel=_style_panel(Color(.07,.095,.085,.96))
     dialogue_panel.position=Vector2(190,410)
@@ -230,9 +236,9 @@ func _menu_choice(item: String) -> void:
         "New Journey":
             _pause(false)
             _new_game()
-            frodo.position=_ground(-20,-35)+Vector3.UP*.25
-            frodo.yaw=PI
-            frodo.rotation.y=PI
+            frodo.position=_ground(-30,-36)+Vector3.UP*.25
+            frodo.yaw=2.71
+            frodo.rotation.y=2.71
 
 func _pause(value: bool) -> void:
     paused_by_user=value
