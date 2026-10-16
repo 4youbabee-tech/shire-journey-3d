@@ -1,0 +1,45 @@
+name: Native Godot Chapter I - verify and Windows export
+on:
+  push:
+    branches:
+      - production/godot-native-*
+    paths:
+      - 'native-godot/**'
+      - '.github/workflows/godot-native.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-import-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.4.1
+          use-dotnet: false
+          include-templates: true
+      - name: Check Python asset dependencies
+        run: python3 -m pip install --user numpy trimesh
+      - name: Validate source, GLB and audio manifests
+        run: python3 native-godot/tests/verify_native_release.py
+      - name: Import assets and verify GDScript parse
+        run: godot --headless --path native-godot --import --quit
+      - name: Run native clock/weather smoke
+        run: godot --headless --path native-godot --script res://ci/headless_smoke.gd
+      - name: Simulate opening scene for 120 frames
+        run: godot --headless --path native-godot --quit-after 120
+      - name: Export Windows executable
+        run: |
+          mkdir -p native-godot/dist
+          godot --headless --path native-godot --export-release 'Windows Desktop' 'dist/ShireJourney.exe'
+          test -s native-godot/dist/ShireJourney.exe
+      - name: Upload Windows candidate (not performance validated)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShireJourney-Godot4-Windows-Candidate
+          path: native-godot/dist/*
+          retention-days: 14
