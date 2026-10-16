@@ -11,6 +11,7 @@ var _materials: Dictionary = {}
 
 func _ready() -> void:
     _build()
+    _hearth_sound()
 
 func _mat(hex: String, rough: float = 0.87, glow: bool = false) -> StandardMaterial3D:
     var key := hex + str(rough) + str(glow)
@@ -45,7 +46,7 @@ func _block(at: Vector3, size: Vector3, color: String, collision: bool = false) 
         mesh.position = at
         add_child(mesh)
 
-func _round(at: Vector3, radius: float, height: float, color: String, sideways: bool = false) -> void:
+func _round(at: Vector3, radius: float, height: float, color: String, sideways: bool = false, solid: bool = false) -> void:
     var mesh := MeshInstance3D.new()
     var cyl := CylinderMesh.new()
     cyl.top_radius = radius
@@ -57,7 +58,20 @@ func _round(at: Vector3, radius: float, height: float, color: String, sideways: 
     if sideways:
         mesh.rotation.x = PI / 2.0
     mesh.material_override = _mat(color)
-    add_child(mesh)
+    if solid:
+        var static_body := StaticBody3D.new()
+        static_body.position = at
+        add_child(static_body)
+        mesh.position = Vector3.ZERO
+        static_body.add_child(mesh)
+        var collider := CollisionShape3D.new()
+        var cylinder := CylinderShape3D.new()
+        cylinder.radius = radius
+        cylinder.height = height
+        collider.shape = cylinder
+        static_body.add_child(collider)
+    else:
+        add_child(mesh)
 
 func _sphere(at: Vector3, size: Vector3, color: String) -> void:
     var mesh := MeshInstance3D.new()
@@ -75,6 +89,39 @@ func _light(at: Vector3, strength: float = 1.4) -> void:
     light.omni_range = 9.0
     light.shadow_enabled = false
     add_child(light)
+
+func _hearth_sound() -> void:
+    # Original procedurally synthesized fire; no downloaded film samples.
+    const RATE := 16000
+    const SECONDS := 2
+    var raw := PackedByteArray()
+    raw.resize(RATE * SECONDS * 2)
+    var random := RandomNumberGenerator.new()
+    random.seed = 940172
+    var low_noise := 0.0
+    var snap := 0.0
+    for frame in range(RATE * SECONDS):
+        low_noise = low_noise * 0.96 + random.randf_range(-1.0, 1.0) * 0.04
+        if random.randf() < 0.002:
+            snap = random.randf_range(-1.0, 1.0)
+        snap *= 0.84
+        var sample := clampf(low_noise * 0.19 + snap * 0.26, -0.85, 0.85)
+        raw.encode_s16(frame * 2, int(sample * 32767.0))
+    var stream := AudioStreamWAV.new()
+    stream.format = AudioStreamWAV.FORMAT_16_BITS
+    stream.mix_rate = RATE
+    stream.stereo = false
+    stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+    stream.data = raw
+    var hearth_audio := AudioStreamPlayer3D.new()
+    hearth_audio.name = "HearthFireOriginalAudio"
+    hearth_audio.stream = stream
+    hearth_audio.position = Vector3(0.0, 1.0, -4.9)
+    hearth_audio.max_distance = 12.0
+    hearth_audio.unit_size = 2.5
+    hearth_audio.volume_db = -12.0
+    add_child(hearth_audio)
+    hearth_audio.play()
 
 func _build() -> void:
     name = "BagEndInterior"
@@ -104,7 +151,7 @@ func _build() -> void:
     _round(Vector3(0, 1.35, 6.87), 1.30, 0.12, "416c35", true)
     _sphere(Vector3(0.65, 1.32, 6.70), Vector3(0.11, 0.11, 0.11), "d4a352")
     # Living room: usable central table, hearth, shelves and domestic props.
-    _round(Vector3(-0.65, 0.86, 0.15), 1.1, 0.16, "745034")
+    _round(Vector3(-0.65, 0.86, 0.15), 1.1, 0.16, "745034", false, true)
     for x in [-1.30, 0.0]:
         for z in [-0.35, 0.65]:
             _block(Vector3(x, 0.40, z), Vector3(0.18, 0.8, 0.19), "513522")
@@ -122,7 +169,7 @@ func _build() -> void:
         for y in [0.65, 1.35, 2.05]:
             _block(Vector3(2.79, y, z), Vector3(0.65, 0.09, 1.7), "9b7545")
     # Study/bedroom: writing desk, book collection, sleeping place.
-    _block(Vector3(-6.35, 0.88, -1.2), Vector3(2.1, 0.19, 1.2), "765035")
+    _block(Vector3(-6.35, 0.88, -1.2), Vector3(2.1, 0.19, 1.2), "765035", true)
     for x in [-7.1, -5.6]:
         _block(Vector3(x, 0.42, -1.2), Vector3(0.18, 0.82, 0.18), "513522")
     _block(Vector3(-6.35, 0.99, -1.35), Vector3(0.6, 0.06, 0.42), "e1cb9e")
@@ -132,12 +179,12 @@ func _build() -> void:
         for i in range(9):
             var shades := ["7a4734", "59705e", "bd985c", "525d7e"]
             _block(Vector3(-8.25 + i * 0.22, shelf + 0.2, -4.67), Vector3(0.15, 0.32, 0.3), shades[i % shades.size()])
-    _block(Vector3(-6.1, 0.43, 4.3), Vector3(2.95, 0.65, 2.0), "6c4d35")
+    _block(Vector3(-6.1, 0.43, 4.3), Vector3(2.95, 0.65, 2.0), "6c4d35", true)
     _block(Vector3(-6.1, 0.81, 4.3), Vector3(2.7, 0.16, 1.78), "a59775")
     _block(Vector3(-6.1, 0.93, 5.05), Vector3(1.3, 0.18, 0.53), "e7d9af")
     _light(Vector3(-6.0, 2.7, -0.2), 1.0)
     # Pantry/kitchen: table, barrels, hanging copper cookware and cupboards.
-    _block(Vector3(6.1, 0.93, -0.5), Vector3(2.3, 0.20, 1.3), "8b643d")
+    _block(Vector3(6.1, 0.93, -0.5), Vector3(2.3, 0.20, 1.3), "8b643d", true)
     for x in [5.25, 6.95]:
         for z in [-0.95, -0.05]:
             _block(Vector3(x, 0.46, z), Vector3(0.20, 0.90, 0.21), "57402c")
