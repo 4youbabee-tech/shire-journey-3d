@@ -16,6 +16,18 @@ func _capture() -> void:
         push_error("Godot did not initialize Chapter I")
         quit(3)
         return
+    # CI's interior save/load smoke can leave a user:// save; never photograph a stale location.
+    game.call("_new_game")
+    var player = game.get("frodo")
+    player.position = game.call("_ground",-30.0,-36.0) + Vector3(0,.25,0)
+    player.yaw = 2.71
+    player.rotation.y = 2.71
+    player.first_person = false
+    player._update_camera()
+    if game.get("inside_bag_end") == true or game.get("inside_cottage") == true:
+        push_error("Exterior capture still inside an interior")
+        quit(7)
+        return
     DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://dist"))
     if not await _save_frame("in_engine_hobbiton.png"):
         quit(4)

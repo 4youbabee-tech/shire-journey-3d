@@ -4,6 +4,10 @@ func _initialize() -> void:
     call_deferred("_run")
 
 func _run() -> void:
+    if OS.get_environment("GITHUB_ACTIONS") != "true":
+        push_error("Interior save/load smoke must run only in isolated GitHub Actions")
+        quit(39)
+        return
     if change_scene_to_file("res://scenes/Main.tscn") != OK:
         push_error("Cannot instantiate chapter for interior integration test")
         quit(30)
