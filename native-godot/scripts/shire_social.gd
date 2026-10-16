@@ -126,7 +126,6 @@ func reply(npc: ShireNPC, topic: String, stage: int, day: int, hour: float, weat
                 ar = "هكذا زال هم صغير. أشكرك على وقتك."
                 relationship_change(id, "trust", 6)
                 relationship_change(id, "respect", 3)
-                wisdom += 1
                 record("kindness_" + id, "Helped " + who, "ساعدت " + who, day)
             else:
                 favours[id] = "offered"
