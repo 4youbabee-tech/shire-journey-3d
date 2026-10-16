@@ -14,9 +14,11 @@ const ActivityScript=preload("res://scripts/shire_activities.gd")
 const MapScript=preload("res://scripts/shire_map.gd")
 const CottageScript=preload("res://scripts/shire_cottage.gd")
 const SoundZoneScript=preload("res://scripts/shire_sound_zones.gd")
+const DiscoveriesScript=preload("res://scripts/shire_discoveries.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
 var activities: ShireActivities
+var discoveries: ShireDiscoveries
 var shire: ShireWorld
 var frodo: ShirePlayer
 var clock: ShireClock
@@ -91,6 +93,7 @@ const LANDMARKS = [
 func _ready() -> void:
     social=SocialScript.new()
     activities=ActivityScript.new()
+    discoveries=DiscoveriesScript.new()
     clock=ClockScript.new()
     weather=WeatherScript.new()
     shire=WorldScript.new()
@@ -123,6 +126,7 @@ func _new_game() -> void:
         _exit_cottage()
     stage=0
     activities.reset()
+    discoveries.reset()
     for station in ShireActivities.STATIONS:
         shire.set_party_prepared(str(station["id"]),false)
     quest_flags={"market_supplies":false,"sam_joined":false}
@@ -446,6 +450,10 @@ func _interaction_prompt() -> void:
     if not party_station.is_empty():
         prompt_label.text="[E] %s | %s (%d/3)" % [party_station["en"],party_station["ar"],activities.progress()]
         return
+    var site: Dictionary=discoveries.nearest(frodo.position,inside_bag_end or inside_cottage)
+    if not site.is_empty():
+        prompt_label.text="[E] %s | %s" % [str(site["en"]),str(site["ar"])]
+        return
     interact_npc=_nearest_npc()
     if interact_npc:
         prompt_label.text="[E] Talk to %s | تحدث معه  •  %s" % [interact_npc.display_name,interact_npc.action]
@@ -489,10 +497,23 @@ func _unhandled_input(event: InputEvent) -> void:
                 _prepare_party_station(str(party_station["id"]))
                 get_viewport().set_input_as_handled()
             else:
-                var npc:=_nearest_npc()
-                if npc:
-                    _begin_conversation(npc)
+                var site: Dictionary=discoveries.nearest(frodo.position)
+                if not site.is_empty():
+                    _discover_landmark(str(site["id"]))
                     get_viewport().set_input_as_handled()
+                else:
+                    var npc:=_nearest_npc()
+                    if npc:
+                        _begin_conversation(npc)
+                        get_viewport().set_input_as_handled()
+
+func _discover_landmark(id: String) -> void:
+    var note: Dictionary=discoveries.discover(id)
+    if note.is_empty():
+        return
+    social.record("shire_discovery_"+id,str(note["en"]),str(note["ar"]),clock.day_index())
+    _show_notice(str(note["en"]),str(note["ar"]))
+    save_game(false)
 
 func _prepare_party_station(id: String) -> void:
     var outcome: Dictionary=activities.prepare(id,stage)
@@ -776,7 +797,7 @@ func save_game(notify: bool=true) -> void:
         "schema":2,"clock":clock.pack(),"stage":stage,
         "flags":quest_flags.duplicate(true),"weather_seed":weather.seed,
         "player":{"pos":[saved_player_pos.x,saved_player_pos.y,saved_player_pos.z],"yaw":frodo.yaw,"camera_first":camera_before_bag_end if (inside_bag_end or inside_cottage) else frodo.first_person,"inside_bag_end":inside_bag_end,"inside_cottage":inside_cottage,"cottage_id":current_cottage_id},
-        "npcs":people_state,"social":social.pack(),"activities":activities.pack(),
+        "npcs":people_state,"social":social.pack(),"activities":activities.pack(),"discoveries":discoveries.pack(),
         "animals":animals.map(func(pet): return pet.pack())}
     var file:=FileAccess.open(SAVE_FILE,FileAccess.WRITE)
     if file:
@@ -805,6 +826,7 @@ func load_game() -> void:
         _exit_cottage()
     social.unpack(raw.get("social",{}))
     activities.unpack(raw.get("activities",{}))
+    discoveries.unpack(raw.get("discoveries",{}))
     for station in ShireActivities.STATIONS:
         var id: String=str(station["id"])
         shire.set_party_prepared(id,activities.is_prepared(id))

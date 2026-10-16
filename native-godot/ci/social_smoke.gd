@@ -87,6 +87,21 @@ func _run_smoke() -> void:
         quit(40)
         return
     sample_house.free()
+    var lore=load("res://scripts/shire_discoveries.gd").new()
+    for site in lore.SITES:
+        var centre: Vector2=site["pos"]
+        var found: Dictionary=lore.nearest(Vector3(centre.x,0,centre.y))
+        if found.is_empty():
+            push_error("World discovery site unreachable")
+            quit(41)
+            return
+        lore.discover(str(found["id"]))
+    var restored_lore=load("res://scripts/shire_discoveries.gd").new()
+    restored_lore.unpack(lore.pack())
+    if restored_lore.seen.size() != lore.SITES.size() or not restored_lore.nearest(Vector3(35,0,8)).is_empty():
+        push_error("Environmental discovery memory failed")
+        quit(42)
+        return
     # Bag End is an actual scene graph with reachable exploration hotspots.
     var interior = load("res://scripts/shire_bag_end.gd").new()
     get_root().add_child(interior)
