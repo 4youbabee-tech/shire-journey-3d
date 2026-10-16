@@ -173,6 +173,28 @@ func _run_smoke() -> void:
         push_error("Road path between Bag End and Water Bridge missing")
         quit(21)
         return
+    # Distant villagers must advance in bounded coarser ticks, with visual rig paused.
+    companion.follow_player=false
+    companion.look_at_player=false
+    companion.position=Vector3(-60,2,0)
+    companion.home=Vector3(-60,2,0)
+    companion.work=Vector3(20,2,0)
+    companion.update_schedule(10.0,false,Vector3(80,2,0),.1,61.0)
+    var before_far: int=companion._simulation_steps
+    if companion.body.visible or companion.body.animation_full_detail:
+        push_error("Offscreen character failed visual LOD")
+        quit(52)
+        return
+    companion.update_schedule(10.0,false,Vector3(80,2,0),.7,62.0)
+    if companion._simulation_steps <= before_far:
+        push_error("Offscreen character schedule stopped completely")
+        quit(53)
+        return
+    companion.update_schedule(10.0,false,Vector3(-60,2,0),.1,63.0)
+    if not companion.body.visible or not companion.body.animation_full_detail:
+        push_error("Near character did not restore animated rig")
+        quit(54)
+        return
     companion.body.end_speaking()
     if companion.body.speaking or companion.body.speech_remaining>0.0:
         push_error("NPC conversation performance did not stop")
