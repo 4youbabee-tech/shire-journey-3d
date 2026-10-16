@@ -11,6 +11,7 @@ var wheel : Node3D
 var lanterns : Array[OmniLight3D] = []
 var chimney_smoke : Array[CPUParticles3D] = []
 var party_decorations: Dictionary = {}
+var party_stations: Dictionary = {}
 var rainfall: CPUParticles3D
 var weather_particles : Array[MeshInstance3D] = []
 var rng:=RandomNumberGenerator.new()
@@ -415,6 +416,7 @@ func _party_field() -> void:
         var site := Node3D.new()
         site.name = id
         site.position = Vector3(x,elevation(x,z),z)
+        party_stations[id] = site
         add_child(site)
         box(site,Vector3(0,.75,0),Vector3(2.25,.16,1.25),entry[3])
         for side in [-.84,.84]:
@@ -440,6 +442,11 @@ func _party_field() -> void:
                 box(decorations,Vector3(px,1.15,0),Vector3(.2,.32,.22),Color("dcab52"))
                 sph(decorations,Vector3(px,1.38,0),Vector3(.15,.14,.15),Color("f3d998"))
 
+
+func set_party_era(birthday_era: bool) -> void:
+    for id in party_stations:
+        if is_instance_valid(party_stations[id]):
+            party_stations[id].visible=birthday_era
 
 func set_party_prepared(id: String, ready: bool) -> void:
     if party_decorations.has(id) and is_instance_valid(party_decorations[id]):

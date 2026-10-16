@@ -326,6 +326,7 @@ func _refresh_story_entities() -> void:
         npcs["gandalf"].visible=stage>=3
     if npcs.has("sam"):
         npcs["sam"].follow_player=stage>=7 and not inside_bag_end
+    shire.set_party_era(stage<5)
 
 func _objective() -> String:
     match stage:
