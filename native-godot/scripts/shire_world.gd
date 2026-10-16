@@ -1,0 +1,378 @@
+class_name ShireWorld
+extends Node3D
+## Original authored 3D Hobbiton scene: curved terrain, earth homes, water, mill, market, party tree.
+## All GLB meshes in assets/models are newly generated meshes, not external copyrighted artwork.
+const SIZE := 105
+const STEP := 2.0
+var sun : DirectionalLight3D
+var world_environment : WorldEnvironment
+var river : MeshInstance3D
+var wheel : Node3D
+var lanterns : Array[OmniLight3D] = []
+var weather_particles : Array[MeshInstance3D] = []
+var rng:=RandomNumberGenerator.new()
+var materials: Dictionary={}
+var drawn : Array[Node3D]=[]
+var day_factor:=1.0
+
+func elevation(x: float,z: float) -> float:
+    var roll:=2.0*sin(x*.029)*cos(z*.024)+1.3*sin(x*.066+z*.019)+.7*cos(z*.081)
+    var bag_hill:=5.5*exp(-((x+24)*(x+24)+(z+21)*(z+21))/750.0)
+    return roll+bag_hill
+
+func material(color: Color, roughness: float=.86) -> StandardMaterial3D:
+    var key: String=str(color.to_html())+str(roughness)
+    if materials.has(key):return materials[key]
+    var m:=StandardMaterial3D.new()
+    m.albedo_color=color
+    m.roughness=roughness
+    materials[key]=m
+    return m
+
+func _ready() -> void:
+    rng.seed=3018
+    _lighting()
+    _terrain()
+    _lanes()
+    _water()
+    _hobbit_hole(Vector2(-24,-20),1.65,true)
+    _hobbit_hole(Vector2(-44,-26),1.16,false)
+    _hobbit_hole(Vector2(-45,-3),1.12,false)
+    _hobbit_hole(Vector2(-18,-39),1.18,false)
+    _hobbit_hole(Vector2(2,30),.97,false)
+    _hobbit_hole(Vector2(18,28),1.17,false)
+    _farm_fields()
+    _market()
+    _watermill()
+    _bridge()
+    _party_field()
+    _trees()
+    _grass_and_flowers()
+    _lantern_posts()
+
+func _lighting() -> void:
+    world_environment=WorldEnvironment.new()
+    add_child(world_environment)
+    var env:=Environment.new()
+    env.background_mode=Environment.BG_SKY
+    var sky:=Sky.new()
+    var atmosphere:=ProceduralSkyMaterial.new()
+    atmosphere.sky_top_color=Color("618bb0")
+    atmosphere.sky_horizon_color=Color("cce4d0")
+    atmosphere.ground_bottom_color=Color("4f654b")
+    sky.sky_material=atmosphere
+    env.sky=sky
+    env.ambient_light_source=Environment.AMBIENT_SOURCE_SKY
+    env.reflected_light_source=Environment.REFLECTION_SOURCE_BG
+    env.tonemap_mode=Environment.TONE_MAPPER_FILMIC
+    env.fog_enabled=true
+    env.fog_density=.005
+    env.fog_light_color=Color("a9bcb0")
+    world_environment.environment=env
+    sun=DirectionalLight3D.new()
+    sun.rotation_degrees=Vector3(-38,-32,0)
+    sun.light_color=Color("ffdfaa")
+    sun.light_energy=1.4
+    sun.shadow_enabled=true
+    sun.directional_shadow_max_distance=65.0
+    add_child(sun)
+
+func box(parent: Node3D, point: Vector3, scale_value: Vector3, tint: Color, turn: float=0.0) -> MeshInstance3D:
+    var node:=MeshInstance3D.new()
+    var mesh:=BoxMesh.new()
+    mesh.size=scale_value
+    node.mesh=mesh
+    node.position=point
+    node.rotation.y=turn
+    node.material_override=material(tint)
+    parent.add_child(node)
+    return node
+
+func sph(parent: Node3D, point: Vector3, scale_value: Vector3, tint: Color) -> MeshInstance3D:
+    var node:=MeshInstance3D.new()
+    var shape:=SphereMesh.new()
+    shape.radial_segments=20
+    shape.rings=12
+    node.mesh=shape
+    node.position=point
+    node.scale=scale_value
+    node.material_override=material(tint)
+    parent.add_child(node)
+    return node
+
+func _terrain() -> void:
+    var tool:=SurfaceTool.new()
+    tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+    var half=float(SIZE)*STEP*.5
+    for ix in range(SIZE):
+        for iz in range(SIZE):
+            var x=-half+float(ix)*STEP
+            var z=-half+float(iz)*STEP
+            var a=Vector3(x,elevation(x,z),z)
+            var b=Vector3(x+STEP,elevation(x+STEP,z),z)
+            var c=Vector3(x+STEP,elevation(x+STEP,z+STEP),z+STEP)
+            var d=Vector3(x,elevation(x,z+STEP),z+STEP)
+            for v in [a,d,b,b,d,c]:
+                var hue=.045*sin(v.x*.11+v.z*.05)+.05*cos(v.z*.19)
+                var color:=Color(.26+hue,.39+hue,.19+hue*.7)
+                tool.set_color(color)
+                tool.set_uv(Vector2(v.x,v.z)*.05)
+                tool.add_vertex(v)
+    tool.generate_normals()
+    var mesh:=tool.commit()
+    var node:=MeshInstance3D.new()
+    node.mesh=mesh
+    var grassy:=StandardMaterial3D.new()
+    grassy.vertex_color_use_as_albedo=true
+    grassy.roughness=.94
+    node.material_override=grassy
+    add_child(node)
+    var collider:=StaticBody3D.new()
+    collider.name="WalkableTerrain"
+    add_child(collider)
+    var shape:=CollisionShape3D.new()
+    shape.shape=mesh.create_trimesh_shape()
+    collider.add_child(shape)
+
+func _path(a: Vector2,b: Vector2,width: float) -> void:
+    var length:=a.distance_to(b)
+    var dir:=(b-a).normalized()
+    var normal:=Vector2(-dir.y,dir.x)
+    var steps:=maxi(2,int(length/2.0))
+    var surface:=SurfaceTool.new()
+    surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+    for i in range(steps):
+        var p:=a.lerp(b,float(i)/steps)
+        var q:=a.lerp(b,float(i+1)/steps)
+        var p1:=p+normal*width*.5
+        var p2:=p-normal*width*.5
+        var q1:=q+normal*width*.5
+        var q2:=q-normal*width*.5
+        for v in [p1,q1,p2,p2,q1,q2]:
+            surface.add_vertex(Vector3(v.x,elevation(v.x,v.y)+.06,v.y))
+    surface.generate_normals()
+    var node:=MeshInstance3D.new()
+    node.mesh=surface.commit()
+    node.material_override=material(Color("907752"))
+    add_child(node)
+
+func _lanes() -> void:
+    _path(Vector2(-24,-19),Vector2(-21,-10),2.5)
+    _path(Vector2(-21,-10),Vector2(-9,-4),3)
+    _path(Vector2(-9,-4),Vector2(17,8),3)
+    _path(Vector2(17,8),Vector2(41,8),3)
+    _path(Vector2(-9,-4),Vector2(-3,25),2.3)
+    _path(Vector2(-3,25),Vector2(9,65),2.6)
+    _path(Vector2(-9,-4),Vector2(-44,-3),1.7)
+    _path(Vector2(17,8),Vector2(31,-17),2.4)
+
+func _river_x(z: float) -> float:
+    return 42+4*sin(z*.048)
+
+func _water() -> void:
+    var surface:=SurfaceTool.new()
+    surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+    for i in range(105):
+        var z=-100.0+float(i)*2.0
+        var z2=z+2.0
+        var x=_river_x(z)
+        var x2=_river_x(z2)
+        for v in [Vector3(x-3,elevation(x,z)+.12,z),Vector3(x2+3,elevation(x2,z2)+.12,z2),Vector3(x+3,elevation(x,z)+.12,z),
+                  Vector3(x-3,elevation(x,z)+.12,z),Vector3(x2-3,elevation(x2,z2)+.12,z2),Vector3(x2+3,elevation(x2,z2)+.12,z2)]:
+            surface.set_uv(Vector2(v.x,v.z)*.06)
+            surface.add_vertex(v)
+    river=MeshInstance3D.new()
+    river.mesh=surface.commit()
+    var water:=ShaderMaterial.new()
+    var code="shader_type spatial; render_mode blend_mix, cull_disabled, depth_draw_opaque; uniform vec4 water_color : source_color = vec4(0.13,0.39,0.46,0.82); void fragment() { float r = sin(UV.x * 52.0 + TIME * 1.0) * 0.06 + sin(UV.y * 83.0 - TIME * 0.9) * 0.04; ALBEDO = water_color.rgb + vec3(r); ROUGHNESS = 0.13; METALLIC=0.03; ALPHA = water_color.a; }"
+    water.shader=Shader.new()
+    water.shader.code=code
+    river.material_override=water
+    add_child(river)
+
+func _hobbit_hole(where: Vector2, scale_factor: float, main_house: bool) -> void:
+    var center:=Vector3(where.x,elevation(where.x,where.y),where.y)
+    var house:=Node3D.new()
+    house.position=center
+    house.scale=Vector3.ONE*scale_factor
+    house.name="BagEnd" if main_house else "HobbitHouse"
+    add_child(house)
+    sph(house,Vector3(0,.95,1.0),Vector3(4.8,2.0,4.3),Color("4b7234"))
+    sph(house,Vector3(0,1.12,-.05),Vector3(4.0,1.9,3.8),Color("6e5438"))
+    sph(house,Vector3(0,2.2,.85),Vector3(4.55,.83,3.8),Color("698845"))
+    # Stone porch/facade with a true circular wooden door and arched frame.
+    var door:=MeshInstance3D.new()
+    var disk:=CylinderMesh.new()
+    disk.top_radius=1.08
+    disk.bottom_radius=1.08
+    disk.height=.13
+    disk.radial_segments=40
+    door.mesh=disk
+    door.position=Vector3(0,1.15,-3.83)
+    door.rotation.x=PI/2.0
+    door.material_override=material(Color("537044") if main_house else Color("83542e"))
+    house.add_child(door)
+    var ring:=MeshInstance3D.new()
+    var torus:=TorusMesh.new()
+    torus.inner_radius=.98
+    torus.outer_radius=1.14
+    torus.rings=8
+    torus.ring_segments=40
+    ring.mesh=torus
+    ring.position=door.position+Vector3(0,0,-.05)
+    ring.rotation.x=PI/2.0
+    ring.material_override=material(Color("bd995a"))
+    house.add_child(ring)
+    var knob:=sph(house,Vector3(.50,1.13,-3.96),Vector3(.12,.12,.12),Color("d6b16e"))
+    knob.material_override=material(Color("dfb568"),.26)
+    for side in [-1.0,1.0]:
+        var window:=MeshInstance3D.new()
+        var window_mesh:=CylinderMesh.new()
+        window_mesh.top_radius=.62
+        window_mesh.bottom_radius=.62
+        window_mesh.height=.07
+        window_mesh.radial_segments=32
+        window.mesh=window_mesh
+        window.position=Vector3(side*2.4,1.35,-3.20)
+        window.rotation.x=PI/2.0
+        window.material_override=material(Color("f3ca79"),.19)
+        house.add_child(window)
+        box(house,Vector3(side*2.4,1.35,-3.28),Vector3(1.12,.085,.08),Color("9e713f"))
+        box(house,Vector3(side*2.4,1.35,-3.29),Vector3(.085,1.12,.08),Color("9e713f"))
+    # Stone chimney with chimney cap and raised planting beds.
+    box(house,Vector3(2.2,3.06,1.1),Vector3(.78,2.45,.82),Color("857a64"))
+    box(house,Vector3(2.2,4.30,1.1),Vector3(1.05,.25,1.05),Color("655b4e"))
+    for i in range(12):
+        var x=-3.6+float(i)*.65
+        box(house,Vector3(x,.3,-4.7),Vector3(.12,.52,.11),Color("ad8752"))
+    var flower_asset:=load("res://assets/models/garden_flowers.glb") as PackedScene
+    for i in range(7):
+        var flowers:=flower_asset.instantiate()
+        flowers.position=Vector3(-3.3+float(i)*1.04,0.18,-4.48)
+        flowers.scale=Vector3.ONE*.72
+        house.add_child(flowers)
+
+func _import(name: String, point: Vector3, factor: float, parent: Node3D=self) -> Node3D:
+    var scene:=load("res://assets/models/%s.glb" % name) as PackedScene
+    var node:=scene.instantiate() as Node3D
+    node.position=point
+    node.scale=Vector3.ONE*factor
+    parent.add_child(node)
+    return node
+
+func _market() -> void:
+    for i in range(3):
+        var x=12.0+float(i)*5.5
+        _import("market_stall",Vector3(x,elevation(x,8),8),1.0)
+        _import("oak_barrel",Vector3(x-1.7,elevation(x-1.7,10),10),1.0)
+    _import("market_wagon",Vector3(23,elevation(23,13)+.1,13),.8)
+    for i in range(6):
+        box(self,Vector3(10.0+i*1.5,elevation(10.0+i*1.5,15)+.2,15),Vector3(.85,.4,.8),Color("917249"))
+
+func _watermill() -> void:
+    var x=33.0;var z=-17.0;var y=elevation(x,z)
+    box(self,Vector3(x,y+2.1,z),Vector3(8.8,4.2,7.3),Color("a88e69"))
+    var roof:=box(self,Vector3(x,y+4.6,z),Vector3(10,1.0,8.6),Color("765337"))
+    roof.rotation.z=.10
+    wheel=_import("watermill_wheel",Vector3(37,y+2.2,-16.7),1.05)
+    wheel.rotation.y=PI/2.0
+    for i in range(5):
+        box(self,Vector3(x-3.1+i*1.5,y+.9,z-3.8),Vector3(.12,1.1,.15),Color("705539"))
+
+func _bridge() -> void:
+    var z=8.0;var bx=_river_x(z)
+    var y=elevation(bx,z)+.65
+    for i in range(14):
+        box(self,Vector3(bx-6.3+i*.95,y,z),Vector3(.90,.22,4.2),Color("936d46"))
+    for side in [-1.0,1.0]:
+        for i in range(6):
+            var x=bx-5.5+i*2.0
+            box(self,Vector3(x,y+.85,z+side*1.9),Vector3(.17,1.65,.17),Color("715035"))
+        box(self,Vector3(bx,y+1.6,z+side*1.9),Vector3(12.5,.14,.18),Color("9c754b"))
+
+func _party_field() -> void:
+    var at:=Vector3(-2,elevation(-2,-3),-3)
+    _import("old_oak_1",at,1.7)
+    for i in range(10):
+        var angle=i*TAU/10.0
+        var x=-2+cos(angle)*9.0;var z=-3+sin(angle)*9.0
+        _import("garden_flowers",Vector3(x,elevation(x,z),z),.8)
+    for i in range(12):
+        var x=-15+float(i)*1.8
+        box(self,Vector3(x,elevation(x,-15)+.14,-15),Vector3(.09,.5,.12),Color("c2a46b"))
+
+func _trees() -> void:
+    for i in range(77):
+        var x=rng.randf_range(-95,95);var z=rng.randf_range(-95,95)
+        if Vector2(x,z).distance_to(Vector2(-24,-20))<12 or Vector2(x,z).distance_to(Vector2(17,8))<13 or absf(x-_river_x(z))<5:
+            continue
+        if Vector2(x,z).distance_to(Vector2(0,0))<14:
+            continue
+        var model="old_oak_%d" % (i%3+1)
+        _import(model,Vector3(x,elevation(x,z)-.25,z),rng.randf_range(.72,1.22))
+    for i in range(10):
+        var z=-80+float(i)*17
+        var x=_river_x(z)-5.5
+        _import("river_willow",Vector3(x,elevation(x,z),z),.9)
+
+func _grass_and_flowers() -> void:
+    # One MultiMesh batch for 1200 grass blades. No thousands of Node3D draw calls.
+    var grass:=MultiMesh.new()
+    grass.transform_format=MultiMesh.TRANSFORM_3D
+    grass.use_colors=true
+    grass.instance_count=1500
+    var blade:=QuadMesh.new()
+    blade.size=Vector2(.19,.52)
+    grass.mesh=blade
+    for i in range(grass.instance_count):
+        var x=rng.randf_range(-90.0,90.0);var z=rng.randf_range(-90.0,90.0)
+        var basis:=Basis(Vector3.UP,rng.randf_range(0.0,TAU))
+        var size_value:=rng.randf_range(.7,1.35)
+        basis=basis.scaled(Vector3(size_value,size_value,size_value))
+        var p:=Vector3(x,elevation(x,z)+.22,z)
+        grass.set_instance_transform(i,Transform3D(basis,p))
+        grass.set_instance_color(i,Color("839c5b") if i%4 else Color("c4ac6c"))
+    var foliage:=MultiMeshInstance3D.new()
+    foliage.multimesh=grass
+    foliage.material_override=material(Color("88a868"))
+    foliage.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+    add_child(foliage)
+    for i in range(36):
+        var x=rng.randf_range(-75,70);var z=rng.randf_range(-70,70)
+        if absf(x-_river_x(z))<3:continue
+        _import("garden_flowers",Vector3(x,elevation(x,z),z),rng.randf_range(.55,1.2))
+
+func _lantern_posts() -> void:
+    for p in [Vector2(-21,-9),Vector2(-4,-2),Vector2(12,8),Vector2(31,-17),Vector2(38,8)]:
+        var base:=Vector3(p.x,elevation(p.x,p.y),p.y)
+        box(self,base+Vector3(0,1.6,0),Vector3(.16,3.2,.16),Color("665440"))
+        var lantern:=_import("hanging_lantern",base+Vector3(0,2.45,0),.5)
+        var light:=OmniLight3D.new()
+        light.position=base+Vector3(0,3.2,0)
+        light.light_energy=.0
+        light.light_color=Color("ffb969")
+        light.omni_range=6.0
+        light.shadow_enabled=false
+        add_child(light)
+        lanterns.append(light)
+
+func _farm_fields() -> void:
+    for k in range(6):
+        var x=-65+float(k)*3.5
+        for i in range(20):
+            var z=25.0+float(i)*1.2
+            var y=elevation(x,z)
+            sph(self,Vector3(x,y+.12,z),Vector3(.19,.35,.19),Color("9ca35d") if i%3 else Color("ceb96d"))
+
+func update_environment(time_of_day: float, night_lighting: float, weather_type: String, weather_strength: float, delta: float) -> void:
+    day_factor=night_lighting
+    sun.rotation_degrees=Vector3(-10.0-65.0*night_lighting, -35.0+time_of_day*5.0,0)
+    sun.light_energy=.10+1.50*night_lighting*(1.0-weather_strength*.35)
+    sun.light_color=Color("ffd49c").lerp(Color("e5eff7"),1.0-night_lighting)
+    var env:=world_environment.environment
+    env.ambient_light_energy=.26+.70*night_lighting*(1.0-weather_strength*.27)
+    env.fog_density=.005 + (.018 if weather_type=="fog" else .007 if weather_type=="mist" else .002)*weather_strength
+    for lamp in lanterns:
+        lamp.light_energy=1.4*(1.0-smoothstep(.3,.7,night_lighting))
+    if is_instance_valid(wheel):
+        wheel.rotation.z+=delta*.23

@@ -1,0 +1,7 @@
+.godot/
+.import/
+exports/
+dist/
+.DS_Store
+*.tmp
+__pycache__/
