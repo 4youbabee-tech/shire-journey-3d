@@ -142,7 +142,11 @@ for material in list(bpy.data.materials):
     bpy.ops.object.convert(target="MESH");bpy.ops.object.join()
     bpy.context.object.name="BagEndCrafted_"+material.name
 bpy.ops.object.select_all(action="SELECT")
-bpy.ops.wm.save_as_mainfile(filepath=str(out/"bag_end_crafted_portal.blend"))
+# .blend source must stay outside res://, or Godot treats it as another asset to import.
+# The .blend scene is still preserved as a downloadable native-source CI artifact.
+source_dir=Path(__file__).resolve().parents[2]/"blender-production"
+source_dir.mkdir(parents=True,exist_ok=True)
+bpy.ops.wm.save_as_mainfile(filepath=str(source_dir/"bag_end_crafted_portal.blend"))
 bpy.ops.export_scene.gltf(filepath=str(out/"bag_end_crafted_portal.glb"),
     export_format="GLB",use_selection=True,export_apply=True,export_yup=True)
 payload=(out/"bag_end_crafted_portal.glb").read_bytes()
