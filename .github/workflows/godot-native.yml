@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ShireJourney-Godot-InEngine-Frame
-          path: native-godot/dist/in_engine_hobbiton.png
+          path: native-godot/dist/in_engine_*.png
           if-no-files-found: ignore
       - name: Export Windows executable
         run: |
