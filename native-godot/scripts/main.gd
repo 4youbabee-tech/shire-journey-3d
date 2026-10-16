@@ -15,10 +15,12 @@ const MapScript=preload("res://scripts/shire_map.gd")
 const CottageScript=preload("res://scripts/shire_cottage.gd")
 const SoundZoneScript=preload("res://scripts/shire_sound_zones.gd")
 const DiscoveriesScript=preload("res://scripts/shire_discoveries.gd")
+const CinemaScript=preload("res://scripts/shire_chapter_cinema.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
 var activities: ShireActivities
 var discoveries: ShireDiscoveries
+var cinema: ShireChapterCinema
 var shire: ShireWorld
 var frodo: ShirePlayer
 var clock: ShireClock
@@ -258,6 +260,10 @@ func _interface() -> void:
     fps_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
     fps_label.autowrap_mode=TextServer.AUTOWRAP_OFF
     hud.add_child(fps_label)
+    cinema=CinemaScript.new()
+    cinema.name="ChapterCinema"
+    add_child(cinema)
+    cinema.sequence_finished.connect(_cinema_finished)
     dialogue_panel=_style_panel(Color(.07,.095,.085,.96))
     dialogue_panel.position=Vector2(190,410)
     dialogue_panel.custom_minimum_size=Vector2(880,270)
@@ -324,6 +330,22 @@ func _pause(value: bool) -> void:
     frodo.active=not value and not in_conversation
     Input.mouse_mode=Input.MOUSE_MODE_VISIBLE if value else Input.MOUSE_MODE_CAPTURED
 
+func _start_cinema(cue: String) -> void:
+    if not is_instance_valid(cinema) or cinema.active:
+        return
+    if in_conversation:
+        _end_conversation()
+    pause_panel.visible=false
+    paused_by_user=false
+    frodo.active=false
+    Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
+    cinema.begin(cue)
+
+func _cinema_finished(_cue: String) -> void:
+    frodo.active=not paused_by_user and not in_conversation and not map_panel.visible and not journal_panel.visible
+    if frodo.active:
+        Input.mouse_mode=Input.MOUSE_MODE_CAPTURED
+
 func _show_notice(en: String, ar: String) -> void:
     prompt_label.text=en+"  |  "+ar
     start_notice_timer=5.0
@@ -354,7 +376,7 @@ func _update_quest() -> void:
     quest_label.text=_objective()
 
 func _process(dt: float) -> void:
-    if paused_by_user or journal_panel.visible or map_panel.visible:
+    if paused_by_user or journal_panel.visible or map_panel.visible or (is_instance_valid(cinema) and cinema.active):
         return
     # Dialogue does NOT freeze world time or neighbour schedules.
     clock.advance(dt)
@@ -414,9 +436,10 @@ func _process(dt: float) -> void:
         save_game(false)
     if stage==7 and frodo.position.z>64 and not in_conversation:
         stage=8
-        _show_notice("CHAPTER I — THE ROAD GOES ON. More chapters remain in production.","انتهى الفصل الأول من النموذج. الرحلة ما زالت قيد التطوير.")
+        _show_notice("Chapter I complete — The road continues.","اكتمل الفصل الأول — والطريق مستمر.")
         _update_quest()
         save_game(false)
+        _start_cinema("departure")
     if not ambience.playing:
         ambience.play()
     if not stream_audio.playing:
@@ -461,6 +484,11 @@ func _interaction_prompt() -> void:
         prompt_label.text="Walk the lanes of Hobbiton. The world continues while you explore."
 
 func _unhandled_input(event: InputEvent) -> void:
+    if is_instance_valid(cinema) and cinema.active:
+        if event is InputEventKey and event.pressed and not event.echo and (event.physical_keycode in [KEY_SPACE,KEY_E,KEY_ENTER,KEY_ESCAPE]):
+            cinema.finish()
+            get_viewport().set_input_as_handled()
+        return
     if event.is_action_pressed("menu"):
         if in_conversation:
             _end_conversation()
@@ -588,7 +616,8 @@ func _story_effect(who: String,topic: String) -> void:
             var npc: ShireNPC=npcs[key]
             if key!="sam":
                 npc.memory.clear()
-        _show_notice("Seventeen years pass. T.A. 3018: Frodo prepares to leave.","مضت سبع عشرة سنة. يستعد فرودو للرحيل.")
+        _show_notice("T.A. 3018 — Frodo prepares to leave.","عام 3018 — يستعد فرودو للرحيل.")
+        _start_cinema("years")
     elif stage==5 and who=="rowan" and topic=="help":
         quest_flags["market_supplies"]=true
         stage=6
