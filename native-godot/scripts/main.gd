@@ -11,6 +11,7 @@ const DialogueScript=preload("res://scripts/shire_dialogue.gd")
 const SocialScript=preload("res://scripts/shire_social.gd")
 const BagEndScript=preload("res://scripts/shire_bag_end.gd")
 const ActivityScript=preload("res://scripts/shire_activities.gd")
+const MapScript=preload("res://scripts/shire_map.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
 var activities: ShireActivities
@@ -55,6 +56,8 @@ const BAG_END_ENTRANCE := Vector2(-24.0, -26.32)
 const INTERIOR_ORIGIN := Vector3(1000.0, 0.0, 1000.0)
 var nearest_landmark_id: String = ""
 var nearest_landmark_distance: float = 99.0
+var map_panel: PanelContainer
+var map_view: ShireMap
 var journal_panel: PanelContainer
 var journal_body: Label
 var landmark_pulse := 0.0
@@ -221,7 +224,7 @@ func _interface() -> void:
     prompt_label.custom_minimum_size=Vector2(1030,35)
     hud.add_child(prompt_label)
     tutorial_label=_text("WASD Move  •  Mouse Look  •  Shift Run  •  E Talk  •  V Camera  •  F5 Save  •  Esc Menu",13,Color("ead9bb"))
-    tutorial_label.text="WASD Move   ·   E Talk   ·   V Camera   ·   Shift Run   ·   F5 Save   ·   Esc Menu"
+    tutorial_label.text="WASD Move   ·   E Interact   ·   M Map   ·   J Journal   ·   V Camera   ·   Shift Run   ·   F5 Save   ·   Esc Menu"
     tutorial_label.position=Vector2(18,682)
     tutorial_label.custom_minimum_size=Vector2(1070,26)
     tutorial_label.autowrap_mode=TextServer.AUTOWRAP_OFF
@@ -261,6 +264,13 @@ func _interface() -> void:
     journal_body=_text("",16,Color("eee3c9"))
     journal_body.custom_minimum_size=Vector2(800,440)
     journal_panel.add_child(journal_body)
+    map_panel=_style_panel(Color(.07,.095,.085,.97))
+    map_panel.position=Vector2(215,105)
+    map_panel.custom_minimum_size=Vector2(850,500)
+    map_panel.visible=false
+    hud.add_child(map_panel)
+    map_view=MapScript.new()
+    map_panel.add_child(map_view)
     var items:=VBoxContainer.new()
     items.add_theme_constant_override("separation",10)
     pause_panel.add_child(items)
@@ -320,7 +330,7 @@ func _update_quest() -> void:
     quest_label.text=_objective()
 
 func _process(dt: float) -> void:
-    if paused_by_user or journal_panel.visible:
+    if paused_by_user or journal_panel.visible or map_panel.visible:
         return
     # Dialogue does NOT freeze world time or neighbour schedules.
     clock.advance(dt)
@@ -418,16 +428,21 @@ func _unhandled_input(event: InputEvent) -> void:
     if event.is_action_pressed("menu"):
         if in_conversation:
             _end_conversation()
+        elif map_panel.visible:
+            _toggle_map()
         else:
             _pause(not paused_by_user)
         get_viewport().set_input_as_handled()
-    elif event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_J and not in_conversation:
+    elif event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_J and not in_conversation and not map_panel.visible:
         _toggle_journal()
+        get_viewport().set_input_as_handled()
+    elif event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_M and not in_conversation and not journal_panel.visible:
+        _toggle_map()
         get_viewport().set_input_as_handled()
     elif event.is_action_pressed("save_game") and not in_conversation:
         save_game()
         get_viewport().set_input_as_handled()
-    elif event.is_action_pressed("interact") and not paused_by_user and not in_conversation and not journal_panel.visible:
+    elif event.is_action_pressed("interact") and not paused_by_user and not in_conversation and not journal_panel.visible and not map_panel.visible:
         if inside_bag_end:
             _interact_interior()
             get_viewport().set_input_as_handled()
@@ -725,3 +740,11 @@ func _toggle_journal() -> void:
         entries.append(str(item.get("ar","")))
     entries.append("Press J to return to the world | اضغط J للعودة")
     journal_body.text="\n".join(entries)
+func _toggle_map() -> void:
+    if paused_by_user or in_conversation or journal_panel.visible:
+        return
+    map_panel.visible = not map_panel.visible
+    frodo.active = not map_panel.visible
+    Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if map_panel.visible else Input.MOUSE_MODE_CAPTURED
+    if map_panel.visible:
+        map_view.configure(LANDMARKS,Vector2(frodo.position.x,frodo.position.z))

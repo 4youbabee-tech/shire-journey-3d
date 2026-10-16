@@ -104,6 +104,14 @@ func _run_smoke() -> void:
         push_error("Birthday activity persistence failed")
         quit(13)
         return
+    var shire_map = load("res://scripts/shire_map.gd").new()
+    get_root().add_child(shire_map)
+    shire_map.configure([["bagend","Bag End","", -24.0,-20.0]], Vector2(-24,-20))
+    if shire_map.project(Vector2(-24,-20)).distance_to(shire_map.project(shire_map.player_position)) > 0.01:
+        push_error("Shire map player projection failed")
+        quit(15)
+        return
+    shire_map.free()
     interior.free()
     npc.free()
     print("PASS: memory, 54 villagers, bilingual dialogue, once-per-day relationship and favour persistence")
