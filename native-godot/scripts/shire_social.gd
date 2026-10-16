@@ -119,7 +119,10 @@ func reply(npc: ShireNPC, topic: String, stage: int, day: int, hour: float, weat
                     en += " It is good to have a friend who remembers."
                     ar += " من الجميل أن يكون لنا صديق يتذكر."
         "birthday":
-            if events.get("party_ready",false)==true:
+            if events.get("fireworks_shown",false)==true:
+                en = "Did you see the fireworks over the field? That was a night to remember!"
+                ar = "هل رأيت الألعاب النارية فوق الحقل؟ كانت ليلة لا تنسى!"
+            elif events.get("party_ready",false)==true:
                 en = "The Party Field is dressed for the celebration! Everyone has noticed your work."
                 ar = "صار حقل الاحتفال جاهزاً للعيد! الجميع لاحظ مساعدتك."
             elif id == "bilbo":
