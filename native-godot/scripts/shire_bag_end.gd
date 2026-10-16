@@ -66,7 +66,7 @@ func _round(at: Vector3, radius: float, height: float, color: String, sideways: 
     mesh.position = at
     if sideways:
         mesh.rotation.x = PI / 2.0
-    mesh.material_override = _mat(color)
+    mesh.material_override = ShireSurfaceMaterials.wooden_trim() if color == "745034" else _mat(color)
     if solid:
         var static_body := StaticBody3D.new()
         static_body.position = at
