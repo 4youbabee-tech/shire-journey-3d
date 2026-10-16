@@ -10,8 +10,10 @@ const WeatherScript=preload("res://scripts/shire_weather.gd")
 const DialogueScript=preload("res://scripts/shire_dialogue.gd")
 const SocialScript=preload("res://scripts/shire_social.gd")
 const BagEndScript=preload("res://scripts/shire_bag_end.gd")
+const ActivityScript=preload("res://scripts/shire_activities.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
+var activities: ShireActivities
 var shire: ShireWorld
 var frodo: ShirePlayer
 var clock: ShireClock
@@ -71,6 +73,7 @@ const LANDMARKS = [
 
 func _ready() -> void:
     social=SocialScript.new()
+    activities=ActivityScript.new()
     clock=ClockScript.new()
     weather=WeatherScript.new()
     shire=WorldScript.new()
@@ -100,6 +103,9 @@ func _new_game() -> void:
     if inside_bag_end:
         _exit_bag_end()
     stage=0
+    activities.reset()
+    for station in ShireActivities.STATIONS:
+        shire.set_party_prepared(str(station["id"]),false)
     quest_flags={"market_supplies":false,"sam_joined":false}
     social=SocialScript.new()
     clock.elapsed=0.0
@@ -398,6 +404,10 @@ func _interaction_prompt() -> void:
     if _near_bag_end_door():
         prompt_label.text="[E] Enter Bag End | ادخل إلى باغ إند"
         return
+    var party_station: Dictionary=activities.available_at(frodo.position,stage)
+    if not party_station.is_empty():
+        prompt_label.text="[E] %s | %s (%d/3)" % [party_station["en"],party_station["ar"],activities.progress()]
+        return
     interact_npc=_nearest_npc()
     if interact_npc:
         prompt_label.text="[E] Talk to %s | تحدث معه  •  %s" % [interact_npc.display_name,interact_npc.action]
@@ -425,10 +435,28 @@ func _unhandled_input(event: InputEvent) -> void:
             _enter_bag_end()
             get_viewport().set_input_as_handled()
         else:
-            var npc:=_nearest_npc()
-            if npc:
-                _begin_conversation(npc)
+            var party_station: Dictionary=activities.available_at(frodo.position,stage)
+            if not party_station.is_empty():
+                _prepare_party_station(str(party_station["id"]))
                 get_viewport().set_input_as_handled()
+            else:
+                var npc:=_nearest_npc()
+                if npc:
+                    _begin_conversation(npc)
+                    get_viewport().set_input_as_handled()
+
+func _prepare_party_station(id: String) -> void:
+    var outcome: Dictionary=activities.prepare(id,stage)
+    if outcome.is_empty():
+        return
+    shire.set_party_prepared(id,true)
+    social.record(id,str(outcome["en"]),str(outcome["ar"]),clock.day_index())
+    if outcome["finished"]:
+        social.record("birthday_party_ready","Party Field is ready for Bilbo's birthday.","حقل الاحتفال جاهز لعيد ميلاد بيلبو.",clock.day_index())
+        _show_notice("All preparations are complete! Return to the neighbours.", "اكتملت تحضيرات الاحتفال! عُد إلى الجيران.")
+    else:
+        _show_notice(str(outcome["en"]),str(outcome["ar"]))
+    save_game(false)
 
 func _begin_conversation(npc: ShireNPC) -> void:
     talking=npc
@@ -606,7 +634,7 @@ func save_game(notify: bool=true) -> void:
         "schema":2,"clock":clock.pack(),"stage":stage,
         "flags":quest_flags.duplicate(true),"weather_seed":weather.seed,
         "player":{"pos":[saved_player_pos.x,saved_player_pos.y,saved_player_pos.z],"yaw":frodo.yaw,"camera_first":camera_before_bag_end if inside_bag_end else frodo.first_person,"inside_bag_end":inside_bag_end},
-        "npcs":people_state,"social":social.pack(),
+        "npcs":people_state,"social":social.pack(),"activities":activities.pack(),
         "animals":animals.map(func(pet): return pet.pack())}
     var file:=FileAccess.open(SAVE_FILE,FileAccess.WRITE)
     if file:
@@ -632,6 +660,10 @@ func load_game() -> void:
     if inside_bag_end:
         _exit_bag_end()
     social.unpack(raw.get("social",{}))
+    activities.unpack(raw.get("activities",{}))
+    for station in ShireActivities.STATIONS:
+        var id: String=str(station["id"])
+        shire.set_party_prepared(id,activities.is_prepared(id))
     clock.unpack(raw.get("clock",{}))
     stage=clampi(int(raw.get("stage",0)),0,8)
     weather.seed=int(raw.get("weather_seed",3018))

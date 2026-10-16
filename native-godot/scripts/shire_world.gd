@@ -10,6 +10,7 @@ var river : MeshInstance3D
 var wheel : Node3D
 var lanterns : Array[OmniLight3D] = []
 var chimney_smoke : Array[CPUParticles3D] = []
+var party_decorations: Dictionary = {}
 var rainfall: CPUParticles3D
 var weather_particles : Array[MeshInstance3D] = []
 var rng:=RandomNumberGenerator.new()
@@ -401,6 +402,48 @@ func _party_field() -> void:
     for i in range(12):
         var x=-15+float(i)*1.8
         box(self,Vector3(x,elevation(x,-15)+.14,-15),Vector3(.09,.5,.12),Color("c2a46b"))
+    # Physical birthday preparations: guests can see each setup after helping.
+    var stations := [
+        ["birthday_bunting", -13.0, -4.0, Color("6c513c")],
+        ["birthday_tables", -8.0, 8.0, Color("7e5943")],
+        ["birthday_lanterns", 9.0, 3.0, Color("6c513c")]
+    ]
+    for entry in stations:
+        var id: String = str(entry[0])
+        var x: float = float(entry[1])
+        var z: float = float(entry[2])
+        var site := Node3D.new()
+        site.name = id
+        site.position = Vector3(x,elevation(x,z),z)
+        add_child(site)
+        box(site,Vector3(0,.75,0),Vector3(2.25,.16,1.25),entry[3])
+        for side in [-.84,.84]:
+            box(site,Vector3(side,.37,0),Vector3(.16,.7,.85),Color("53402e"))
+        var decorations := Node3D.new()
+        decorations.name = "PreparedDecorations"
+        site.add_child(decorations)
+        decorations.visible = false
+        party_decorations[id] = decorations
+        if id == "birthday_bunting":
+            for i in range(7):
+                var px := -1.02 + float(i)*.34
+                box(decorations,Vector3(px,1.48,0),Vector3(.12,.46,.08),Color.from_hsv(float(i)/7.0,.48,.82))
+            box(decorations,Vector3(0,1.73,0),Vector3(2.5,.08,.09),Color("d3b987"))
+        elif id == "birthday_tables":
+            for i in range(5):
+                var px := -.75 + float(i)*.37
+                sph(decorations,Vector3(px,.91,0),Vector3(.19,.13,.19),Color("d1a661"))
+            box(decorations,Vector3(0,.83,0),Vector3(2.0,.05,1.1),Color("e1c9a0"))
+        else:
+            for i in range(4):
+                var px := -.72 + float(i)*.48
+                box(decorations,Vector3(px,1.15,0),Vector3(.2,.32,.22),Color("dcab52"))
+                sph(decorations,Vector3(px,1.38,0),Vector3(.15,.14,.15),Color("f3d998"))
+
+
+func set_party_prepared(id: String, ready: bool) -> void:
+    if party_decorations.has(id) and is_instance_valid(party_decorations[id]):
+        party_decorations[id].visible = ready
 
 func _trees() -> void:
     for i in range(77):

@@ -80,6 +80,26 @@ func _run_smoke() -> void:
         quit(10)
         return
     companion.free()
+    var preparations = load("res://scripts/shire_activities.gd").new()
+    for station in preparations.STATIONS:
+        var px: float=float(station["x"])
+        var pz: float=float(station["z"])
+        var found: Dictionary=preparations.available_at(Vector3(px,0,pz),0)
+        if found.is_empty() or str(found["id"]) != str(station["id"]):
+            push_error("Missing birthday preparation hotspot")
+            quit(11)
+            return
+        preparations.prepare(str(station["id"]),0)
+    if preparations.progress() != 3:
+        push_error("Birthday activity completion failed")
+        quit(12)
+        return
+    var saved_preparations = load("res://scripts/shire_activities.gd").new()
+    saved_preparations.unpack(preparations.pack())
+    if saved_preparations.progress() != 3 or not saved_preparations.available_at(Vector3(-13,0,-4),0).is_empty():
+        push_error("Birthday activity persistence failed")
+        quit(13)
+        return
     interior.free()
     npc.free()
     print("PASS: memory, 54 villagers, bilingual dialogue, once-per-day relationship and favour persistence")
