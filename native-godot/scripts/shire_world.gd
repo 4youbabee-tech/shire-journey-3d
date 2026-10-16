@@ -125,9 +125,9 @@ func _terrain() -> void:
     node.mesh=mesh
     var grassy:=StandardMaterial3D.new()
     grassy.vertex_color_use_as_albedo=true
-    grassy.albedo_texture=load("res://assets/textures/grass_albedo.png")
+    grassy.albedo_texture=load("res://assets/textures/grass_albedo.jpg")
     grassy.normal_enabled=true
-    grassy.normal_texture=load("res://assets/textures/grass_normal.png")
+    grassy.normal_texture=load("res://assets/textures/grass_normal.jpg")
     grassy.normal_scale=.28
     grassy.roughness=.93
     grassy.texture_repeat=BaseMaterial3D.TEXTURE_REPEAT_ENABLED
@@ -161,9 +161,9 @@ func _path(a: Vector2,b: Vector2,width: float) -> void:
     var node:=MeshInstance3D.new()
     node.mesh=surface.commit()
     var earth:=StandardMaterial3D.new()
-    earth.albedo_texture=load("res://assets/textures/path_albedo.png")
+    earth.albedo_texture=load("res://assets/textures/path_albedo.jpg")
     earth.normal_enabled=true
-    earth.normal_texture=load("res://assets/textures/path_normal.png")
+    earth.normal_texture=load("res://assets/textures/path_normal.jpg")
     earth.normal_scale=.35
     earth.roughness=.92
     earth.texture_repeat=BaseMaterial3D.TEXTURE_REPEAT_ENABLED

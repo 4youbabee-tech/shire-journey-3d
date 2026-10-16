@@ -49,8 +49,8 @@ def mats(kind):
     tangent=np.stack([-dx*.85,-dy*.85,np.ones_like(dx)*.95],axis=2)
     tangent/=np.linalg.norm(tangent,axis=2,keepdims=True)
     normal=Image.fromarray(np.uint8(np.clip(tangent*.5+.5,0,1)*255),'RGB')
-    albedo.save(DEST/(kind+'_albedo.png'),optimize=True)
-    normal.save(DEST/(kind+'_normal.png'),optimize=True)
+    albedo.resize((512,512),Image.Resampling.LANCZOS).save(DEST/(kind+'_albedo.jpg'),quality=82,optimize=True,progressive=True,subsampling=0)
+    normal.resize((512,512),Image.Resampling.LANCZOS).save(DEST/(kind+'_normal.jpg'),quality=82,optimize=True,progressive=True,subsampling=0)
     print(kind, 'roughness',rough)
 
 for item in ['grass','path']:

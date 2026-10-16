@@ -98,33 +98,33 @@
       "licensed_external_asset": false
     },
     {
-      "path": "assets/textures/grass_albedo.png",
-      "bytes": 526562,
-      "sha256": "fe0a1c933fc1051f56e220d2aa2e10d2aeb9ae90c5d74713a315fef55590b81c",
+      "path": "assets/textures/grass_albedo.jpg",
+      "bytes": 39455,
+      "sha256": "f53108119413b1330cca6cc6ca4ae11205497a656700e02b02cdf2fd1eaec755",
       "provenance": "ORIGINAL-GAME",
       "generator": "scripts/make_pbr_ground.py",
       "licensed_external_asset": false
     },
     {
-      "path": "assets/textures/grass_normal.png",
-      "bytes": 1005691,
-      "sha256": "e4b9fe8ccd8bfa039a99d18664d4025eba7952bec35494c9784239089ce924c7",
+      "path": "assets/textures/grass_normal.jpg",
+      "bytes": 76448,
+      "sha256": "a49bdbdd87533cbabb0f24a298c1b966f3b88e9b325e19ea5e9656e85016f813",
       "provenance": "ORIGINAL-GAME",
       "generator": "scripts/make_pbr_ground.py",
       "licensed_external_asset": false
     },
     {
-      "path": "assets/textures/path_albedo.png",
-      "bytes": 757254,
-      "sha256": "8f3a04247ccbc18431f08956a3c878aa336ea3fcb9eb20f7fd3a0cc1dc6fada7",
+      "path": "assets/textures/path_albedo.jpg",
+      "bytes": 41146,
+      "sha256": "d184340b90ff3b46f6b2baae85e1730ae4c9b21dc871e62afa945fce438fadec",
       "provenance": "ORIGINAL-GAME",
       "generator": "scripts/make_pbr_ground.py",
       "licensed_external_asset": false
     },
     {
-      "path": "assets/textures/path_normal.png",
-      "bytes": 1037893,
-      "sha256": "00db5783d03d4b8c83c3c48027d302a9c5fff3089d36282a0015cfc5f004f6de",
+      "path": "assets/textures/path_normal.jpg",
+      "bytes": 86302,
+      "sha256": "8c65c7cdad3bb28d5b99e2cd3cf4151b6703afd3075a382c102e8533bb8920a6",
       "provenance": "ORIGINAL-GAME",
       "generator": "scripts/make_pbr_ground.py",
       "licensed_external_asset": false

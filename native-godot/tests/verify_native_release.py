@@ -16,7 +16,7 @@ check('res://scripts/main.gd' in scene,'native scene attached')
 for key in ['player.gd','shire_world.gd','shire_npc.gd','shire_clock.gd','shire_weather.gd','shire_dialogue.gd','main.gd','shire_animal.gd']:
  check((root/'scripts'/key).exists(),f'exists {key}')
 source='\n'.join(p.read_text() for p in (root/'scripts').glob('*.gd'))
-for feature,code in [('clock','REAL_DAY'),('weather','is_raining'),('physics','CharacterBody3D'),('save','user://shire_journey_godot_save_v2.json'),('54 NPCs','neighbour_%02d'),('Arabic subtitles','dialogue_ar'),('1st/3rd camera','first_person'),('dialogue memory','last_memory'),('story chronology','clock.story_year=3018'),('water shader','shader_type spatial'),('wildlife weather shelters','rain_now'),('native grass normal','grass_normal.png'),('circular stone arch','_stone_arch')]:
+for feature,code in [('clock','REAL_DAY'),('weather','is_raining'),('physics','CharacterBody3D'),('save','user://shire_journey_godot_save_v2.json'),('54 NPCs','neighbour_%02d'),('Arabic subtitles','dialogue_ar'),('1st/3rd camera','first_person'),('dialogue memory','last_memory'),('story chronology','clock.story_year=3018'),('water shader','shader_type spatial'),('wildlife weather shelters','rain_now'),('native grass normal','grass_normal.jpg'),('circular stone arch','_stone_arch')]:
  check(code in source,feature)
 for gd in (root/'scripts').glob('*.gd'):
  s=gd.read_text()
@@ -49,12 +49,13 @@ manifest=json.loads((root/'assets'/'manifest.json').read_text())
 for entry in manifest['assets']:
  item=root/entry['path']
  check(item.exists() and item.stat().st_size==entry['bytes'] and __import__('hashlib').sha256(item.read_bytes()).hexdigest()==entry['sha256'], f"asset manifest {entry['path']}")
-for key in ['grass_albedo.png','grass_normal.png','path_albedo.png','path_normal.png']:
+for key in ['grass_albedo.jpg','grass_normal.jpg','path_albedo.jpg','path_normal.jpg']:
  file=root/'assets'/'textures'/key
  try:
   payload=file.read_bytes()
-  w,h=struct.unpack_from('>II',payload,16)
-  check(payload[:8]==b'\x89PNG\r\n\x1a\n' and w==768 and h==768,f'PBR texture {key} 768px')
+  from PIL import Image
+  w,h=Image.open(file).size
+  check(payload[:2]==b'\xff\xd8' and Image.open(file).size==(512,512),f'PBR texture {key} 512px')
  except Exception as error:
   errors.append(f'PBR texture {key} unreadable: {error}')
 check('for i in range(19)' in source,'19 animals with simulated weather response')
