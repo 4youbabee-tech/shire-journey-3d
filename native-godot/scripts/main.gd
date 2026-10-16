@@ -8,7 +8,9 @@ const AnimalScript=preload("res://scripts/shire_animal.gd")
 const ClockScript=preload("res://scripts/shire_clock.gd")
 const WeatherScript=preload("res://scripts/shire_weather.gd")
 const DialogueScript=preload("res://scripts/shire_dialogue.gd")
+const SocialScript=preload("res://scripts/shire_social.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
+var social: ShireSocial
 var shire: ShireWorld
 var frodo: ShirePlayer
 var clock: ShireClock
@@ -42,8 +44,26 @@ var rain_audio: AudioStreamPlayer
 var stream_audio: AudioStreamPlayer3D
 var world_seed:=24
 var start_notice_timer:=10.0
+var nearest_landmark_id: String = ""
+var nearest_landmark_distance: float = 99.0
+var journal_panel: PanelContainer
+var journal_body: Label
+var landmark_pulse := 0.0
+const LANDMARKS = [
+    ["bagend", "Bag End", "منزل باغ إند", -24.0, -20.0],
+    ["bagshot", "Bagshot Row", "صف باغشوت", -44.0, -26.0],
+    ["party", "Party Field", "حقل الاحتفال", -2.0, -3.0],
+    ["market", "Hobbiton Market", "سوق هوبيتون", 17.0, 8.0],
+    ["mill", "The Old Mill", "الطاحونة القديمة", 32.0, -20.0],
+    ["bridge", "Water Bridge", "جسر النهر", 41.0, 8.0],
+    ["fields", "Southern Fields", "الحقول الجنوبية", -62.0, 28.0],
+    ["garden", "Sam\'s Garden", "حديقة سام", -30.0, -13.0],
+    ["lane", "Northern Lane", "الطريق الشمالي", 9.0, 65.0],
+    ["willows", "River Willows", "صفصاف النهر", 43.0, -42.0]
+]
 
 func _ready() -> void:
+    social=SocialScript.new()
     clock=ClockScript.new()
     weather=WeatherScript.new()
     shire=WorldScript.new()
@@ -60,6 +80,7 @@ func _ready() -> void:
     _soundscape()
     _interface()
     _refresh_story_entities()
+    social.record("homecoming", "Awoke among the hills of Hobbiton", "استيقظت بين تلال هوبيتون", 0)
     _show_notice("September, T.A. 3001 — a birthday remembered", "سبتمبر عام 3001 — ذكرى عيد ميلاد بيلبو")
     Input.mouse_mode=Input.MOUSE_MODE_VISIBLE
     var new_game:=not FileAccess.file_exists(SAVE_FILE)
@@ -71,6 +92,7 @@ func _ready() -> void:
 func _new_game() -> void:
     stage=0
     quest_flags={"market_supplies":false,"sam_joined":false}
+    social=SocialScript.new()
     clock.elapsed=0.0
     clock.story_year=3001
     _refresh_story_entities()
@@ -216,6 +238,14 @@ func _interface() -> void:
     pause_panel.custom_minimum_size=Vector2(420,330)
     pause_panel.visible=false
     hud.add_child(pause_panel)
+    journal_panel=_style_panel(Color(.07,.095,.085,.96))
+    journal_panel.position=Vector2(220,120)
+    journal_panel.custom_minimum_size=Vector2(840,480)
+    journal_panel.visible=false
+    hud.add_child(journal_panel)
+    journal_body=_text("",16,Color("eee3c9"))
+    journal_body.custom_minimum_size=Vector2(800,440)
+    journal_panel.add_child(journal_body)
     var items:=VBoxContainer.new()
     items.add_theme_constant_override("separation",10)
     pause_panel.add_child(items)
@@ -273,7 +303,7 @@ func _update_quest() -> void:
     quest_label.text=_objective()
 
 func _process(dt: float) -> void:
-    if paused_by_user:
+    if paused_by_user or journal_panel.visible:
         return
     # Dialogue does NOT freeze world time or neighbour schedules.
     clock.advance(dt)
@@ -300,6 +330,7 @@ func _process(dt: float) -> void:
                 npc.visible=false
                 continue
             npc.update_schedule(clock.hour_value(),weather.is_raining(clock.elapsed),frodo.position,sim_delta,clock.elapsed)
+    _landmark_update(dt)
     shire.update_environment(clock.hour_value(),clock.light_factor(),w,weather.darkness_at(clock.elapsed),dt)
     shire.rainfall.position=frodo.position+Vector3(0,13,0)
     # Rain is an audible changing system, not only a visual sky overlay.
@@ -357,6 +388,9 @@ func _unhandled_input(event: InputEvent) -> void:
         else:
             _pause(not paused_by_user)
         get_viewport().set_input_as_handled()
+    elif event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_J and not in_conversation:
+        _toggle_journal()
+        get_viewport().set_input_as_handled()
     elif event.is_action_pressed("save_game") and not in_conversation:
         save_game()
         get_viewport().set_input_as_handled()
@@ -376,15 +410,16 @@ func _begin_conversation(npc: ShireNPC) -> void:
     dialogue_title.text=npc.display_name+"  •  "+npc.job
     dialogue_text.text="A neighbour waits to hear what you have to say."
     dialogue_ar.text="أحد أهل الشاير يصغي إلى حديثك."
+    social.meet(npc.profile_id,clock.day_index())
     _topics()
 
 func _topics() -> void:
     for child in choices.get_children():
         child.queue_free()
     if not is_instance_valid(talking):return
-    for topic in DialogueScript.available(talking,stage):
+    for topic in social.available(talking.profile_id,stage,clock.hour_value()):
         var btn:=Button.new()
-        btn.text=DialogueScript.label(topic)
+        btn.text=social.option_label(topic)
         btn.custom_minimum_size=Vector2(790,29)
         btn.add_theme_font_size_override("font_size",14)
         choices.add_child(btn)
@@ -397,12 +432,12 @@ func _topics() -> void:
 
 func _choose_topic(topic: String) -> void:
     if not is_instance_valid(talking):return
-    var reply: Dictionary=DialogueScript.answer(talking,topic,weather.type_at(clock.elapsed),clock.day_index(),stage)
+    var reply: Dictionary=social.reply(talking,topic,stage,clock.day_index(),clock.hour_value(),weather.type_at(clock.elapsed))
     dialogue_title.text=str(reply["speaker"])
     dialogue_text.text=str(reply["en"])
     dialogue_ar.text=str(reply["ar"])
-    talking.remember(str(reply["memory"]),clock.day_index(),7 if topic=="help" else 3)
-    _story_effect(talking.profile_id,topic)
+    talking.remember(topic,clock.day_index(),7 if topic in ["friendship","favour"] else 3)
+    _story_effect(talking.profile_id,"help" if topic=="favour" and str(social.favours.get(talking.profile_id,""))=="done" else topic)
     _topics()
     save_game(false)
 
@@ -449,7 +484,7 @@ func save_game(notify: bool=true) -> void:
         "schema":2,"clock":clock.pack(),"stage":stage,
         "flags":quest_flags.duplicate(true),"weather_seed":weather.seed,
         "player":{"pos":[frodo.position.x,frodo.position.y,frodo.position.z],"yaw":frodo.yaw,"camera_first":frodo.first_person},
-        "npcs":people_state,
+        "npcs":people_state,"social":social.pack(),
         "animals":animals.map(func(pet): return pet.pack())}
     var file:=FileAccess.open(SAVE_FILE,FileAccess.WRITE)
     if file:
@@ -472,6 +507,7 @@ func load_game() -> void:
     if not raw is Dictionary or int(raw.get("schema",-1))!=2:
         _show_notice("Save file version not supported", "ملف حفظ غير متوافق")
         return
+    social.unpack(raw.get("social",{}))
     clock.unpack(raw.get("clock",{}))
     stage=clampi(int(raw.get("stage",0)),0,8)
     weather.seed=int(raw.get("weather_seed",3018))
@@ -498,3 +534,33 @@ func load_game() -> void:
     _refresh_story_entities()
     _update_quest()
     _show_notice("Saved journey loaded", "تم استرجاع الرحلة")
+
+
+func _landmark_update(dt: float) -> void:
+    landmark_pulse+=dt
+    if landmark_pulse<.25: return
+    landmark_pulse=0.0
+    nearest_landmark_id=""
+    nearest_landmark_distance=99.0
+    for point in LANDMARKS:
+        var key: String=str(point[0])
+        var distance: float=Vector2(frodo.position.x,frodo.position.z).distance_to(Vector2(float(point[3]),float(point[4])))
+        if distance<nearest_landmark_distance:
+            nearest_landmark_id=key
+            nearest_landmark_distance=distance
+        if distance<8.0 and social.record("landmark_"+key,"Discovered "+str(point[1]),"اكتشفت "+str(point[2]),clock.day_index()):
+            _show_notice("Discovered: "+str(point[1]),"اكتشفت "+str(point[2]))
+            save_game(false)
+
+func _toggle_journal() -> void:
+    if paused_by_user or in_conversation: return
+    journal_panel.visible=not journal_panel.visible
+    frodo.active=not journal_panel.visible
+    Input.mouse_mode=Input.MOUSE_MODE_VISIBLE if journal_panel.visible else Input.MOUSE_MODE_CAPTURED
+    if not journal_panel.visible: return
+    var entries: Array[String]=["THE SHIRE JOURNAL | يوميات الشاير", "Wisdom / الحكمة: %d  |  Places: %d / %d" % [social.wisdom,social.discovered.size(),LANDMARKS.size()+1],""]
+    for item in social.journal.slice(-12):
+        entries.append("Day %d · %s" % [int(item.get("day",0)),str(item.get("en",""))])
+        entries.append(str(item.get("ar","")))
+    entries.append("Press J to return to the world | اضغط J للعودة")
+    journal_body.text="\n".join(entries)
