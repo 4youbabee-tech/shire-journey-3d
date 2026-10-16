@@ -60,5 +60,27 @@ func _run() -> void:
         push_error("Cannot exit cottage")
         quit(38)
         return
+    game.call("_new_game")
+    game.call("_start_cinema","years")
+    var scene_cinema: Node=game.get("cinema")
+    if scene_cinema == null or not scene_cinema.active:
+        push_error("Cinematic start regression")
+        quit(43)
+        return
+    scene_cinema.finish()
+    game.stage=7
+    player.position=game.call("_ground",10.0,65.1)
+    game.call("_process",0.15)
+    if game.stage!=8 or not scene_cinema.active:
+        push_error("Chapter completion regression")
+        quit(44)
+        return
+    scene_cinema.finish()
+    game.save_game(false)
+    game.load_game()
+    if game.stage!=8:
+        push_error("Ending save regression")
+        quit(45)
+        return
     print("PASS: Chapter I door, Bag End and cottage interior entry/exit, and save/load")
     quit(0)
