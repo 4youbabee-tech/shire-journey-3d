@@ -114,8 +114,11 @@ func reply(npc: ShireNPC, topic: String, stage: int, day: int, hour: float, weat
         "friendship":
             en = "That's a generous thought. A neighbour's kindness lasts longer than the day's sunshine."
             ar = "كلمات كريمة. تبقى طيبة الجار أطول من ضوء النهار."
-            relationship_change(id, "affinity", 3)
-            relationship_change(id, "trust", 1)
+            var kindness_day: String = "friendship_day_" + id
+            if int(events.get(kindness_day, -1)) != day:
+                relationship_change(id, "affinity", 3)
+                relationship_change(id, "trust", 1)
+                events[kindness_day] = day
         "favour":
             if str(favours.get(id, "")) == "done":
                 en = "You've already lent a hand. I haven't forgotten it."
@@ -126,7 +129,6 @@ func reply(npc: ShireNPC, topic: String, stage: int, day: int, hour: float, weat
                 ar = "هكذا زال هم صغير. أشكرك على وقتك."
                 relationship_change(id, "trust", 6)
                 relationship_change(id, "respect", 3)
-                wisdom += 1
                 record("kindness_" + id, "Helped " + who, "ساعدت " + who, day)
             else:
                 favours[id] = "offered"
