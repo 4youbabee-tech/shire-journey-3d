@@ -74,7 +74,7 @@ def main() -> None:
     total = 0
     for asset in ASSETS:
         details = json_api("https://api.polyhaven.com/info/" + asset)
-        if str(details.get("type")) != "models":
+        if int(details.get("type", -1)) != 2:
             raise ValueError("Not a Poly Haven model " + asset)
         tree = json_api("https://api.polyhaven.com/files/" + asset)
         node = tree.get("gltf", {}).get(RESOLUTION, {}).get("gltf")
@@ -105,9 +105,13 @@ def main() -> None:
         for item in required:
             if not safe_relative_path(directory, str(item)).is_file():
                 raise ValueError("Missing required buffer/texture " + str(item))
+        imported_path = directory / "asset.gltf"
+        if imported_path.name != gltf_name:
+            imported_path.write_bytes((directory / gltf_name).read_bytes())
+            (directory / gltf_name).unlink()
         manifest["models"][asset] = {
             "page": "https://polyhaven.com/a/" + asset, "author": details.get("authors", {}),
-            "geometry": gltf_name, "files": outputs
+            "geometry": "asset.gltf", "original_geometry_name": gltf_name, "files": outputs
         }
         print("VERIFIED PHOTOREAL CC0", asset, "textures", len(outputs) - 1, "mesh groups", len(scene["meshes"]))
     (ROOT / "provenance.json").write_text(json.dumps(manifest, indent=2, default=str) + "\n", encoding="utf-8")
