@@ -1,0 +1,31 @@
+name: Shire Native - verified Poly Haven CC0 import
+on:
+  push:
+    branches:
+      - production/godot-native-*
+    paths:
+      - 'native-godot/scripts/pull_polyhaven_cc0.py'
+      - '.github/workflows/polyhaven-asset-import.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cc0-import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and checksum official CC0 1K grass texture set
+        run: python3 native-godot/scripts/pull_polyhaven_cc0.py
+      - name: Confirm two texture files and official provenance
+        run: |
+          test -s native-godot/assets/external/polyhaven_leafy_grass/diffuse_1k.jpg
+          test -s native-godot/assets/external/polyhaven_leafy_grass/normal_gl_1k.jpg
+          test -s native-godot/assets/external/polyhaven_leafy_grass/LICENSE_AND_SOURCE.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Shire-PolyHaven-CC0-Verified-Grass-1K
+          path: native-godot/assets/external/polyhaven_leafy_grass/*
+          retention-days: 14
