@@ -134,6 +134,16 @@ func _run_smoke() -> void:
         return
     fireworks_test.free()
     another_firework.free()
+    var chapters=load("res://scripts/journey_chapter_registry.gd")
+    if chapters.validate().size()!=0 or chapters.CHAPTERS.size()<12:
+        push_error("Future chapter production graph incomplete")
+        quit(55)
+        return
+    var shire_successor: Dictionary=chapters.next_chapter("CH_F1_01")
+    if shire_successor.get("id","")!="CH_F1_02" or shire_successor.get("status","")=="playable_candidate":
+        push_error("Chapter I -> Bree transition incorrectly claims playable future content")
+        quit(56)
+        return
     # Bag End is an actual scene graph with reachable exploration hotspots.
     var interior = load("res://scripts/shire_bag_end.gd").new()
     get_root().add_child(interior)
