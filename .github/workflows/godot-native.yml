@@ -36,6 +36,8 @@ jobs:
         run: godot --headless --path native-godot --script res://ci/headless_smoke.gd
       - name: Verify native social memory and 54 NPC records
         run: godot --headless --path native-godot --script res://ci/social_smoke.gd
+      - name: Test Bag End and cottages through save-load transitions
+        run: godot --headless --path native-godot --script res://ci/interior_integration_smoke.gd
       - name: Simulate opening scene for 120 frames
         run: godot --headless --path native-godot --quit-after 120
       - name: Capture in-engine screenshot via virtual display
