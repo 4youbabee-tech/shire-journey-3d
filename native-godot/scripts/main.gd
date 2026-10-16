@@ -163,6 +163,7 @@ func _people() -> void:
         var p: Array=listed[i]
         var npc: ShireNPC=NPCScript.new()
         npc.configure(str(p[0]),str(p[1]),str(p[2]),_ground(float(p[3]),float(p[4])),_ground(float(p[5]),float(p[6])),p[7],i)
+        npc.terrain_height=Callable(shire,"elevation")
         npcs[str(p[0])]=npc
         add_child(npc)
 

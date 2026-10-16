@@ -1,5 +1,6 @@
 class_name ShireNPC
 extends Node3D
+const PathsScript = preload("res://scripts/shire_paths.gd")
 const AvatarScript = preload("res://scripts/shire_avatar.gd")
 ## Simple schedule driven person; no LLM may alter the quest or lore.
 var profile_id := ""
@@ -19,6 +20,10 @@ var closeness := 99.0
 var action := "resting"
 var seed_value := 0
 var follow_player := false
+var terrain_height: Callable
+var route_points: Array[Vector2] = []
+var route_goal := Vector2(INF,INF)
+var route_index := 0
 var legs: Array[Node3D] = []
 var arms: Array[Node3D] = []
 
@@ -63,11 +68,26 @@ func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: f
         action="sleeping"
     destination=target
     var walking := false
+    var desired_goal := Vector2(target.x,target.z)
+    if follow_player:
+        route_points.clear()
+        route_goal=Vector2(INF,INF)
+        route_index=0
+    elif route_points.is_empty() or route_goal.distance_to(desired_goal)>1.3:
+        route_points=PathsScript.route(Vector2(position.x,position.z),desired_goal)
+        route_goal=desired_goal
+        route_index=0
     if closeness<3.3 and look_at_player:
         body.rotation.y=lerp_angle(body.rotation.y, atan2(player_pos.x-global_position.x,player_pos.z-global_position.z), minf(delta*3.0,1.0))
     else:
-        var target2:=Vector2(target.x,target.z)
         var current:=Vector2(position.x,position.z)
+        var target2: Vector2=desired_goal
+        if not follow_player and not route_points.is_empty():
+            for guard in range(route_points.size()):
+                target2=route_points[route_index]
+                if current.distance_to(target2)>=.45 or route_index>=route_points.size()-1:
+                    break
+                route_index+=1
         var distance:=current.distance_to(target2)
         if distance>.3:
             walking=true
@@ -82,7 +102,10 @@ func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: f
                 body.position.y=sin(game_seconds*5.0+float(seed_value))*.035
         elif closeness<35:
             body.position.y=sin(game_seconds*.8+float(seed_value))*.012
-        position.y=home.y if distance<=.3 else lerpf(position.y,target.y,minf(delta*2.0,1.0))
+        if terrain_height.is_valid():
+            position.y=float(terrain_height.call(position.x,position.z))
+        else:
+            position.y=home.y if distance<=.3 else lerpf(position.y,target.y,minf(delta*2.0,1.0))
     body.animate_walk(walking,game_seconds+float(seed_value)*.08,delta,closeness,follow_player)
     visible=closeness<100.0
     # This node is updated by the world scheduler; disabling _process does not stop its simulation.

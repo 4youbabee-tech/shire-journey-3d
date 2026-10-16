@@ -97,6 +97,22 @@ func _run_smoke() -> void:
         push_error("Sam companion ignores player while raining")
         quit(10)
         return
+    var road = load("res://scripts/shire_paths.gd")
+    var walking_route: Array[Vector2] = road.route(Vector2(-24,-19),Vector2(41,8))
+    if walking_route.is_empty() or walking_route.back().distance_to(Vector2(41,8))>.001 or walking_route.size()<2:
+        push_error("Road path between Bag End and Water Bridge missing")
+        quit(21)
+        return
+    companion.follow_player=false
+    companion.home=Vector3.ZERO
+    companion.work=Vector3(41,0,8)
+    companion.position=Vector3(-24,0,-19)
+    companion.terrain_height=func(x: float,z: float) -> float: return 2.75
+    companion.update_schedule(10.0,false,Vector3(-24,0,-19),.5,66.0)
+    if absf(companion.position.y-2.75)>.001 or companion.route_points.is_empty():
+        push_error("NPC terrain tracking or cached village route missing")
+        quit(22)
+        return
     companion.free()
     var preparations = load("res://scripts/shire_activities.gd").new()
     for station in preparations.STATIONS:
