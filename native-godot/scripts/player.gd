@@ -15,6 +15,8 @@ var camera : Camera3D
 var head_pivot : Node3D
 var body_parts : Array[Node3D] = []
 var active := true
+const CAMERA_OFFSET := Vector3(.45,1.15,3.35)
+var camera_obstructed := false
 
 func _ready() -> void:
     name="Frodo"
@@ -59,9 +61,28 @@ func _unhandled_input(event: InputEvent) -> void:
 func _update_camera() -> void:
     if not is_instance_valid(camera):
         return
-    camera.position=Vector3(0,0,0) if first_person else Vector3(0.45, 1.15, 3.35)
     head_pivot.rotation.x=pitch
     visual.visible=not first_person
+    _camera_collision()
+
+func _camera_collision() -> void:
+    if not is_instance_valid(camera) or not is_inside_tree():
+        return
+    if first_person:
+        camera.position=Vector3.ZERO
+        camera_obstructed=false
+        return
+    var from: Vector3=head_pivot.global_position
+    var to: Vector3=head_pivot.to_global(CAMERA_OFFSET)
+    var query:=PhysicsRayQueryParameters3D.create(from,to)
+    query.exclude=[get_rid()]
+    var obstruction: Dictionary=get_world_3d().direct_space_state.intersect_ray(query)
+    camera_obstructed=not obstruction.is_empty()
+    var proposed: Vector3=CAMERA_OFFSET
+    if camera_obstructed:
+        var max_distance: float=maxf(.15,from.distance_to(obstruction["position"])-.27)
+        proposed=CAMERA_OFFSET.normalized()*minf(max_distance,CAMERA_OFFSET.length())
+    camera.position=proposed
 
 func _physics_process(dt: float) -> void:
     if not active:
@@ -69,6 +90,7 @@ func _physics_process(dt: float) -> void:
         velocity.z=move_toward(velocity.z,0.0,dt*10.0)
         velocity.y-=gravity*dt
         move_and_slide()
+        _camera_collision()
         return
     var input:=Input.get_vector("move_left","move_right","move_forward","move_back")
     var forward:=-global_transform.basis.z
@@ -86,6 +108,7 @@ func _physics_process(dt: float) -> void:
     else:
         velocity.y=0.0
     move_and_slide()
+    _camera_collision()
     if not first_person and direction.length()>0.01:
         visual.position.y=sin(Time.get_ticks_msec()*0.014)*0.045
     else:
