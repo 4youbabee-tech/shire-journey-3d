@@ -132,6 +132,15 @@ func _run_smoke() -> void:
             quit(30)
             return
         hero.free()
+    var life = load("res://scripts/shire_village_life.gd").new()
+    get_root().add_child(life)
+    life.populate(func(x: float,z: float)->float: return .5)
+    if life.motion_nodes.size()<12:
+        push_error("Domestic village detail animation nodes missing")
+        quit(33)
+        return
+    life.tick(9.0,1.0,.1)
+    life.free()
     companion.free()
     var preparations = load("res://scripts/shire_activities.gd").new()
     for station in preparations.STATIONS:
