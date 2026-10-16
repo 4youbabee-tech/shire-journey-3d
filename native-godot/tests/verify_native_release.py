@@ -42,6 +42,11 @@ for name in ['shire_birds_original.ogg','river_original.ogg']:
 for match in re.findall(r'res://([^"\']+\.glb)',source):
  if '%' not in match:
   check((root/match).exists(),f'asset reference {match}')
+check('parent: Node3D=self' not in source, 'no runtime self default in GDScript signature')
+manifest=json.loads((root/'assets'/'manifest.json').read_text())
+for entry in manifest['assets']:
+ item=root/entry['path']
+ check(item.exists() and item.stat().st_size==entry['bytes'] and __import__('hashlib').sha256(item.read_bytes()).hexdigest()==entry['sha256'], f"asset manifest {entry['path']}")
 print('OFFLINE NATIVE RELEASE AUDIT')
 print(f'PASS: {len(passed)}')
 print(f'FAIL: {len(errors)}')

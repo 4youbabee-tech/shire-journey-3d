@@ -15,3 +15,6 @@
 
 ## Next real production gate
 Import in Godot and run, resolve engine parser/runtime issues, benchmark real Windows machine, import audited licensed PBR assets, then release verified EXE and in-engine screenshots. Do not merge incomplete changes into main production without this gate.
+
+## GitHub source checkpoint
+Native source was staged on the branch `production/godot-native-chapter1-20261016`; linked GLB and OGG assets are committed separately. This branch has not been merged into `main`, because the Godot engine launch gate is still unverified.

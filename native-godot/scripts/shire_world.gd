@@ -181,6 +181,7 @@ func _water() -> void:
                   Vector3(x-3,elevation(x,z)+.12,z),Vector3(x2-3,elevation(x2,z2)+.12,z2),Vector3(x2+3,elevation(x2,z2)+.12,z2)]:
             surface.set_uv(Vector2(v.x,v.z)*.06)
             surface.add_vertex(v)
+    surface.generate_normals()
     river=MeshInstance3D.new()
     river.mesh=surface.commit()
     var water:=ShaderMaterial.new()
@@ -252,12 +253,12 @@ func _hobbit_hole(where: Vector2, scale_factor: float, main_house: bool) -> void
         flowers.scale=Vector3.ONE*.72
         house.add_child(flowers)
 
-func _import(name: String, point: Vector3, factor: float, parent: Node3D=self) -> Node3D:
+func _import(name: String, point: Vector3, factor: float) -> Node3D:
     var scene:=load("res://assets/models/%s.glb" % name) as PackedScene
     var node:=scene.instantiate() as Node3D
     node.position=point
     node.scale=Vector3.ONE*factor
-    parent.add_child(node)
+    add_child(node)
     return node
 
 func _market() -> void:

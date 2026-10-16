@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "path": "assets/audio/river_original.ogg",
+      "bytes": 56961,
+      "sha256": "2bf565318cb1d1fd2f7b7e64ffdfd1365173eaa2f019b480f976d02622b5bb9b",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_audio.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/audio/shire_birds_original.ogg",
+      "bytes": 49543,
+      "sha256": "0b2112bce32744a1c62e733389fd4177b226cd0eb5b8c24a232daeccc42348bd",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_audio.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/models/garden_flowers.glb",
+      "bytes": 93608,
+      "sha256": "8337822ca61004de409ae5e2f33276a2302aaf2a3978a88bf09a47ad8b150d18",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_models.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/models/hanging_lantern.glb",
+      "bytes": 14020,
+      "sha256": "a93c449db632a6ff3d26a653569fd1874b66c5f094f61c61231f66675ffe96a8",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_models.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/models/market_stall.glb",
+      "bytes": 32420,
+      "sha256": "fa67c9fb4eb499124e5956208f7e503c576b43554aaa5fe639dc00d9a5b3b973",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_models.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/models/market_wagon.glb",
+      "bytes": 36380,
+      "sha256": "de9559bcaaa8b4a87314312b31e524d1f8c05248db78d5e8a90ad2b151086e21",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_models.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/models/oak_barrel.glb",
+      "bytes": 20536,
+      "sha256": "f7de248b7c4d61b36c7c9328f52950c63d858f1e26054768d5c6af69a3421337",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_models.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/models/old_oak_1.glb",
+      "bytes": 53404,
+      "sha256": "d02e8cf18494c31aa962243f358a3ed44fd342a839f18e3d96e4aa3a17768227",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_models.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/models/old_oak_2.glb",
+      "bytes": 53392,
+      "sha256": "e8171e8b76608450ab98a280d534d0bbfe44ffa78bacdd6c3ef117474917d66d",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_models.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/models/old_oak_3.glb",
+      "bytes": 53396,
+      "sha256": "d11d4dea70c45ac0449f85112c46adf3a9f0008fd6f2a8ff7a0956be3550f7d7",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_models.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/models/river_willow.glb",
+      "bytes": 120816,
+      "sha256": "8cf91fc35e35de45212b731dfb53543bc5e78feed56c07b35b3bad06745f96d7",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_models.py",
+      "licensed_external_asset": false
+    },
+    {
+      "path": "assets/models/watermill_wheel.glb",
+      "bytes": 35792,
+      "sha256": "caababcb59915c23379afabe2ee0a1fd384bb27847a93fc4766f4ac63b4372ab",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_models.py",
+      "licensed_external_asset": false
+    }
+  ]
+}
