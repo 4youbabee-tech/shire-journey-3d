@@ -9,7 +9,6 @@ const ClockScript=preload("res://scripts/shire_clock.gd")
 const WeatherScript=preload("res://scripts/shire_weather.gd")
 const DialogueScript=preload("res://scripts/shire_dialogue.gd")
 const SocialScript=preload("res://scripts/shire_social.gd")
-const SocialScript=preload("res://scripts/shire_social.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
 var social: ShireSocial
@@ -66,7 +65,6 @@ const LANDMARKS = [
 
 func _ready() -> void:
     social=SocialScript.new()
-    social=SocialScript.new()
     clock=ClockScript.new()
     weather=WeatherScript.new()
     shire=WorldScript.new()
@@ -95,7 +93,6 @@ func _ready() -> void:
 func _new_game() -> void:
     stage=0
     quest_flags={"market_supplies":false,"sam_joined":false}
-    social=SocialScript.new()
     clock.elapsed=0.0
     clock.story_year=3001
     _refresh_story_entities()
