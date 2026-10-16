@@ -113,6 +113,15 @@ func _run_smoke() -> void:
         push_error("NPC terrain tracking or cached village route missing")
         quit(22)
         return
+    if OS.get_environment("GITHUB_ACTIONS")=="true":
+        var hero = load("res://scripts/shire_avatar.gd").new()
+        get_root().add_child(hero)
+        hero.build("frodo",Color("8a7056"),3,true)
+        if not hero.is_imported:
+            push_error("Rigged CC0 Frodo model missing from exported project")
+            quit(30)
+            return
+        hero.free()
     companion.free()
     var preparations = load("res://scripts/shire_activities.gd").new()
     for station in preparations.STATIONS:

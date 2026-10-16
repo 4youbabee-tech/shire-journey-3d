@@ -7,6 +7,8 @@ var legs: Array[Node3D] = []
 var face_detail: Node3D
 var is_imported := false
 var external_animation: AnimationPlayer
+var idle_clip := ""
+var walk_clip := ""
 var playing_walk := false
 var _sphere_mesh: SphereMesh
 var _capsule_mesh: CapsuleMesh
@@ -51,18 +53,24 @@ func build(character_id: String, cloth: Color, seed_number: int, rich_detail: bo
     _setup_meshes()
     # Higher-detail freely licensed assets can be dropped in without modifying gameplay.
     # Never fetch an unlicensed actor likeness or film model.
-    if character_id.is_valid_identifier():
-        var asset_path: String = "res://assets/characters/" + character_id + ".glb"
+    const CC0_HEROES := {"frodo":"Rogue", "sam":"Rogue", "bilbo":"Rogue_Hooded", "gandalf":"Mage"}
+    if CC0_HEROES.has(character_id):
+        var asset_path: String = "res://assets/characters/cc0_kaykit/" + str(CC0_HEROES[character_id]) + ".glb"
         if ResourceLoader.exists(asset_path):
             var imported: Resource = load(asset_path)
             if imported is PackedScene:
                 var scene: Node = (imported as PackedScene).instantiate()
                 if scene is Node3D:
                     add_child(scene)
+                    scene.scale=Vector3.ONE*(0.7 if character_id!="gandalf" else 0.92)
                     is_imported = true
                     var animator: Node = scene.find_child("AnimationPlayer",true,false)
                     if animator is AnimationPlayer:
                         external_animation = animator
+                        for clip in external_animation.get_animation_list():
+                            if idle_clip.is_empty() and str(clip).to_lower().contains("idle"): idle_clip=str(clip)
+                            if walk_clip.is_empty() and str(clip).to_lower().contains("walk"): walk_clip=str(clip)
+                        if not idle_clip.is_empty(): external_animation.play(idle_clip)
                     return
                 scene.free()
     var hair_choices := [Color("33231b"),Color("553b29"),Color("7b5533"),Color("3c3028"),Color("976b3c")]
@@ -126,8 +134,8 @@ func set_detail_range(distance: float) -> void:
 func animate_walk(walking: bool, seconds: float, delta: float, distance: float, companion: bool = false) -> void:
     if is_imported:
         if is_instance_valid(external_animation):
-            var clip: String = "Walk" if walking else "Idle"
-            if external_animation.has_animation(clip):
+            var clip: String = walk_clip if walking else idle_clip
+            if not clip.is_empty() and external_animation.has_animation(clip):
                 if external_animation.current_animation != clip:
                     external_animation.play(clip,0.20)
         return
