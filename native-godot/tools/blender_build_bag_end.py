@@ -14,8 +14,10 @@ def mat(name,c,r=.8,m=0,glow=0):
     n.inputs["Roughness"].default_value=r
     n.inputs["Metallic"].default_value=m
     if glow:
-        n.inputs["Emission Color"].default_value=(*c,1)
-        n.inputs["Emission Strength"].default_value=glow
+        color_socket = "Emission Color" if "Emission Color" in n.inputs else "Emission"
+        n.inputs[color_socket].default_value=(*c,1)
+        if "Emission Strength" in n.inputs:
+            n.inputs["Emission Strength"].default_value=glow
     return a
 stones=[mat("quarried_limestone_%s"%i,c,.94) for i,c in enumerate(
     [(.56,.53,.45),(.67,.62,.52),(.73,.69,.57),(.50,.49,.42)])]
