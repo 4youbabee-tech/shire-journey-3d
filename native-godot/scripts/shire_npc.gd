@@ -18,6 +18,8 @@ var closeness := 99.0
 var action := "resting"
 var seed_value := 0
 var follow_player := false
+var legs: Array[Node3D] = []
+var arms: Array[Node3D] = []
 
 func configure(id_value: String, label: String, occupation: String, origin: Vector3, workplace: Vector3, palette: Color, seed_number: int) -> void:
     profile_id=id_value
@@ -33,13 +35,23 @@ func configure(id_value: String, label: String, occupation: String, origin: Vect
     make_part(Vector3(0, 0.82, 0),Vector3(.5,.66,.40),palette,0)
     make_part(Vector3(0,1.35,0),Vector3(.37,.37,.35),Color("edc7a2"),0)
     make_part(Vector3(0,1.55,-.02),Vector3(.37,.15,.35),Color("49312a"),0)
+    legs.clear()
+    arms.clear()
     for side in [-1.0,1.0]:
-        make_part(Vector3(side*.19,.33,0),Vector3(.18,.36,.21),Color("554233"),1)
-        make_part(Vector3(side*.40,.9,0),Vector3(.16,.44,.18),palette.lightened(.11),1)
+        var hip := Node3D.new()
+        hip.position = Vector3(side*.19,.67,0)
+        body.add_child(hip)
+        legs.append(hip)
+        make_part(Vector3(0,-.34,0),Vector3(.18,.36,.21),Color("554233"),1,hip)
+        var shoulder := Node3D.new()
+        shoulder.position = Vector3(side*.40,1.13,0)
+        body.add_child(shoulder)
+        arms.append(shoulder)
+        make_part(Vector3(0,-.23,0),Vector3(.16,.44,.18),palette.lightened(.11),1,shoulder)
         make_part(Vector3(side*.14,1.36,-.3),Vector3(.042,.043,.041),Color("2e2a23"),0)
     make_part(Vector3(0,1.24,-.37),Vector3(.095,.08,.12),Color("d9a57f"),0)
 
-func make_part(where: Vector3, size_value: Vector3, color: Color, shape: int) -> void:
+func make_part(where: Vector3, size_value: Vector3, color: Color, shape: int, mount: Node3D = null) -> void:
     var mesh:=MeshInstance3D.new()
     mesh.mesh=CapsuleMesh.new() if shape==1 else SphereMesh.new()
     mesh.position=where
@@ -49,7 +61,10 @@ func make_part(where: Vector3, size_value: Vector3, color: Color, shape: int) ->
     material.roughness=.94
     mesh.material_override=material
     mesh.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-    body.add_child(mesh)
+    if mount == null:
+        body.add_child(mesh)
+    else:
+        mount.add_child(mesh)
 
 func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: float, game_seconds: float) -> void:
     closeness=global_position.distance_to(player_pos)
@@ -75,6 +90,7 @@ func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: f
     else:
         action="sleeping"
     destination=target
+    var walking := false
     if closeness<3.3 and look_at_player:
         body.rotation.y=lerp_angle(body.rotation.y, atan2(player_pos.x-global_position.x,player_pos.z-global_position.z), minf(delta*3.0,1.0))
     else:
@@ -82,6 +98,7 @@ func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: f
         var current:=Vector2(position.x,position.z)
         var distance:=current.distance_to(target2)
         if distance>.3:
+            walking=true
             # Far-off characters still advance their schedule; animation is distance-culled.
             var stride := (8.2 if closeness > 12.0 else 5.1) if follow_player else travel_speed * (2.0 if closeness > 32 else 1.0)
             var step:=minf(distance,delta*stride)
@@ -94,6 +111,14 @@ func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: f
         elif closeness<35:
             body.position.y=sin(game_seconds*.8+float(seed_value))*.012
         position.y=home.y if distance<=.3 else lerpf(position.y,target.y,minf(delta*2.0,1.0))
+    if closeness < 35.0:
+        var gait: float=game_seconds * (9.0 if follow_player else 6.0) + float(seed_value)*.47
+        var amplitude: float=.43 if walking else .035
+        for i in range(mini(legs.size(),arms.size())):
+            var phase: float=gait + float(i)*PI
+            var swing: float=sin(phase)*amplitude
+            legs[i].rotation.x=lerpf(legs[i].rotation.x,swing,minf(delta*9.0,1.0))
+            arms[i].rotation.x=lerpf(arms[i].rotation.x,-swing*.85,minf(delta*9.0,1.0))
     visible=closeness<100.0
     # This node is updated by the world scheduler; disabling _process does not stop its simulation.
     if body != null and closeness>=35.0:
