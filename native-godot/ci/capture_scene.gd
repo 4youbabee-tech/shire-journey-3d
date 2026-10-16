@@ -19,9 +19,9 @@ func _capture() -> void:
     # CI's interior save/load smoke can leave a user:// save; never photograph a stale location.
     game.call("_new_game")
     var player = game.get("frodo")
-    player.position = game.call("_ground",-30.0,-36.0) + Vector3(0,.25,0)
-    player.yaw = 2.71
-    player.rotation.y = 2.71
+    player.position = game.call("_ground",-40.0,-41.0) + Vector3(0,.35,0)
+    player.yaw = -2.65
+    player.rotation.y = -2.65
     player.first_person = false
     player._update_camera()
     if game.get("inside_bag_end") == true or game.get("inside_cottage") == true:
