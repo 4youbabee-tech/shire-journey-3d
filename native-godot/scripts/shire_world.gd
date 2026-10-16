@@ -130,7 +130,6 @@ func _terrain() -> void:
     grassy.normal_texture=load("res://assets/textures/grass_normal.jpg")
     grassy.normal_scale=.28
     grassy.roughness=.93
-    grassy.texture_repeat=BaseMaterial3D.TEXTURE_REPEAT_ENABLED
     node.material_override=grassy
     add_child(node)
     var collider:=StaticBody3D.new()
@@ -166,7 +165,6 @@ func _path(a: Vector2,b: Vector2,width: float) -> void:
     earth.normal_texture=load("res://assets/textures/path_normal.jpg")
     earth.normal_scale=.35
     earth.roughness=.92
-    earth.texture_repeat=BaseMaterial3D.TEXTURE_REPEAT_ENABLED
     earth.cull_mode=BaseMaterial3D.CULL_DISABLED
     node.material_override=earth
     add_child(node)
