@@ -26,7 +26,7 @@ jobs:
       - name: Author Bag End PBR portal in Blender and export GLB
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y blender
+          sudo apt-get install -y blender python3-numpy
           blender -b --factory-startup -t 2 --python native-godot/tools/blender_build_bag_end.py
       - name: Validate new Blender geometry and provenance
         run: python3 native-godot/tools/verify_blender_hero_art.py

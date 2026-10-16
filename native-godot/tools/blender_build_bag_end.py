@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """ORIGINAL-GAME Bag End portal. Blender-generated editable .blend + PBR glTF GLB."""
 import bpy, math, random, json, hashlib
+from mathutils import Matrix
 from pathlib import Path
 out=Path(__file__).resolve().parents[1]/"assets/models"
 out.mkdir(parents=True,exist_ok=True)
@@ -118,6 +119,18 @@ for i in range(105):
     finish(o,o.name,leaves[i%3])
 box("Forge_wall_lantern",(1.60,2.11,-4.26),(.29,.43,.09),iron,.025)
 disk("Lantern_amber_pane",1.60,2.11,-4.40,.11,.18,glass,16)
+# Model positions were authored in Godot XYZ (Y is up, -Z faces outward).
+# Blender is Z-up. Convert into Blender coordinates before glTF Y-up export,
+# so the imported Godot model lands exactly on the established Bag End facade.
+for obj in list(bpy.context.scene.objects):
+    if obj.type != "MESH":
+        continue
+    obj.data.transform(obj.matrix_world)
+    obj.matrix_world = Matrix.Identity(4)
+    for vertex in obj.data.vertices:
+        position = vertex.co.copy()
+        vertex.co = (position.x, -position.z, position.y)
+    obj.data.update()
 # Combine objects sharing materials to avoid hundreds of additional draw calls.
 for material in list(bpy.data.materials):
     group=[o for o in bpy.context.scene.objects
