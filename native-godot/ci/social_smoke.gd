@@ -84,11 +84,15 @@ func _run_smoke() -> void:
     get_root().add_child(companion)
     companion.configure("sam", "Samwise Gamgee", "gardener", Vector3.ZERO, Vector3(8, 0, 8), Color("787b49"), 1)
     companion.follow_player = true
-    if companion.legs.size() != 2 or companion.arms.size() != 2:
+    if companion.legs.size() != 2 or companion.arms.size() != 2 or companion.body.get_child_count() < 8:
         push_error("NPC rigged limbs missing")
         quit(14)
         return
     companion.update_schedule(13.0, true, Vector3(6, 0, 0), 1.0, 60.0)
+    if companion.body.get_node_or_null("FaceDetailLOD") == null:
+        push_error("Character face detail LOD missing")
+        quit(20)
+        return
     if companion.action != "accompanying" or companion.position.x <= 0.0:
         push_error("Sam companion ignores player while raining")
         quit(10)
