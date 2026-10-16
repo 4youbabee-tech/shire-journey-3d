@@ -46,6 +46,7 @@ var stream_audio: AudioStreamPlayer3D
 var world_seed:=24
 var start_notice_timer:=10.0
 var inside_bag_end := false
+var camera_before_bag_end := false
 var bag_end_interior: ShireBagEnd
 var exterior_return := Vector3.ZERO
 const BAG_END_ENTRANCE := Vector2(-24.0, -26.32)
@@ -518,6 +519,7 @@ func _enter_bag_end() -> void:
         bag_end_interior.position = INTERIOR_ORIGIN
         add_child(bag_end_interior)
     exterior_return = frodo.position
+    camera_before_bag_end = frodo.first_person
     inside_bag_end = true
     frodo.first_person = true
     shire.visible = false
@@ -544,6 +546,7 @@ func _exit_bag_end() -> void:
     frodo.velocity = Vector3.ZERO
     frodo.yaw = PI
     frodo.rotation.y = PI
+    frodo.first_person = camera_before_bag_end
     frodo._update_camera()
     shire.visible = true
     for key in npcs:
@@ -602,7 +605,7 @@ func save_game(notify: bool=true) -> void:
     var game_state: Dictionary={
         "schema":2,"clock":clock.pack(),"stage":stage,
         "flags":quest_flags.duplicate(true),"weather_seed":weather.seed,
-        "player":{"pos":[saved_player_pos.x,saved_player_pos.y,saved_player_pos.z],"yaw":frodo.yaw,"camera_first":frodo.first_person,"inside_bag_end":inside_bag_end},
+        "player":{"pos":[saved_player_pos.x,saved_player_pos.y,saved_player_pos.z],"yaw":frodo.yaw,"camera_first":camera_before_bag_end if inside_bag_end else frodo.first_person,"inside_bag_end":inside_bag_end},
         "npcs":people_state,"social":social.pack(),
         "animals":animals.map(func(pet): return pet.pack())}
     var file:=FileAccess.open(SAVE_FILE,FileAccess.WRITE)
@@ -645,6 +648,7 @@ func load_game() -> void:
     frodo._update_camera()
     if data.get("inside_bag_end",false)==true:
         _enter_bag_end()
+        camera_before_bag_end=bool(data.get("camera_first",false))
         frodo.first_person = true
         frodo._update_camera()
     var restored: Dictionary=raw.get("npcs",{})
