@@ -9,6 +9,7 @@ const ClockScript=preload("res://scripts/shire_clock.gd")
 const WeatherScript=preload("res://scripts/shire_weather.gd")
 const DialogueScript=preload("res://scripts/shire_dialogue.gd")
 const SocialScript=preload("res://scripts/shire_social.gd")
+const BagEndScript=preload("res://scripts/shire_bag_end.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
 var shire: ShireWorld
@@ -44,6 +45,11 @@ var rain_audio: AudioStreamPlayer
 var stream_audio: AudioStreamPlayer3D
 var world_seed:=24
 var start_notice_timer:=10.0
+var inside_bag_end := false
+var bag_end_interior: ShireBagEnd
+var exterior_return := Vector3.ZERO
+const BAG_END_ENTRANCE := Vector2(-24.0, -26.32)
+const INTERIOR_ORIGIN := Vector3(1000.0, 0.0, 1000.0)
 var nearest_landmark_id: String = ""
 var nearest_landmark_distance: float = 99.0
 var journal_panel: PanelContainer
@@ -90,6 +96,8 @@ func _ready() -> void:
         _new_game()
 
 func _new_game() -> void:
+    if inside_bag_end:
+        _exit_bag_end()
     stage=0
     quest_flags={"market_supplies":false,"sam_joined":false}
     social=SocialScript.new()
@@ -320,6 +328,15 @@ func _process(dt: float) -> void:
     if autosave>26.0:
         autosave=0.0
         save_game(false)
+    if inside_bag_end:
+        top_label.text="Bag End | باغ إند  •  "+clock.stamp()
+        if start_notice_timer>0.0:
+            start_notice_timer-=dt
+        else:
+            _interior_prompt()
+        if int(elapsed_show)%2==0:
+            fps_label.text="%d fps | Bag End interior" % Engine.get_frames_per_second()
+        return
     var w:=weather.type_at(clock.elapsed)
     if last_npc_update>.10:
         var sim_delta:=last_npc_update
@@ -375,6 +392,9 @@ func _nearest_npc() -> ShireNPC:
 func _interaction_prompt() -> void:
     if in_conversation:
         return
+    if _near_bag_end_door():
+        prompt_label.text="[E] Enter Bag End | ادخل إلى باغ إند"
+        return
     interact_npc=_nearest_npc()
     if interact_npc:
         prompt_label.text="[E] Talk to %s | تحدث معه  •  %s" % [interact_npc.display_name,interact_npc.action]
@@ -394,11 +414,18 @@ func _unhandled_input(event: InputEvent) -> void:
     elif event.is_action_pressed("save_game") and not in_conversation:
         save_game()
         get_viewport().set_input_as_handled()
-    elif event.is_action_pressed("interact") and not paused_by_user and not in_conversation:
-        var npc:=_nearest_npc()
-        if npc:
-            _begin_conversation(npc)
+    elif event.is_action_pressed("interact") and not paused_by_user and not in_conversation and not journal_panel.visible:
+        if inside_bag_end:
+            _interact_interior()
             get_viewport().set_input_as_handled()
+        elif _near_bag_end_door():
+            _enter_bag_end()
+            get_viewport().set_input_as_handled()
+        else:
+            var npc:=_nearest_npc()
+            if npc:
+                _begin_conversation(npc)
+                get_viewport().set_input_as_handled()
 
 func _begin_conversation(npc: ShireNPC) -> void:
     talking=npc
@@ -475,15 +502,104 @@ func _end_conversation() -> void:
     frodo.active=true
     Input.mouse_mode=Input.MOUSE_MODE_CAPTURED
 
+func _near_bag_end_door() -> bool:
+    if inside_bag_end:
+        return false
+    var here := Vector2(frodo.position.x, frodo.position.z)
+    return here.distance_to(BAG_END_ENTRANCE) < 3.1
+
+func _enter_bag_end() -> void:
+    if inside_bag_end:
+        return
+    if not is_instance_valid(bag_end_interior):
+        bag_end_interior = BagEndScript.new()
+        bag_end_interior.position = INTERIOR_ORIGIN
+        add_child(bag_end_interior)
+    exterior_return = frodo.position
+    inside_bag_end = true
+    shire.visible = false
+    for key in npcs:
+        npcs[key].visible = false
+    for pet in animals:
+        pet.visible = false
+    frodo.position = INTERIOR_ORIGIN + ShireBagEnd.ENTRY
+    frodo.velocity = Vector3.ZERO
+    frodo.yaw = 0.0
+    frodo.rotation.y = 0.0
+    frodo._update_camera()
+    ambience.volume_db = -33.0
+    stream_audio.volume_db = -52.0
+    rain_audio.volume_db = -52.0
+    social.record("bagend_entered", "Entered Bag End", "دخلت منزل باغ إند", clock.day_index())
+    _show_notice("Bag End — explore the study, hearth and pantry.", "باغ إند — استكشف المكتبة والمدفأة والمخزن.")
+
+func _exit_bag_end() -> void:
+    if not inside_bag_end:
+        return
+    inside_bag_end = false
+    frodo.position = exterior_return
+    frodo.velocity = Vector3.ZERO
+    frodo.yaw = PI
+    frodo.rotation.y = PI
+    frodo._update_camera()
+    shire.visible = true
+    for key in npcs:
+        npcs[key].visible = true
+    for pet in animals:
+        pet.visible = true
+    if is_instance_valid(bag_end_interior):
+        bag_end_interior.queue_free()
+        bag_end_interior = null
+    stream_audio.volume_db = -17.0
+    _refresh_story_entities()
+    _show_notice("Back in Hobbiton", "عدت إلى هوبيتون")
+
+func _interior_action() -> String:
+    if not is_instance_valid(bag_end_interior):
+        return ""
+    return bag_end_interior.interaction_at(frodo.position - INTERIOR_ORIGIN)
+
+func _interior_prompt() -> void:
+    match _interior_action():
+        "exit":
+            prompt_label.text = "[E] Leave Bag End | اخرج من باغ إند"
+        "study":
+            prompt_label.text = "[E] Read Bilbo's study notes | تفحّص مكتب بيلبو"
+        "pantry":
+            prompt_label.text = "[E] Explore the pantry | استكشف المخزن"
+        "hearth":
+            prompt_label.text = "[E] Sit by the hearth | اجلس قرب الموقد"
+        _:
+            prompt_label.text = "Bag End: study, pantry, hearth and round door | استكشف غرف المنزل"
+
+func _interact_interior() -> void:
+    match _interior_action():
+        "exit":
+            _exit_bag_end()
+            return
+        "study":
+            social.record("bagend_study", "Read the papers in Bilbo's study", "قرأت أوراق مكتب بيلبو", clock.day_index())
+            _show_notice("Old maps and travel notes lie on the writing desk.", "على المكتب خرائط قديمة وملاحظات سفر.")
+        "pantry":
+            social.record("bagend_pantry", "Explored Bag End's pantry", "استكشفت مخزن باغ إند", clock.day_index())
+            _show_notice("The shelves are carefully stocked for a quiet Shire day.", "الرفوف مليئة بمؤونة يوم هادئ في الشاير.")
+        "hearth":
+            social.record("bagend_hearth", "Rested beside the Bag End hearth", "استرحت قرب موقد باغ إند", clock.day_index())
+            _show_notice("The hearth is warm, and Hobbiton seems far away.", "الموقد دافئ، وتبدو هوبيتون بعيدة عن الهموم.")
+        _:
+            return
+    save_game(false)
+
 func save_game(notify: bool=true) -> void:
     var people_state: Dictionary={}
     for key in npcs:
         var npc: ShireNPC=npcs[key]
         people_state[key]=npc.pack()
+    var saved_player_pos: Vector3=exterior_return if inside_bag_end else frodo.position
     var game_state: Dictionary={
         "schema":2,"clock":clock.pack(),"stage":stage,
         "flags":quest_flags.duplicate(true),"weather_seed":weather.seed,
-        "player":{"pos":[frodo.position.x,frodo.position.y,frodo.position.z],"yaw":frodo.yaw,"camera_first":frodo.first_person},
+        "player":{"pos":[saved_player_pos.x,saved_player_pos.y,saved_player_pos.z],"yaw":frodo.yaw,"camera_first":frodo.first_person,"inside_bag_end":inside_bag_end},
         "npcs":people_state,"social":social.pack(),
         "animals":animals.map(func(pet): return pet.pack())}
     var file:=FileAccess.open(SAVE_FILE,FileAccess.WRITE)
@@ -507,6 +623,8 @@ func load_game() -> void:
     if not raw is Dictionary or int(raw.get("schema",-1))!=2:
         _show_notice("Save file version not supported", "ملف حفظ غير متوافق")
         return
+    if inside_bag_end:
+        _exit_bag_end()
     social.unpack(raw.get("social",{}))
     clock.unpack(raw.get("clock",{}))
     stage=clampi(int(raw.get("stage",0)),0,8)
@@ -522,6 +640,8 @@ func load_game() -> void:
     frodo.rotation.y=frodo.yaw
     frodo.first_person=bool(data.get("camera_first",false))
     frodo._update_camera()
+    if data.get("inside_bag_end",false)==true:
+        _enter_bag_end()
     var restored: Dictionary=raw.get("npcs",{})
     for key in npcs:
         if restored.get(key) is Dictionary:
