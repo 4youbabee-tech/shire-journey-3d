@@ -23,6 +23,8 @@ jobs:
           version: 4.4.1
           use-dotnet: false
           include-templates: true
+      - name: Enforce shared cinematic chapter quality evidence contract
+        run: python3 native-godot/tools/audit_quality_contract.py
       - name: Check Python asset dependencies
         run: python3 -m pip install --user numpy trimesh pillow pillow
       - name: Vendor CC0 rigged animated characters
