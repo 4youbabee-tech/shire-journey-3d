@@ -14,12 +14,13 @@ static func place(root: Node3D, item: String, at: Vector3, factor: float = 1.0, 
     if not model is Node3D:
         model.free()
         return null
-    model.name = "CC0_" + item
-    model.position = at
-    model.scale = Vector3.ONE * factor
-    model.rotation.y = heading
-    root.add_child(model)
-    return model
+    var visual: Node3D = model as Node3D
+    visual.name = "CC0_" + item
+    visual.position = at
+    visual.scale = Vector3.ONE * factor
+    visual.rotation.y = heading
+    root.add_child(visual)
+    return visual
 
 static func _furniture_parent(owner: Node3D) -> Node3D:
     var node := Node3D.new()

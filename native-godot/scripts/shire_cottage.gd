@@ -12,6 +12,7 @@ var materials: Dictionary = {}
 
 func _ready() -> void:
     _build()
+    ShireLicensedProps.dress_cottage(self,variant_id)
 
 func _material(hex: String) -> StandardMaterial3D:
     if materials.has(hex):

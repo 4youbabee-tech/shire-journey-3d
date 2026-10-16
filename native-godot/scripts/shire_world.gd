@@ -50,6 +50,7 @@ func _ready() -> void:
     _hobbit_hole(Vector2(18,28),1.17,false)
     _farm_fields()
     _market()
+    ShireLicensedProps.dress_market(self,Callable(self,"elevation"))
     _watermill()
     _bridge()
     _party_field()

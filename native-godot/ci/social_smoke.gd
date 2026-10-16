@@ -181,6 +181,17 @@ func _run_smoke() -> void:
         push_error("Cottage furnishing interactions invalid")
         quit(19)
         return
+    if OS.get_environment("GITHUB_ACTIONS") == "true":
+        var bag_props: Node=interior.get_node_or_null("CC0_Furniture")
+        var cottage_props: Node=home.get_node_or_null("CC0_Furniture")
+        if bag_props == null or bag_props.get_child_count() < 7:
+            push_error("CC0 Bag End PBR furniture failed import")
+            quit(34)
+            return
+        if cottage_props == null or cottage_props.get_child_count() < 5:
+            push_error("CC0 cottage PBR furniture failed import")
+            quit(35)
+            return
     home.free()
     interior.free()
     npc.free()
