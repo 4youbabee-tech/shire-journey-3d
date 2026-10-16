@@ -467,6 +467,7 @@ func _prepare_party_station(id: String) -> void:
     shire.set_party_prepared(id,true)
     social.record(id,str(outcome["en"]),str(outcome["ar"]),clock.day_index())
     if outcome["finished"]:
+        social.events["party_ready"]=true
         social.record("birthday_party_ready","Party Field is ready for Bilbo's birthday.","حقل الاحتفال جاهز لعيد ميلاد بيلبو.",clock.day_index())
         _show_notice("All preparations are complete! Return to the neighbours.", "اكتملت تحضيرات الاحتفال! عُد إلى الجيران.")
     else:

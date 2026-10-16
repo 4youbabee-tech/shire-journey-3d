@@ -57,11 +57,12 @@ func relationship_change(id: String, attribute: String, amount: int) -> void:
 func available(id: String, stage: int, hour: float) -> Array[String]:
     var options: Array[String] = ["greeting", "daily", "work", "memory", "friendship"]
     if hour >= 6.0 and hour < 21.0: options.append("favour")
+    if stage < 5: options.append("birthday")
     if stage >= 5: options.append("journey")
     return options
 
 func option_label(topic: String) -> String:
-    return {"greeting":"Greet them | ألقِ التحية", "daily":"Ask about the day | اسأل عن يومه", "work":"Ask about their work | اسأل عن عمله", "memory":"Remember earlier days | استرجع الذكريات", "friendship":"Share a kind word | كلمة طيبة", "favour":"Offer a small kindness | اعرض المساعدة", "journey":"Discuss the road | تحدّث عن الطريق"}.get(topic, topic)
+    return {"greeting":"Greet them | ألقِ التحية", "daily":"Ask about the day | اسأل عن يومه", "work":"Ask about their work | اسأل عن عمله", "memory":"Remember earlier days | استرجع الذكريات", "friendship":"Share a kind word | كلمة طيبة", "favour":"Offer a small kindness | اعرض المساعدة", "birthday":"Ask about Bilbo\'s birthday | تحدّث عن عيد ميلاد بيلبو", "journey":"Discuss the road | تحدّث عن الطريق"}.get(topic, topic)
 
 func reply(npc: ShireNPC, topic: String, stage: int, day: int, hour: float, weather: String) -> Dictionary:
     var id: String = npc.profile_id
@@ -111,6 +112,16 @@ func reply(npc: ShireNPC, topic: String, stage: int, day: int, hour: float, weat
             else:
                 en = "I still remember when we spoke of %s, %d day(s) ago." % [str(memory["topic"]), maxi(0,day-int(memory["day"]))]
                 ar = "ما زلت أتذكر حديثنا عن %s منذ %d يوم." % [str(memory["topic"]),maxi(0,day-int(memory["day"]))]
+        "birthday":
+            if events.get("party_ready",false)==true:
+                en = "The Party Field is dressed for the celebration! Everyone has noticed your work."
+                ar = "صار حقل الاحتفال جاهزاً للعيد! الجميع لاحظ مساعدتك."
+            elif id == "bilbo":
+                en = "There is a great deal to prepare. I hope the neighbours enjoy the evening."
+                ar = "هناك الكثير من التحضيرات. أتمنى أن يستمتع الجيران بالسهرة."
+            else:
+                en = "The Party Field still needs a few helping hands before the birthday."
+                ar = "حقل الاحتفال يحتاج بعض المساعدة قبل عيد الميلاد."
         "friendship":
             en = "That's a generous thought. A neighbour's kindness lasts longer than the day's sunshine."
             ar = "كلمات كريمة. تبقى طيبة الجار أطول من ضوء النهار."

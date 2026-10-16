@@ -52,8 +52,18 @@ func _run_smoke() -> void:
         push_error("Favour reward must be issued exactly once")
         quit(6)
         return
+    social.events["party_ready"]=true
+    var festive: Dictionary=social.reply(npc,"birthday",0,9,14.0,"clear")
+    if not str(festive["en"]).contains("Party Field") or not social.available(npc.profile_id,0,14.0).has("birthday"):
+        push_error("Birthday event did not change NPC conversations")
+        quit(16)
+        return
     var restored = load("res://scripts/shire_social.gd").new()
     restored.unpack(social.pack())
+    if restored.events.get("party_ready",false) != true:
+        push_error("Birthday conversation state did not persist")
+        quit(17)
+        return
     restored.reply(npc, "friendship", 1, 9, 10.0, "clear")
     if int(restored.ensure_person("test_neighbour")["affinity"]) != 56:
         push_error("Daily friendship cooldown not preserved after save/load")
