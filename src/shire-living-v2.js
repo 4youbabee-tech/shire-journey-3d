@@ -151,7 +151,7 @@
     if(typeof root.selectNPCStoryTopic==='function'){
       const fn=root.selectNPCStoryTopic;
       root.selectNPCStoryTopic=function(topic){
-        const npc=typeof dialogueNPC!=='undefined'?dialogueNPC:null,s=game.state;
+        const npc=game.dialogueNPC||null,s=game.state;
         if(!npc||!Object.prototype.hasOwnProperty.call(TOPICS,topic))return fn(topic);
         const history=recall(s.livingWorld,npc.name,s.played,'story_memory');
         const result=fn(topic);
