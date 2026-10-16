@@ -54,6 +54,7 @@ func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: f
     closeness=global_position.distance_to(player_pos)
     var target:=home
     if rain:
+        target=home
         action="sheltering"
     elif game_hour>=7.0 and game_hour<12.0:
         target=work
@@ -69,8 +70,9 @@ func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: f
         action="visiting" if seed_value%3==0 else "resting"
     else:
         action="sleeping"
+    destination=target
     if closeness<3.3 and look_at_player:
-        body.rotation.y=lerp_angle(body.rotation.y, atan2(player_pos.x-position.x,player_pos.z-position.z), minf(delta*3.0,1.0))
+        body.rotation.y=lerp_angle(body.rotation.y, atan2(player_pos.x-global_position.x,player_pos.z-global_position.z), minf(delta*3.0,1.0))
     else:
         var target2:=Vector2(target.x,target.z)
         var current:=Vector2(position.x,position.z)
@@ -88,7 +90,9 @@ func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: f
             body.position.y=sin(game_seconds*.8+float(seed_value))*.012
         position.y=home.y if distance<=.3 else lerpf(position.y,target.y,minf(delta*2.0,1.0))
     visible=closeness<100.0
-    set_process(closeness<25.0)
+    # This node is updated by the world scheduler; disabling _process does not stop its simulation.
+    if body != null and closeness>=35.0:
+        body.position.y=0.0
 
 func remember(topic: String, game_day: int, weight: int=4) -> void:
     memory.append({"topic":topic, "day":game_day, "weight":weight})
