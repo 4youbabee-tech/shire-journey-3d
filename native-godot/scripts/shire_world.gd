@@ -527,12 +527,34 @@ func _lantern_posts() -> void:
         lanterns.append(light)
 
 func _farm_fields() -> void:
-    for k in range(6):
-        var x=-65+float(k)*3.5
-        for i in range(20):
-            var z=25.0+float(i)*1.2
-            var y=elevation(x,z)
-            sph(self,Vector3(x,y+.12,z),Vector3(.19,.35,.19),Color("9ca35d") if i%3 else Color("ceb96d"))
+    # One shared mesh and two draw batches instead of 120 SphereMesh nodes.
+    var seedling := SphereMesh.new()
+    seedling.radial_segments=8
+    seedling.rings=5
+    for palette in range(2):
+        var batch := MultiMesh.new()
+        batch.transform_format=MultiMesh.TRANSFORM_3D
+        batch.instance_count=120
+        batch.mesh=seedling
+        var n := 0
+        for k in range(6):
+            var x: float=-65.0+float(k)*3.5
+            for i in range(20):
+                if (i%3==0) != (palette==1):
+                    continue
+                var z: float=25.0+float(i)*1.2
+                var y: float=elevation(x,z)
+                var basis:=Basis.IDENTITY.scaled(Vector3(.19,.35,.19))
+                batch.set_instance_transform(n,Transform3D(basis,Vector3(x,y+.12,z)))
+                n+=1
+        # Shrink to the actual instance count: ten dry stems per row, twenty green.
+        batch.visible_instance_count=n
+        var container:=MultiMeshInstance3D.new()
+        container.name="FarmCropBatch_%d" % palette
+        container.multimesh=batch
+        container.material_override=material(Color("ceb96d") if palette==1 else Color("9ca35d"))
+        container.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+        add_child(container)
 
 func update_environment(time_of_day: float, night_lighting: float, weather_type: String, weather_strength: float, delta: float) -> void:
     day_factor=night_lighting
