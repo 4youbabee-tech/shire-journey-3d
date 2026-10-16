@@ -112,6 +112,9 @@ func reply(npc: ShireNPC, topic: String, stage: int, day: int, hour: float, weat
             else:
                 en = "I still remember when we spoke of %s, %d day(s) ago." % [str(memory["topic"]), maxi(0,day-int(memory["day"]))]
                 ar = "ما زلت أتذكر حديثنا عن %s منذ %d يوم." % [str(memory["topic"]),maxi(0,day-int(memory["day"]))]
+                if mood == "warm":
+                    en += " It is good to have a friend who remembers."
+                    ar += " من الجميل أن يكون لنا صديق يتذكر."
         "birthday":
             if events.get("party_ready",false)==true:
                 en = "The Party Field is dressed for the celebration! Everyone has noticed your work."

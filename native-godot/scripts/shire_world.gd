@@ -30,6 +30,7 @@ func material(color: Color, roughness: float=.86) -> StandardMaterial3D:
     var m:=StandardMaterial3D.new()
     m.albedo_color=color
     m.roughness=roughness
+    m.specular_mode=BaseMaterial3D.SPECULAR_SCHLICK_GGX
     materials[key]=m
     return m
 
@@ -70,6 +71,11 @@ func _lighting() -> void:
     env.ambient_light_source=Environment.AMBIENT_SOURCE_SKY
     env.reflected_light_source=Environment.REFLECTION_SOURCE_BG
     env.tonemap_mode=Environment.TONE_MAPPER_FILMIC
+    # Conservative grade for the 2 GB VRAM target: no expensive SSAO/SSIL in GL Compatibility.
+    env.adjustment_enabled=true
+    env.adjustment_brightness=1.025
+    env.adjustment_contrast=1.075
+    env.adjustment_saturation=0.92
     env.fog_enabled=true
     env.fog_density=.0023
     env.fog_light_color=Color("778e82")
@@ -78,6 +84,7 @@ func _lighting() -> void:
     sun.rotation_degrees=Vector3(-38,-32,0)
     sun.light_color=Color("ffdfaa")
     sun.light_energy=.95
+    sun.shadow_blur=1.35
     sun.shadow_enabled=true
     sun.directional_shadow_max_distance=65.0
     add_child(sun)

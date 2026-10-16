@@ -13,6 +13,7 @@ const BagEndScript=preload("res://scripts/shire_bag_end.gd")
 const ActivityScript=preload("res://scripts/shire_activities.gd")
 const MapScript=preload("res://scripts/shire_map.gd")
 const CottageScript=preload("res://scripts/shire_cottage.gd")
+const SoundZoneScript=preload("res://scripts/shire_sound_zones.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
 var activities: ShireActivities
@@ -47,6 +48,7 @@ var elapsed_show:=0.0
 var ambience: AudioStreamPlayer
 var rain_audio: AudioStreamPlayer
 var stream_audio: AudioStreamPlayer3D
+var sound_zones: ShireSoundZones
 var world_seed:=24
 var start_notice_timer:=10.0
 var inside_bag_end := false
@@ -179,6 +181,8 @@ func _animals() -> void:
         add_child(pet)
 
 func _soundscape() -> void:
+    sound_zones=SoundZoneScript.new()
+    add_child(sound_zones)
     ambience=AudioStreamPlayer.new()
     ambience.stream=load("res://assets/audio/shire_birds_original.ogg")
     ambience.volume_db=-20.0
@@ -350,6 +354,8 @@ func _process(dt: float) -> void:
         return
     # Dialogue does NOT freeze world time or neighbour schedules.
     clock.advance(dt)
+    if is_instance_valid(sound_zones):
+        sound_zones.update_zones(clock.hour_value(),weather.type_at(clock.elapsed),inside_bag_end or inside_cottage,dt)
     autosave+=dt
     elapsed_show+=dt
     last_npc_update+=dt

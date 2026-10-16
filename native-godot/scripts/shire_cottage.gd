@@ -97,6 +97,10 @@ func _build() -> void:
     light.omni_range=10.0
     light.shadow_enabled=false
     add_child(light)
+    for i in range(6):
+        _bowl(Vector3(3.35+float(i%3)*.42,.17,2.05+float(i/3)*.36),.21,"c5a074")
+    for i in range(6):
+        _block(Vector3(-4.7+float(i)*.31,2.38,-3.1),Vector3(.18,.34,.28),"796849" if i%2==0 else "a78b53")
 
 func interaction_at(point: Vector3) -> String:
     if point.distance_to(EXIT)<1.7:

@@ -195,6 +195,15 @@ func _build() -> void:
         _round(Vector3(x, 1.7, -5.7), 0.42, 0.12, "a47744")
     _block(Vector3(7.7, 1.22, -1.4), Vector3(0.9, 2.22, 2.2), "765537")
     _light(Vector3(6.0, 2.7, 1.0), 1.15)
+    # Room-scale dressing from production location bible: books, pantry goods and copper cookware.
+    for i in range(8):
+        var col := "a77945" if i%3==0 else "7f5b3a" if i%3==1 else "5c704f"
+        _block(Vector3(5.15+float(i%4)*.42,2.10,-5.52+float(i/4)*.37),Vector3(.28,.48,.29),col)
+    for i in range(5):
+        _sphere(Vector3(5.1+float(i)*.6,1.18,-.55),Vector3(.2,.13,.17),"b58349")
+    for i in range(7):
+        _block(Vector3(-7.7+float(i)*.48,.23,1.7),Vector3(.3,.25,.32),"8d6749")
+    _light(Vector3(0,2.7,2.1),.50)
 
 func interaction_at(local_position: Vector3) -> String:
     if local_position.distance_to(EXIT) < 2.3:
