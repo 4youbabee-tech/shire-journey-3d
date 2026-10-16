@@ -16,7 +16,7 @@ check('res://scripts/main.gd' in scene,'native scene attached')
 for key in ['player.gd','shire_world.gd','shire_npc.gd','shire_clock.gd','shire_weather.gd','shire_dialogue.gd','main.gd','shire_animal.gd']:
  check((root/'scripts'/key).exists(),f'exists {key}')
 source='\n'.join(p.read_text() for p in (root/'scripts').glob('*.gd'))
-for feature,code in [('clock','REAL_DAY'),('weather','is_raining'),('physics','CharacterBody3D'),('save','user://shire_journey_godot_save_v2.json'),('54 NPCs','neighbour_%02d'),('Arabic subtitles','dialogue_ar'),('1st/3rd camera','first_person'),('dialogue memory','last_memory'),('story chronology','clock.story_year=3018'),('water shader','shader_type spatial'),('wildlife weather shelters','rain_now'),('native grass normal','grass_normal.jpg'),('circular stone arch','_stone_arch')]:
+for feature,code in [('clock','REAL_DAY'),('weather','is_raining'),('physics','CharacterBody3D'),('save','user://shire_journey_godot_save_v2.json'),('54 NPCs','neighbour_%02d'),('Arabic subtitles','dialogue_ar'),('1st/3rd camera','first_person'),('dialogue memory','last_memory'),('story chronology','clock.story_year=3018'),('water shader','shader_type spatial'),('wildlife weather shelters','rain_now'),('external CC0 grass normal','normal_gl_512.jpg'),('circular stone arch','_stone_arch')]:
  check(code in source,feature)
 for gd in (root/'scripts').glob('*.gd'):
  s=gd.read_text()
@@ -60,6 +60,15 @@ for key in ['grass_albedo.jpg','grass_normal.jpg','path_albedo.jpg','path_normal
   errors.append(f'PBR texture {key} unreadable: {error}')
 check('for i in range(19)' in source,'19 animals with simulated weather response')
 check('_rain_emitter' in source and 'rain_audio' in source, 'weather rain particles and original loop')
+license_file=root/'assets'/'external'/'polyhaven_leafy_grass'/'LICENSE_AND_SOURCE.json'
+try:
+ provenance=json.loads(license_file.read_text())
+ check(provenance.get('license')=='CC0 1.0' and provenance.get('slug')=='leafy_grass','verified Poly Haven CC0 origin')
+ for e in provenance.get('files',[]):
+  p=root/e['path']
+  check(__import__('hashlib').md5(p.read_bytes()).hexdigest()==e.get('official_expected_md5'),'Poly Haven source MD5 '+str(e['path']))
+except Exception as exc:
+ errors.append('Poly Haven asset provenance invalid '+str(exc))
 print('OFFLINE NATIVE RELEASE AUDIT')
 print(f'PASS: {len(passed)}')
 print(f'FAIL: {len(errors)}')

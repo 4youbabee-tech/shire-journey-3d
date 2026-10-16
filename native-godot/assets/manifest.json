@@ -136,6 +136,24 @@
       "provenance": "ORIGINAL-GAME",
       "generator": "scripts/generate_rain.py",
       "licensed_external_asset": false
+    },
+    {
+      "path": "assets/external/polyhaven_leafy_grass/diffuse_512.jpg",
+      "bytes": 140079,
+      "sha256": "8e2afea6f6b0f513bec99ff61b738bd9ea2c37e5312695be2ef9c80733e9f93c",
+      "provenance": "THIRD-PARTY-CC0",
+      "license": "CC0 1.0",
+      "source": "https://polyhaven.com/a/leafy_grass",
+      "derivative": "project-downsampled-512-from-verified-official-1k"
+    },
+    {
+      "path": "assets/external/polyhaven_leafy_grass/normal_gl_512.jpg",
+      "bytes": 189248,
+      "sha256": "cce38e01fe9ac3421657c253121fffd12cc98c56832f061bef939aeb09b0ef01",
+      "provenance": "THIRD-PARTY-CC0",
+      "license": "CC0 1.0",
+      "source": "https://polyhaven.com/a/leafy_grass",
+      "derivative": "project-downsampled-512-from-verified-official-1k"
     }
   ]
 }

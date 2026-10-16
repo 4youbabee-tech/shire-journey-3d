@@ -145,7 +145,7 @@ func _terrain() -> void:
                 var hue=.045*sin(v.x*.11+v.z*.05)+.05*cos(v.z*.19)
                 var color:=Color(.89+hue*.15,.93+hue*.10,.86+hue*.13)
                 tool.set_color(color)
-                tool.set_uv(Vector2(v.x,v.z)*.05)
+                tool.set_uv(Vector2(v.x,v.z)*.20)
                 tool.add_vertex(v)
     tool.generate_normals()
     var mesh:=tool.commit()
@@ -153,9 +153,9 @@ func _terrain() -> void:
     node.mesh=mesh
     var grassy:=StandardMaterial3D.new()
     grassy.vertex_color_use_as_albedo=true
-    grassy.albedo_texture=load("res://assets/textures/grass_albedo.jpg")
+    grassy.albedo_texture=load("res://assets/external/polyhaven_leafy_grass/diffuse_512.jpg")
     grassy.normal_enabled=true
-    grassy.normal_texture=load("res://assets/textures/grass_normal.jpg")
+    grassy.normal_texture=load("res://assets/external/polyhaven_leafy_grass/normal_gl_512.jpg")
     grassy.normal_scale=.28
     grassy.roughness=.93
     grassy.cull_mode=BaseMaterial3D.CULL_DISABLED
