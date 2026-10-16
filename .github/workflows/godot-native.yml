@@ -55,6 +55,8 @@ jobs:
         run: |
           mkdir -p native-godot/dist
           xvfb-run -a -s '-screen 0 1280x720x24' godot --rendering-driver opengl3 --path native-godot --script res://ci/capture_scene.gd
+      - name: Reject blank or obstructed game screenshots
+        run: python3 native-godot/tools/verify_render_visibility.py
       - name: Upload in-engine screenshot when captured
         uses: actions/upload-artifact@v4
         with:
