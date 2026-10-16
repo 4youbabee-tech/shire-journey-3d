@@ -12,6 +12,7 @@ const SocialScript=preload("res://scripts/shire_social.gd")
 const BagEndScript=preload("res://scripts/shire_bag_end.gd")
 const ActivityScript=preload("res://scripts/shire_activities.gd")
 const MapScript=preload("res://scripts/shire_map.gd")
+const CottageScript=preload("res://scripts/shire_cottage.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
 var activities: ShireActivities
@@ -49,10 +50,21 @@ var stream_audio: AudioStreamPlayer3D
 var world_seed:=24
 var start_notice_timer:=10.0
 var inside_bag_end := false
+var inside_cottage := false
+var cottage_interior: ShireCottage
+var current_cottage_id := ""
+var current_cottage_name := ""
 var camera_before_bag_end := false
 var bag_end_interior: ShireBagEnd
 var exterior_return := Vector3.ZERO
 const BAG_END_ENTRANCE := Vector2(-24.0, -26.32)
+const COTTAGE_DOORS := [
+    ["bagshot_cottage","Bagshot Row Home",-44.0,-30.44],
+    ["garden_cottage","North Garden Home",-45.0,-7.29],
+    ["hill_cottage","South Hill Home",-18.0,-43.52],
+    ["northern_cottage","North Lane Home",2.0,26.28],
+    ["market_cottage","Market Hill Home",18.0,23.52]
+]
 const INTERIOR_ORIGIN := Vector3(1000.0, 0.0, 1000.0)
 var nearest_landmark_id: String = ""
 var nearest_landmark_distance: float = 99.0
@@ -105,6 +117,8 @@ func _ready() -> void:
 func _new_game() -> void:
     if inside_bag_end:
         _exit_bag_end()
+    if inside_cottage:
+        _exit_cottage()
     stage=0
     activities.reset()
     for station in ShireActivities.STATIONS:
@@ -347,12 +361,13 @@ func _process(dt: float) -> void:
     if autosave>26.0:
         autosave=0.0
         save_game(false)
-    if inside_bag_end:
-        top_label.text="Bag End | باغ إند  •  "+clock.stamp()
+    if inside_bag_end or inside_cottage:
+        top_label.text=("Bag End" if inside_bag_end else current_cottage_name)+" | منزل الهوبيت  •  "+clock.stamp()
         if start_notice_timer>0.0:
             start_notice_timer-=dt
         else:
-            _interior_prompt()
+            if inside_bag_end: _interior_prompt()
+            else: _cottage_prompt()
         if int(elapsed_show)%2==0:
             fps_label.text="%d fps | Bag End interior" % Engine.get_frames_per_second()
         return
@@ -414,6 +429,10 @@ func _interaction_prompt() -> void:
     if _near_bag_end_door():
         prompt_label.text="[E] Enter Bag End | ادخل إلى باغ إند"
         return
+    var cottage_door: Array=_nearest_cottage_door()
+    if not cottage_door.is_empty():
+        prompt_label.text="[E] Enter %s | ادخل المنزل" % str(cottage_door[1])
+        return
     var party_station: Dictionary=activities.available_at(frodo.position,stage)
     if not party_station.is_empty():
         prompt_label.text="[E] %s | %s (%d/3)" % [party_station["en"],party_station["ar"],activities.progress()]
@@ -446,8 +465,14 @@ func _unhandled_input(event: InputEvent) -> void:
         if inside_bag_end:
             _interact_interior()
             get_viewport().set_input_as_handled()
+        elif inside_cottage:
+            _interact_cottage()
+            get_viewport().set_input_as_handled()
         elif _near_bag_end_door():
             _enter_bag_end()
+            get_viewport().set_input_as_handled()
+        elif not _nearest_cottage_door().is_empty():
+            _enter_cottage(_nearest_cottage_door())
             get_viewport().set_input_as_handled()
         else:
             var party_station: Dictionary=activities.available_at(frodo.position,stage)
@@ -549,8 +574,94 @@ func _end_conversation() -> void:
     frodo.active=true
     Input.mouse_mode=Input.MOUSE_MODE_CAPTURED
 
+func _nearest_cottage_door() -> Array:
+    if inside_bag_end or inside_cottage:
+        return []
+    var here := Vector2(frodo.position.x,frodo.position.z)
+    var nearest: Array=[]
+    var best: float=2.95
+    for entry in COTTAGE_DOORS:
+        var dist: float=here.distance_to(Vector2(float(entry[2]),float(entry[3])))
+        if dist<best:
+            best=dist
+            nearest=entry
+    return nearest
+
+func _enter_cottage(entry: Array) -> void:
+    if inside_bag_end or inside_cottage:
+        return
+    exterior_return=frodo.position
+    camera_before_bag_end=frodo.first_person
+    current_cottage_id=str(entry[0])
+    current_cottage_name=str(entry[1])
+    cottage_interior=CottageScript.new()
+    cottage_interior.variant_id=current_cottage_id
+    cottage_interior.display_name=current_cottage_name
+    cottage_interior.position=INTERIOR_ORIGIN
+    add_child(cottage_interior)
+    inside_cottage=true
+    frodo.first_person=true
+    shire.visible=false
+    for key in npcs: npcs[key].visible=false
+    for pet in animals: pet.visible=false
+    frodo.position=INTERIOR_ORIGIN+ShireCottage.ENTRY
+    frodo.velocity=Vector3.ZERO
+    frodo.yaw=0.0
+    frodo.rotation.y=0.0
+    frodo._update_camera()
+    ambience.volume_db=-32.0
+    stream_audio.volume_db=-52.0
+    rain_audio.volume_db=-52.0
+    social.record("home_"+current_cottage_id,"Visited "+current_cottage_name,"زرت "+current_cottage_name,clock.day_index())
+    _show_notice("A homely cottage. Explore the shelves, pantry and hearth.", "منزل دافئ. استكشف الرفوف والمخزن والموقد.")
+
+func _exit_cottage() -> void:
+    if not inside_cottage:
+        return
+    inside_cottage=false
+    frodo.position=exterior_return
+    frodo.velocity=Vector3.ZERO
+    frodo.yaw=PI
+    frodo.rotation.y=PI
+    frodo.first_person=camera_before_bag_end
+    frodo._update_camera()
+    shire.visible=true
+    for key in npcs: npcs[key].visible=true
+    for pet in animals: pet.visible=true
+    if is_instance_valid(cottage_interior):
+        cottage_interior.queue_free()
+        cottage_interior=null
+    current_cottage_id=""
+    current_cottage_name=""
+    stream_audio.volume_db=-17.0
+    _refresh_story_entities()
+    _show_notice("Back outside in Hobbiton","عدت إلى هوبيتون")
+
+func _cottage_prompt() -> void:
+    if not is_instance_valid(cottage_interior):
+        return
+    match cottage_interior.interaction_at(frodo.position-INTERIOR_ORIGIN):
+        "exit": prompt_label.text="[E] Leave cottage | اخرج من المنزل"
+        "reading": prompt_label.text="[E] Look at the family books | انظر إلى كتب العائلة"
+        "pantry": prompt_label.text="[E] Inspect the pantry | تفقّد المخزن"
+        "hearth": prompt_label.text="[E] Warm yourself by the fire | اقترب من الموقد"
+        _: prompt_label.text="Explore the cottage | استكشف المنزل"
+
+func _interact_cottage() -> void:
+    if not is_instance_valid(cottage_interior):
+        return
+    var place: String=cottage_interior.interaction_at(frodo.position-INTERIOR_ORIGIN)
+    if place=="exit":
+        _exit_cottage()
+        return
+    if place=="":
+        return
+    social.record("cottage_"+current_cottage_id+"_"+place,"Explored "+place+" in "+current_cottage_name,"استكشفت "+current_cottage_name,clock.day_index())
+    _show_notice("A small story from ordinary Shire life.", "تفصيل صغير من حياة الشاير اليومية.")
+    save_game(false)
+
 func _near_bag_end_door() -> bool:
-    if inside_bag_end:
+    if inside_bag_end or inside_cottage:
         return false
     var here := Vector2(frodo.position.x, frodo.position.z)
     return here.distance_to(BAG_END_ENTRANCE) < 3.1
@@ -645,11 +756,11 @@ func save_game(notify: bool=true) -> void:
     for key in npcs:
         var npc: ShireNPC=npcs[key]
         people_state[key]=npc.pack()
-    var saved_player_pos: Vector3=exterior_return if inside_bag_end else frodo.position
+    var saved_player_pos: Vector3=exterior_return if (inside_bag_end or inside_cottage) else frodo.position
     var game_state: Dictionary={
         "schema":2,"clock":clock.pack(),"stage":stage,
         "flags":quest_flags.duplicate(true),"weather_seed":weather.seed,
-        "player":{"pos":[saved_player_pos.x,saved_player_pos.y,saved_player_pos.z],"yaw":frodo.yaw,"camera_first":camera_before_bag_end if inside_bag_end else frodo.first_person,"inside_bag_end":inside_bag_end},
+        "player":{"pos":[saved_player_pos.x,saved_player_pos.y,saved_player_pos.z],"yaw":frodo.yaw,"camera_first":camera_before_bag_end if (inside_bag_end or inside_cottage) else frodo.first_person,"inside_bag_end":inside_bag_end,"inside_cottage":inside_cottage,"cottage_id":current_cottage_id},
         "npcs":people_state,"social":social.pack(),"activities":activities.pack(),
         "animals":animals.map(func(pet): return pet.pack())}
     var file:=FileAccess.open(SAVE_FILE,FileAccess.WRITE)
@@ -675,6 +786,8 @@ func load_game() -> void:
         return
     if inside_bag_end:
         _exit_bag_end()
+    if inside_cottage:
+        _exit_cottage()
     social.unpack(raw.get("social",{}))
     activities.unpack(raw.get("activities",{}))
     for station in ShireActivities.STATIONS:
@@ -699,6 +812,12 @@ func load_game() -> void:
         camera_before_bag_end=bool(data.get("camera_first",false))
         frodo.first_person = true
         frodo._update_camera()
+    elif data.get("inside_cottage",false)==true:
+        for door in COTTAGE_DOORS:
+            if str(door[0])==str(data.get("cottage_id","")):
+                _enter_cottage(door)
+                camera_before_bag_end=bool(data.get("camera_first",false))
+                break
     var restored: Dictionary=raw.get("npcs",{})
     for key in npcs:
         if restored.get(key) is Dictionary:
@@ -742,7 +861,7 @@ func _toggle_journal() -> void:
     entries.append("Press J to return to the world | اضغط J للعودة")
     journal_body.text="\n".join(entries)
 func _toggle_map() -> void:
-    if paused_by_user or in_conversation or journal_panel.visible:
+    if paused_by_user or in_conversation or journal_panel.visible or inside_bag_end or inside_cottage:
         return
     map_panel.visible = not map_panel.visible
     frodo.active = not map_panel.visible

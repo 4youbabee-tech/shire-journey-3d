@@ -122,6 +122,18 @@ func _run_smoke() -> void:
         quit(15)
         return
     shire_map.free()
+    var home = load("res://scripts/shire_cottage.gd").new()
+    home.variant_id="bagshot_cottage"
+    get_root().add_child(home)
+    if home.get_child_count()<20 or home.interaction_at(home.ENTRY)!="" or home.interaction_at(home.EXIT)!="exit":
+        push_error("Explorable Hobbiton home geometry or door invalid")
+        quit(18)
+        return
+    if home.interaction_at(home.READING)!="reading" or home.interaction_at(home.PANTRY)!="pantry":
+        push_error("Cottage furnishing interactions invalid")
+        quit(19)
+        return
+    home.free()
     interior.free()
     npc.free()
     print("PASS: memory, 54 villagers, bilingual dialogue, once-per-day relationship and favour persistence")
