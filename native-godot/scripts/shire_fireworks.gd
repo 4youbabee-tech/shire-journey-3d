@@ -39,8 +39,8 @@ func _generate_pop() -> AudioStreamWAV:
     for i in range(int(RATE*DURATION)):
         var t: float=float(i)/float(RATE)
         envelope=exp(-t*15.0)
-        var signal: float=(sin(TAU*125.0*t)*.65+rng.randf_range(-1.0,1.0)*.28)*envelope*.24
-        data.encode_s16(i*2,int(clampf(signal,-.95,.95)*32767.0))
+        var waveform: float=(sin(TAU*125.0*t)*.65+rng.randf_range(-1.0,1.0)*.28)*envelope*.24
+        data.encode_s16(i*2,int(clampf(waveform,-.95,.95)*32767.0))
     var result := AudioStreamWAV.new()
     result.format=AudioStreamWAV.FORMAT_16_BITS
     result.mix_rate=RATE
