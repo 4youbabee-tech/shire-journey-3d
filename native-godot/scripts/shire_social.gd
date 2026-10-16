@@ -4,6 +4,18 @@ extends RefCounted
 const TOPICS := ["family", "harvest", "rumours", "friendship", "festival", "fears", "promise"]
 const ROLE_WANTS := {"gardener":"a thriving garden", "baker":"a warm loaf for every neighbour", "farmer":"a peaceful harvest", "miller":"a steady mill wheel", "merchant":"a fair market", "weaver":"warm clothes for winter", "messenger":"a safe road", "carpenter":"a sound roof"}
 const ROLE_AR := {"gardener":"حديقة مزدهرة", "baker":"خبز طازج للجيران", "farmer":"حصاد هادئ", "miller":"طاحونة تعمل جيداً", "merchant":"سوق عادلة", "weaver":"ثياب دافئة للشتاء", "messenger":"طريق آمن", "carpenter":"سقف يحمي العائلة"}
+const PERSONAL_VOICES := {
+    "sam":{"greeting":["I was tending the borders, Mr. Frodo. Some roots need time, like a good friendship.","كنت أعتني بأطراف الحديقة يا سيد فرودو. بعض الجذور تحتاج وقتًا، مثل الصداقة الطيبة."],"work":["The garden asks for patience, and it gives more than it takes.","الحديقة تطلب الصبر، لكنها تعطي أكثر مما تأخذ."]},
+    "bilbo":{"greeting":["There you are, Frodo. I have another page to write and a dozen roads in my head.","ها أنت يا فرودو. أمامي صفحة جديدة أكتبها وعشرات الطرق في خيالي."],"work":["I write down what I remember, and sometimes what I wish I had noticed.","أدوّن ما أتذكره، وأحيانًا ما أتمنى لو أنني انتبهت إليه."]},
+    "gandalf":{"greeting":["A fair morning for a thoughtful question, Frodo, though not every question needs an answer today.","صباح مناسب لسؤال متأنٍّ يا فرودو، وليس لكل سؤال جواب اليوم."],"work":["Some preparations are best made quietly, well before anyone knows why.","بعض الاستعدادات من الأفضل أن تتم بهدوء، قبل أن يعرف الناس سببها بوقت طويل."]},
+    "rosie":{"greeting":["Frodo! You look as though you could do with something warm to eat.","فرودو! تبدو بحاجة إلى وجبة دافئة."],"work":["There's a great deal to do, but a cheerful table is worth the trouble.","هناك الكثير من العمل، لكن مائدة عامرة بالمودة تستحق العناء."]},
+    "rowan":{"greeting":["Morning, Frodo! The first loaves are out, and the queue is already growing.","صباح الخير يا فرودو! خرجت الأرغفة الأولى والطابور يزداد طولًا."],"work":["I rise early so my neighbours may start the day with fresh bread.","أستيقظ باكرًا ليبدأ الجيران يومهم بخبز طازج."]},
+    "hobb":{"greeting":["Listen, Frodo. The mill wheel is almost as talkative as the market today.","اسمع يا فرودو. عجلة الطاحونة تكاد تكون كثيرة الكلام كالسوق اليوم."],"work":["The water has its own rhythm. A miller learns to follow it.","للمياه إيقاعها الخاص. يتعلم الطحّان أن يسير معه."]},
+    "tansy":{"greeting":["Mind the seedlings, Frodo. They're only beginning to trust the sunlight.","انتبه إلى الشتلات يا فرودو. بدأت لتوها تثق بضوء الشمس."],"work":["The soil will tell you what it needs if you learn to listen.","تخبرك التربة بما تحتاجه إن تعلمت الإصغاء."]},
+    "hazel":{"greeting":["Good day, Frodo. If you're passing through, have a look at the new wares.","نهارك سعيد يا فرودو. إن كنت مارًا، ألق نظرة على البضائع الجديدة."],"work":["Fair dealing keeps a village closer than any fine speech.","المعاملة العادلة تجمع القرية أكثر من أجمل الخطابات."]},
+    "hugo":{"greeting":["Morning. There'll be rain before the hay is in, mark my words.","صباح الخير. ستمطر قبل جمع التبن، تذكّر كلامي."],"work":["A good field asks for work no one sees and patience no one praises.","الحقل الجيد يحتاج عملًا لا يراه أحد وصبرًا لا يمدحه أحد."]},
+    "aster":{"greeting":["Frodo! I have passed three gardens today, and each has a new story.","فرودو! مررت اليوم بثلاث حدائق ولكل منها حكاية جديدة."],"work":["Letters travel between homes, but news travels faster than I do.","تنتقل الرسائل بين البيوت، لكن الأخبار أسرع مني."]}
+}
 const MEM_LIMIT := 32
 var bonds: Dictionary = {}
 var journal: Array[Dictionary] = []
@@ -144,6 +156,14 @@ func reply(npc: ShireNPC, topic: String, stage: int, day: int, hour: float, weat
         _:
             en = "Every season brings another small story."
             ar = "يحمل كل فصل حكاية صغيرة جديدة."
+    # ORIGINAL-GAME voice profiles vary the ten named residents; mood overrides
+    # still take precedence during rain, night, or a damaged relationship.
+    if PERSONAL_VOICES.has(id) and topic in ["greeting","work"]:
+        var distinctive: Dictionary = PERSONAL_VOICES[id]
+        if topic == "work" or mood == "content":
+            var voice: Array = distinctive[topic]
+            en = str(voice[0])
+            ar = str(voice[1])
     meet(id, day)
     remember(id, topic, day, 7 if topic in ["friendship", "favour"] else 3)
     return {"speaker":who, "en":en, "ar":ar, "mood":mood}
