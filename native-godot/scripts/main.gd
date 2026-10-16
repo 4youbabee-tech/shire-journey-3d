@@ -16,11 +16,13 @@ const CottageScript=preload("res://scripts/shire_cottage.gd")
 const SoundZoneScript=preload("res://scripts/shire_sound_zones.gd")
 const DiscoveriesScript=preload("res://scripts/shire_discoveries.gd")
 const CinemaScript=preload("res://scripts/shire_chapter_cinema.gd")
+const FireworksScript=preload("res://scripts/shire_fireworks.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
 var activities: ShireActivities
 var discoveries: ShireDiscoveries
 var cinema: ShireChapterCinema
+var fireworks: ShireFireworks
 var shire: ShireWorld
 var frodo: ShirePlayer
 var clock: ShireClock
@@ -110,6 +112,8 @@ func _ready() -> void:
     _people()
     _animals()
     _soundscape()
+    fireworks=FireworksScript.new()
+    add_child(fireworks)
     _interface()
     _refresh_story_entities()
     social.record("homecoming", "Awoke among the hills of Hobbiton", "استيقظت بين تلال هوبيتون", 0)
@@ -129,6 +133,7 @@ func _new_game() -> void:
     stage=0
     activities.reset()
     discoveries.reset()
+    fireworks.reset()
     for station in ShireActivities.STATIONS:
         shire.set_party_prepared(str(station["id"]),false)
     quest_flags={"market_supplies":false,"sam_joined":false}
@@ -469,6 +474,9 @@ func _interaction_prompt() -> void:
     if not cottage_door.is_empty():
         prompt_label.text="[E] Enter %s | ادخل المنزل" % str(cottage_door[1])
         return
+    if fireworks.can_interact(frodo.position,stage):
+        prompt_label.text="[E] Watch Gandalf\'s fireworks | شاهد ألعاب غاندالف النارية"
+        return
     var party_station: Dictionary=activities.available_at(frodo.position,stage)
     if not party_station.is_empty():
         prompt_label.text="[E] %s | %s (%d/3)" % [party_station["en"],party_station["ar"],activities.progress()]
@@ -520,6 +528,10 @@ func _unhandled_input(event: InputEvent) -> void:
             _enter_cottage(_nearest_cottage_door())
             get_viewport().set_input_as_handled()
         else:
+            if fireworks.can_interact(frodo.position,stage):
+                _launch_fireworks()
+                get_viewport().set_input_as_handled()
+                return
             var party_station: Dictionary=activities.available_at(frodo.position,stage)
             if not party_station.is_empty():
                 _prepare_party_station(str(party_station["id"]))
@@ -534,6 +546,15 @@ func _unhandled_input(event: InputEvent) -> void:
                     if npc:
                         _begin_conversation(npc)
                         get_viewport().set_input_as_handled()
+
+func _launch_fireworks() -> void:
+    var outcome: Dictionary=fireworks.launch(stage)
+    if outcome.is_empty():
+        return
+    social.record("gandalf_fireworks",str(outcome["en"]),str(outcome["ar"]),clock.day_index())
+    social.events["fireworks_shown"]=true
+    _show_notice(str(outcome["en"]),str(outcome["ar"]))
+    save_game(false)
 
 func _discover_landmark(id: String) -> void:
     var note: Dictionary=discoveries.discover(id)
@@ -826,7 +847,7 @@ func save_game(notify: bool=true) -> void:
         "schema":2,"clock":clock.pack(),"stage":stage,
         "flags":quest_flags.duplicate(true),"weather_seed":weather.seed,
         "player":{"pos":[saved_player_pos.x,saved_player_pos.y,saved_player_pos.z],"yaw":frodo.yaw,"camera_first":camera_before_bag_end if (inside_bag_end or inside_cottage) else frodo.first_person,"inside_bag_end":inside_bag_end,"inside_cottage":inside_cottage,"cottage_id":current_cottage_id},
-        "npcs":people_state,"social":social.pack(),"activities":activities.pack(),"discoveries":discoveries.pack(),
+        "npcs":people_state,"social":social.pack(),"activities":activities.pack(),"discoveries":discoveries.pack(),"fireworks":fireworks.pack(),
         "animals":animals.map(func(pet): return pet.pack())}
     var file:=FileAccess.open(SAVE_FILE,FileAccess.WRITE)
     if file:
@@ -856,6 +877,7 @@ func load_game() -> void:
     social.unpack(raw.get("social",{}))
     activities.unpack(raw.get("activities",{}))
     discoveries.unpack(raw.get("discoveries",{}))
+    fireworks.unpack(raw.get("fireworks",{}))
     for station in ShireActivities.STATIONS:
         var id: String=str(station["id"])
         shire.set_party_prepared(id,activities.is_prepared(id))
