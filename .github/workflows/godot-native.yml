@@ -32,6 +32,17 @@ jobs:
         run: godot --headless --path native-godot --script res://ci/headless_smoke.gd
       - name: Simulate opening scene for 120 frames
         run: godot --headless --path native-godot --quit-after 120
+      - name: Capture in-engine screenshot via virtual display
+        continue-on-error: true
+        run: |
+          mkdir -p native-godot/dist
+          xvfb-run -a -s '-screen 0 1280x720x24' godot --rendering-driver opengl3 --path native-godot --script res://ci/capture_scene.gd
+      - name: Upload in-engine screenshot when captured
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShireJourney-Godot-InEngine-Frame
+          path: native-godot/dist/in_engine_hobbiton.png
+          if-no-files-found: ignore
       - name: Export Windows executable
         run: |
           mkdir -p native-godot/dist
@@ -43,3 +54,22 @@ jobs:
           name: ShireJourney-Godot4-Windows-Candidate
           path: native-godot/dist/*
           retention-days: 14
+
+  windows-launch-smoke:
+    needs: linux-import-smoke
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ShireJourney-Godot4-Windows-Candidate
+          path: dist
+      - name: Launch exported Windows EXE for 120 frames
+        shell: pwsh
+        run: |
+          $exe = Join-Path $PWD 'dist\ShireJourney.exe'
+          if (!(Test-Path $exe)) { throw "Windows EXE not found" }
+          $output = & $exe --headless --quit-after 120 2>&1 | Out-String
+          Write-Host $output
+          if ($LASTEXITCODE -ne 0) { throw "Windows game exited with code $LASTEXITCODE" }
+          if ($output -match 'SCRIPT ERROR|Parse Error') { throw "Godot script error in Windows smoke" }
