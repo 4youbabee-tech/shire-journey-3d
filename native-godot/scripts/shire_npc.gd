@@ -26,6 +26,11 @@ var route_goal := Vector2(INF,INF)
 var route_index := 0
 var legs: Array[Node3D] = []
 var arms: Array[Node3D] = []
+const VISUAL_DISTANCE := 50.0
+const FULL_FIDELITY_DISTANCE := 21.0
+const FAR_SIMULATION_INTERVAL := .68
+var _far_tick_accumulator := 0.0
+var _simulation_steps := 0
 
 func configure(id_value: String, label: String, occupation: String, origin: Vector3, workplace: Vector3, palette: Color, seed_number: int) -> void:
     profile_id=id_value
@@ -45,6 +50,22 @@ func configure(id_value: String, label: String, occupation: String, origin: Vect
 
 func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: float, game_seconds: float) -> void:
     closeness=global_position.distance_to(player_pos)
+    # Never deactivate the resident itself: only off-camera visual updates.
+    # Their schedules continue in coarse steps, preserving relationships and saves.
+    var high_priority: bool=follow_player or look_at_player
+    var far_away: bool=closeness>=VISUAL_DISTANCE and not high_priority
+    body.visible=not far_away
+    body.set_animation_lod(closeness<=FULL_FIDELITY_DISTANCE or high_priority)
+    if far_away:
+        _far_tick_accumulator+=delta
+        if _far_tick_accumulator<FAR_SIMULATION_INTERVAL:
+            return
+        delta=_far_tick_accumulator
+        _far_tick_accumulator=0.0
+    else:
+        # Do not accelerate a nearby character to compensate an offscreen tick.
+        _far_tick_accumulator=0.0
+    _simulation_steps+=1
     var target:=home
     if follow_player:
         target = player_pos + Vector3(1.4, 0.0, 1.4) if closeness > 2.4 else position
@@ -108,7 +129,8 @@ func update_schedule(game_hour: float, rain: bool, player_pos: Vector3, delta: f
             position.y=home.y if distance<=.3 else lerpf(position.y,target.y,minf(delta*2.0,1.0))
     # Social encounters trigger short animated gestures without starting canonical dialogue.
     body.social_gesture = not look_at_player and not walking and action in ["socializing","visiting"] and closeness < 26.0 and fposmod(game_seconds+float(seed_value)*.73,13.0)<2.5
-    body.animate_walk(walking,game_seconds+float(seed_value)*.08,delta,closeness,follow_player)
+    if not far_away:
+        body.animate_walk(walking,game_seconds+float(seed_value)*.08,delta,closeness,follow_player)
     visible=closeness<100.0
     # This node is updated by the world scheduler; disabling _process does not stop its simulation.
     if body != null and closeness>=35.0:
