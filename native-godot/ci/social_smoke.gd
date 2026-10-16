@@ -102,6 +102,25 @@ func _run_smoke() -> void:
         push_error("Environmental discovery memory failed")
         quit(42)
         return
+    var fireworks_test=load("res://scripts/shire_fireworks.gd").new()
+    get_root().add_child(fireworks_test)
+    if not fireworks_test.can_interact(Vector3(5,0,-9),3):
+        push_error("Birthday fireworks interaction inaccessible")
+        quit(47)
+        return
+    if fireworks_test.launch(3).is_empty() or fireworks_test.can_interact(Vector3(5,0,-9),3):
+        push_error("Birthday fireworks launch invalid")
+        quit(48)
+        return
+    var another_firework=load("res://scripts/shire_fireworks.gd").new()
+    get_root().add_child(another_firework)
+    another_firework.unpack(fireworks_test.pack())
+    if another_firework.can_interact(Vector3(5,0,-9),3):
+        push_error("Birthday fireworks save replay invalid")
+        quit(49)
+        return
+    fireworks_test.free()
+    another_firework.free()
     # Bag End is an actual scene graph with reachable exploration hotspots.
     var interior = load("res://scripts/shire_bag_end.gd").new()
     get_root().add_child(interior)
