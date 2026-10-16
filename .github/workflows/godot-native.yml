@@ -27,7 +27,10 @@ jobs:
       - name: Validate source, GLB and audio manifests
         run: python3 native-godot/tests/verify_native_release.py
       - name: Import assets and verify GDScript parse
-        run: godot --headless --path native-godot --import --quit
+        run: |
+          set -o pipefail
+          godot --headless --path native-godot --import --quit 2>&1 | tee /tmp/shire-import.log
+          if grep -E 'SCRIPT ERROR|Parse Error|Compile Error' /tmp/shire-import.log; then exit 1; fi
       - name: Run native clock/weather smoke
         run: godot --headless --path native-godot --script res://ci/headless_smoke.gd
       - name: Simulate opening scene for 120 frames
