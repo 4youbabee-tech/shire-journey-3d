@@ -18,6 +18,7 @@ var rng:=RandomNumberGenerator.new()
 var materials: Dictionary={}
 var drawn : Array[Node3D]=[]
 var day_factor:=1.0
+var village_life: ShireVillageLife
 
 func elevation(x: float,z: float) -> float:
     var roll:=2.0*sin(x*.029)*cos(z*.024)+1.3*sin(x*.066+z*.019)+.7*cos(z*.081)
@@ -55,6 +56,10 @@ func _ready() -> void:
     _trees()
     _grass_and_flowers()
     _lantern_posts()
+    village_life=preload("res://scripts/shire_village_life.gd").new()
+    village_life.name="AnimatedDomesticDetails"
+    add_child(village_life)
+    village_life.populate(Callable(self,"elevation"))
 
 func _lighting() -> void:
     world_environment=WorldEnvironment.new()
@@ -538,3 +543,5 @@ func update_environment(time_of_day: float, night_lighting: float, weather_type:
 
     if is_instance_valid(wheel):
         wheel.rotation.z+=delta*.23
+    if is_instance_valid(village_life):
+        village_life.tick(Time.get_ticks_msec()*.001,1.7 if weather_type in ["storm","heavy_rain"] else 1.0,delta)
