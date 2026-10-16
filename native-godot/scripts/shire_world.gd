@@ -158,6 +158,7 @@ func _terrain() -> void:
     grassy.normal_texture=load("res://assets/textures/grass_normal.jpg")
     grassy.normal_scale=.28
     grassy.roughness=.93
+    grassy.cull_mode=BaseMaterial3D.CULL_DISABLED
     node.material_override=grassy
     add_child(node)
     var collider:=StaticBody3D.new()
