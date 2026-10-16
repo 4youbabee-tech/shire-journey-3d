@@ -10,6 +10,7 @@ var river : MeshInstance3D
 var wheel : Node3D
 var lanterns : Array[OmniLight3D] = []
 var chimney_smoke : Array[CPUParticles3D] = []
+var rainfall: CPUParticles3D
 var weather_particles : Array[MeshInstance3D] = []
 var rng:=RandomNumberGenerator.new()
 var materials: Dictionary={}
@@ -33,6 +34,7 @@ func material(color: Color, roughness: float=.86) -> StandardMaterial3D:
 func _ready() -> void:
     rng.seed=3018
     _lighting()
+    _rain_emitter()
     _terrain()
     _lanes()
     _water()
@@ -100,6 +102,32 @@ func sph(parent: Node3D, point: Vector3, scale_value: Vector3, tint: Color) -> M
     node.material_override=material(tint)
     parent.add_child(node)
     return node
+
+func _rain_emitter() -> void:
+    rainfall=CPUParticles3D.new()
+    rainfall.name="LocalRain"
+    rainfall.amount=150
+    rainfall.lifetime=1.5
+    rainfall.emitting=false
+    rainfall.emission_shape=CPUParticles3D.EMISSION_SHAPE_BOX
+    rainfall.emission_box_extents=Vector3(13,5,13)
+    rainfall.direction=Vector3(0,-1,0)
+    rainfall.spread=7.0
+    rainfall.gravity=Vector3(0,-10.0,0)
+    rainfall.initial_velocity_min=9.0
+    rainfall.initial_velocity_max=13.5
+    rainfall.scale_amount_min=.75
+    rainfall.scale_amount_max=1.15
+    var drop_mesh:=BoxMesh.new()
+    drop_mesh.size=Vector3(.018,.38,.018)
+    var rain_material:=StandardMaterial3D.new()
+    rain_material.albedo_color=Color(.68,.77,.82,.55)
+    rain_material.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA
+    rain_material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
+    rain_material.cull_mode=BaseMaterial3D.CULL_DISABLED
+    drop_mesh.material=rain_material
+    rainfall.mesh=drop_mesh
+    add_child(rainfall)
 
 func _terrain() -> void:
     var tool:=SurfaceTool.new()
@@ -448,5 +476,7 @@ func update_environment(time_of_day: float, night_lighting: float, weather_type:
         lamp.light_energy=1.4*(1.0-smoothstep(.3,.7,night_lighting))
     for smoke in chimney_smoke:
         smoke.emitting=weather_type not in ["heavy_rain", "storm"]
+    rainfall.emitting=weather_type in ["light_rain", "heavy_rain", "storm"] and weather_strength>.12
+
     if is_instance_valid(wheel):
         wheel.rotation.z+=delta*.23

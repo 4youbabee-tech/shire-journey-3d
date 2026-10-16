@@ -128,6 +128,14 @@
       "provenance": "ORIGINAL-GAME",
       "generator": "scripts/make_pbr_ground.py",
       "licensed_external_asset": false
+    },
+    {
+      "path": "assets/audio/shire_rain_original.ogg",
+      "bytes": 49327,
+      "sha256": "fc000e87e17d19e2f5aeb29b0b5ef6774fd8bb5757161c416b00c212867d3170",
+      "provenance": "ORIGINAL-GAME",
+      "generator": "scripts/generate_rain.py",
+      "licensed_external_asset": false
     }
   ]
 }

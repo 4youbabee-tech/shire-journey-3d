@@ -39,7 +39,7 @@ for name in ['shire_birds_original.wav','river_original.wav']:
   with wave.open(str(root/'assets'/'audio'/name),'rb') as wav:
    check(wav.getnframes()>22050 and wav.getnchannels()==1,f'{name} audio valid')
  except Exception as e: errors.append(f'audio {name}: {e}')
-for name in ['shire_birds_original.ogg','river_original.ogg']:
+for name in ['shire_birds_original.ogg','river_original.ogg','shire_rain_original.ogg']:
  check((root/'assets'/'audio'/name).stat().st_size>1000,f'{name} compressed audio valid')
 for match in re.findall(r'res://([^"\']+\.glb)',source):
  if '%' not in match:
@@ -59,6 +59,7 @@ for key in ['grass_albedo.jpg','grass_normal.jpg','path_albedo.jpg','path_normal
  except Exception as error:
   errors.append(f'PBR texture {key} unreadable: {error}')
 check('for i in range(19)' in source,'19 animals with simulated weather response')
+check('_rain_emitter' in source and 'rain_audio' in source, 'weather rain particles and original loop')
 print('OFFLINE NATIVE RELEASE AUDIT')
 print(f'PASS: {len(passed)}')
 print(f'FAIL: {len(errors)}')

@@ -21,3 +21,11 @@ Native source was staged on the branch `production/godot-native-chapter1-2026101
 
 ## CI candidate
 A native Godot headless test and Windows export workflow was authored, but is not evidence of a successful EXE build unless the associated GitHub workflow is confirmed successful and its artifact downloaded and tested.
+
+## Native weather/visual increment (2026-10-16)
+- Added 4 original 512x512 PBR JPEGs (grass/earth diffuse+normal) and deterministic generators.
+- Added procedural chimneys, circular stone facade arch, moderated fog and daylight.
+- Added 19 stateful birds/animals/insects (hens/rabbits/butterflies) with night/rain rules, saved/restored with world state.
+- Added rain emitter and synthesized OGG rain sound linked to weather.
+- This checkpoint initially passed Python static audits only. Godot CI results and screenshots are required to prove runtime success. Source files remain editable and original-game owned.
+- Photo-realistic characters, skeletons, external CC0 downloads and 30 FPS on target hardware remain future production gates.

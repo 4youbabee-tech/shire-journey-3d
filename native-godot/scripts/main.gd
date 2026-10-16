@@ -38,6 +38,7 @@ var last_npc_update:=0.0
 var autosave:=0.0
 var elapsed_show:=0.0
 var ambience: AudioStreamPlayer
+var rain_audio: AudioStreamPlayer
 var stream_audio: AudioStreamPlayer3D
 var world_seed:=24
 var start_notice_timer:=10.0
@@ -136,6 +137,11 @@ func _soundscape() -> void:
     stream_audio.volume_db=-17
     add_child(stream_audio)
     stream_audio.play()
+    rain_audio=AudioStreamPlayer.new()
+    rain_audio.stream=load("res://assets/audio/shire_rain_original.ogg")
+    rain_audio.volume_db=-48.0
+    add_child(rain_audio)
+    rain_audio.play()
 
 func _style_panel(box_color: Color=Color(.075,.11,.10,.89)) -> PanelContainer:
     var container:=PanelContainer.new()
@@ -289,6 +295,10 @@ func _process(dt: float) -> void:
                 continue
             npc.update_schedule(clock.hour_value(),weather.is_raining(clock.elapsed),frodo.position,sim_delta,clock.elapsed)
     shire.update_environment(clock.hour_value(),clock.light_factor(),w,weather.darkness_at(clock.elapsed),dt)
+    shire.rainfall.position=frodo.position+Vector3(0,13,0)
+    # Rain is an audible changing system, not only a visual sky overlay.
+    rain_audio.volume_db=lerpf(rain_audio.volume_db,-17.0 if weather.is_raining(clock.elapsed) else -48.0,minf(dt*.8,1.0))
+    ambience.volume_db=lerpf(ambience.volume_db,-31.0 if weather.is_raining(clock.elapsed) else -20.0,minf(dt*.4,1.0))
     top_label.text=clock.stamp()+"  •  "+w.replace("_"," ")
     if start_notice_timer>0:
         start_notice_timer-=dt
@@ -310,6 +320,8 @@ func _process(dt: float) -> void:
         ambience.play()
     if not stream_audio.playing:
         stream_audio.play()
+    if not rain_audio.playing:
+        rain_audio.play()
 
 func _nearest_npc() -> ShireNPC:
     var best: ShireNPC=null
