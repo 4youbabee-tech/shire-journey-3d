@@ -102,6 +102,19 @@ func _run_smoke() -> void:
         push_error("Environmental discovery memory failed")
         quit(42)
         return
+    var footsteps_test=load("res://scripts/shire_footsteps.gd").new()
+    get_root().add_child(footsteps_test)
+    if footsteps_test.soil == null or footsteps_test.wood == null:
+        push_error("Indoor and outdoor footstep samples absent")
+        quit(50)
+        return
+    footsteps_test.on_wood=true
+    footsteps_test.tick(3.5,true,true,.52)
+    if not footsteps_test.player.playing:
+        push_error("Footstep cadence or audio trigger failed")
+        quit(51)
+        return
+    footsteps_test.free()
     var fireworks_test=load("res://scripts/shire_fireworks.gd").new()
     get_root().add_child(fireworks_test)
     if not fireworks_test.can_interact(Vector3(5,0,-9),3):
