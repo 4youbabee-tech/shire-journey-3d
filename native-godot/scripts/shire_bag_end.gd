@@ -2,7 +2,7 @@ class_name ShireBagEnd
 extends Node3D
 ## ORIGINAL-GAME explorable Bag End interior. Instantiated only when the player enters.
 ## Low-spec geometry: reusable materials, no external textures or copyrighted film assets.
-const ENTRY := Vector3(0.0, 0.24, 4.7)
+const ENTRY := Vector3(0.0, 0.24, 2.8)
 const EXIT := Vector3(0.0, 0.0, 6.45)
 const STUDY := Vector3(-6.25, 0.0, -0.4)
 const PANTRY := Vector3(6.25, 0.0, -1.3)

@@ -1,6 +1,10 @@
 extends SceneTree
 # Headless pure-logic test under Godot 4.4.1.
 func _initialize() -> void:
+    # SceneTree._initialize runs before child _ready methods; defer scene checks.
+    call_deferred("_run_smoke")
+
+func _run_smoke() -> void:
     var social=load("res://scripts/shire_social.gd").new()
     social.meet("sam",0)
     social.remember("sam","gardens",0,15)
@@ -58,7 +62,7 @@ func _initialize() -> void:
     # Bag End is an actual scene graph with reachable exploration hotspots.
     var interior = load("res://scripts/shire_bag_end.gd").new()
     get_root().add_child(interior)
-    if interior.get_child_count() < 25 or interior.interaction_at(interior.EXIT) != "exit":
+    if interior.get_child_count() < 25 or interior.interaction_at(interior.EXIT) != "exit" or interior.interaction_at(interior.ENTRY) != "":
         push_error("Bag End interior scene or exit interaction missing")
         quit(8)
         return
