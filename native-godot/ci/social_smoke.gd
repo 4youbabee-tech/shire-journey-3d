@@ -66,6 +66,16 @@ func _initialize() -> void:
         push_error("Bag End study/pantry/hearth hotspots unavailable")
         quit(9)
         return
+    var companion = load("res://scripts/shire_npc.gd").new()
+    get_root().add_child(companion)
+    companion.configure("sam", "Samwise Gamgee", "gardener", Vector3.ZERO, Vector3(8, 0, 8), Color("787b49"), 1)
+    companion.follow_player = true
+    companion.update_schedule(13.0, true, Vector3(6, 0, 0), 1.0, 60.0)
+    if companion.action != "accompanying" or companion.position.x <= 0.0:
+        push_error("Sam companion ignores player while raining")
+        quit(10)
+        return
+    companion.free()
     interior.free()
     npc.free()
     print("PASS: memory, 54 villagers, bilingual dialogue, once-per-day relationship and favour persistence")
