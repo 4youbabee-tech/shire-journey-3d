@@ -46,6 +46,24 @@ jobs:
             native-godot/assets/models/shire_*_craftwork.glb
             native-godot/assets/models/shire_*_craftwork.source.json
           retention-days: 14
+      - name: Build two original animated Blender wildlife models
+        run: blender -b --factory-startup -t 2 --python native-godot/tools/blender_build_shire_wildlife.py
+      - name: Verify Blender wildlife GLB animation and mesh budgets
+        run: python3 native-godot/tools/verify_shire_wildlife.py
+      - name: Upload editable Blender wildlife sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShireJourney-Wildlife-Editable-Blender
+          path: blender-production/shire_wildlife/*.blend
+          retention-days: 14
+      - name: Upload two original animated wildlife GLBs
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShireJourney-Wildlife-Production-GLB
+          path: |
+            native-godot/assets/models/shire_*_animated.glb
+            native-godot/assets/models/shire_*_animated.source.json
+          retention-days: 14
       - name: Validate new Blender geometry and provenance
         run: python3 native-godot/tools/verify_blender_hero_art.py
       - name: Upload native editable Blender file
@@ -104,6 +122,8 @@ jobs:
         run: godot --headless --path native-godot --script res://ci/shire_district_art_smoke.gd
       - name: Verify 14-chapter bilingual screenplay graph and Shire journal beats
         run: godot --headless --path native-godot --script res://ci/campaign_story_smoke.gd
+      - name: Verify 14 animated Blender wildlife in the Godot world
+        run: godot --headless --path native-godot --script res://ci/shire_wildlife_smoke.gd
       - name: Simulate opening scene for 120 frames
         run: godot --headless --path native-godot --quit-after 120
       - name: Capture in-engine screenshot via virtual display
@@ -165,6 +185,10 @@ jobs:
         with:
           name: ShireJourney-Districts-Production-GLB
           path: native-godot/assets/models
+      - uses: actions/download-artifact@v4
+        with:
+          name: ShireJourney-Wildlife-Production-GLB
+          path: native-godot/assets/models
       - name: Commit verified Blender GLB after both test jobs
         shell: bash
         run: |
@@ -173,6 +197,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add native-godot/assets/models/bag_end_crafted_portal.glb native-godot/assets/models/bag_end_crafted_portal.source.json
           git add native-godot/assets/models/shire_*_craftwork.glb native-godot/assets/models/shire_*_craftwork.source.json
+          git add native-godot/assets/models/shire_*_animated.glb native-godot/assets/models/shire_*_animated.source.json
           if git diff --cached --quiet; then
             echo "Already committed"
           else

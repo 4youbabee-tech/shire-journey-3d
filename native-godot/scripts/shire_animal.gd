@@ -18,6 +18,23 @@ func setup(kind: String, point: Vector3, index: int) -> void:
     seed_number = index
     body = Node3D.new()
     add_child(body)
+    # Genuine Blender animated asset, not a generated capsule/sphere fallback.
+    # Keep the existing deterministic wildlife AI and save/load unchanged.
+    if species in ["hen","rabbit"]:
+        var species_asset := "res://assets/models/shire_" + species + "_animated.glb"
+        if ResourceLoader.exists(species_asset):
+            var wild_scene := load(species_asset) as PackedScene
+            if wild_scene != null:
+                var instance := wild_scene.instantiate() as Node3D
+                if instance != null:
+                    instance.name="ShireWildlifeGLB"
+                    body.add_child(instance)
+                    var ap: Node = instance.find_child("AnimationPlayer",true,false)
+                    if ap is AnimationPlayer:
+                        var clips: PackedStringArray = (ap as AnimationPlayer).get_animation_list()
+                        if not clips.is_empty():
+                            (ap as AnimationPlayer).play(str(clips[0]))
+                    return
     if species == "hen":
         _part(Vector3(0,.20,0),Vector3(.29,.23,.36),Color("ad7852"),0)
         _part(Vector3(0,.40,-.21),Vector3(.16,.17,.19),Color("d7ac74"),0)
