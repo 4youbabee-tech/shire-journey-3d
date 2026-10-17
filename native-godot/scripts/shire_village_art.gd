@@ -15,6 +15,27 @@ static func _mat(hex: String) -> StandardMaterial3D:
         _mats[hex] = m
     return _mats[hex]
 
+static var _scanned_surfaces: Dictionary = {}
+
+static func _surface(label: String, hex: String) -> StandardMaterial3D:
+    # All village facades, timber, stonework share verified Poly Haven 1K PBR
+    # albedo+normal texture resources, not individually flat-coloured cubes.
+    var id: String = label.to_lower()
+    var stone: bool = id.contains("stone") or id.contains("masonry") or id.contains("buttress") or id.contains("parapet") or id.contains("paving")
+    var timber: bool = id.contains("wood") or id.contains("oak") or id.contains("timber") or id.contains("shingle") or id.contains("counter") or id.contains("crate") or id.contains("rail") or id.contains("post") or id.contains("tool") or id.contains("roof")
+    if not stone and not timber:
+        return _mat(hex)
+    var cache_key: String = ("stone" if stone else "wood") + "_" + hex
+    if _scanned_surfaces.has(cache_key):
+        return _scanned_surfaces[cache_key]
+    var base: StandardMaterial3D = ShireSurfaceMaterials.plaster_walls() if stone else ShireSurfaceMaterials.wooden_trim()
+    var surface: StandardMaterial3D = base.duplicate() as StandardMaterial3D
+    surface.albedo_color = Color(hex)
+    surface.roughness = .92 if stone else .84
+    surface.uv1_scale = Vector3(1.3,1.3,1.0)
+    _scanned_surfaces[cache_key] = surface
+    return surface
+
 static func _zone(parent: Node3D, label: String) -> Node3D:
     var zone := Node3D.new()
     zone.name = label
@@ -31,7 +52,7 @@ static func _box(parent: Node3D, label: String, at: Vector3,
     visual.mesh = block
     visual.position = at
     visual.rotation.y = yaw
-    visual.material_override = _mat(colour)
+    visual.material_override = _surface(label,colour)
     visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
     parent.add_child(visual)
     return visual

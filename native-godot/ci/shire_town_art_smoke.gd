@@ -43,6 +43,12 @@ func _verify() -> void:
         push_error("Stone bridge arch not physically modeled in world")
         quit(194)
         return
+    var arch_pbr: Array[Node] = bridge.find_children("BridgeStoneVoussoir_*","MeshInstance3D",true,false)
+    var wall_material: StandardMaterial3D = (arch_pbr[0] as MeshInstance3D).material_override as StandardMaterial3D
+    if wall_material == null or wall_material.albedo_texture == null or wall_material.normal_texture == null:
+        push_error("Stone bridge PBR photographed texture and normal mapping missing")
+        quit(205)
+        return
     if art.find_children("*","MeshInstance3D",true,false).size() < 260:
         push_error("Whole town is still missing authored set-dressing meshes")
         quit(195)

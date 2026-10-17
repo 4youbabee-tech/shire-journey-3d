@@ -23,17 +23,17 @@ EDIT.mkdir(parents=True, exist_ok=True)
 SEED = 2026101709
 
 SPECIES = {
-    "oak": {"height": 7.7, "spread": 3.2, "limbs": 16, "leaf_count": 31,
-            "leaf_length": .48, "leaf_width": .20, "trunk": .44, "drop": .10,
+    "oak": {"height": 7.7, "spread": 3.2, "limbs": 16, "leaf_count": 124,
+            "leaf_length": .63, "leaf_width": .29, "trunk": .44, "drop": .10,
             "colors": [(0.22,.36,.17),(.29,.45,.19),(.36,.48,.24),(.39,.53,.27)]},
-    "beech": {"height": 9.1, "spread": 2.6, "limbs": 20, "leaf_count": 27,
-              "leaf_length": .37, "leaf_width": .15, "trunk": .34, "drop": .02,
+    "beech": {"height": 9.1, "spread": 2.6, "limbs": 20, "leaf_count": 96,
+              "leaf_length": .53, "leaf_width": .24, "trunk": .34, "drop": .02,
               "colors": [(0.28,.38,.17),(.39,.49,.22),(.46,.53,.28),(.33,.43,.19)]},
-    "alder": {"height": 6.5, "spread": 2.6, "limbs": 15, "leaf_count": 28,
-              "leaf_length": .35, "leaf_width": .16, "trunk": .34, "drop": .26,
+    "alder": {"height": 6.5, "spread": 2.6, "limbs": 15, "leaf_count": 108,
+              "leaf_length": .49, "leaf_width": .25, "trunk": .34, "drop": .26,
               "colors": [(0.20,.37,.25),(.31,.48,.31),(.37,.52,.34),(.24,.42,.28)]},
-    "willow": {"height": 8.2, "spread": 3.45, "limbs": 20, "leaf_count": 32,
-               "leaf_length": .42, "leaf_width": .10, "trunk": .43, "drop": 1.25,
+    "willow": {"height": 8.2, "spread": 3.45, "limbs": 20, "leaf_count": 108,
+               "leaf_length": .60, "leaf_width": .18, "trunk": .43, "drop": 1.25,
                "colors": [(0.32,.47,.20),(.46,.55,.28),(.49,.58,.31),(.34,.44,.18)]},
 }
 

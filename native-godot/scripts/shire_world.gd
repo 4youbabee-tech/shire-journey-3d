@@ -93,8 +93,8 @@ func _lighting() -> void:
     env.background_mode=Environment.BG_SKY
     var sky:=Sky.new()
     var atmosphere:=ProceduralSkyMaterial.new()
-    atmosphere.sky_top_color=Color("618bb0")
-    atmosphere.sky_horizon_color=Color("f4dcc1")
+    atmosphere.sky_top_color=Color("658dac")
+    atmosphere.sky_horizon_color=Color("a3bfc8")
     atmosphere.ground_bottom_color=Color("4f654b")
     sky.sky_material=atmosphere
     env.sky=sky
@@ -103,17 +103,17 @@ func _lighting() -> void:
     env.tonemap_mode=Environment.TONE_MAPPER_FILMIC
     # Conservative grade for the 2 GB VRAM target: no expensive SSAO/SSIL in GL Compatibility.
     env.adjustment_enabled=true
-    env.adjustment_brightness=1.025
-    env.adjustment_contrast=1.075
-    env.adjustment_saturation=1.02
+    env.adjustment_brightness=.86
+    env.adjustment_contrast=1.12
+    env.adjustment_saturation=1.05
     env.fog_enabled=true
-    env.fog_density=.0023
-    env.fog_light_color=Color("d1bca0")
+    env.fog_density=.0016
+    env.fog_light_color=Color("a0b4ab")
     world_environment.environment=env
     sun=DirectionalLight3D.new()
     sun.rotation_degrees=Vector3(-38,-32,0)
-    sun.light_color=Color("ffe0b0")
-    sun.light_energy=.95
+    sun.light_color=Color("ffdfb7")
+    sun.light_energy=.86
     sun.shadow_blur=1.35
     sun.shadow_enabled=true
     sun.directional_shadow_max_distance=65.0
@@ -185,7 +185,7 @@ func _terrain() -> void:
             var d=Vector3(x,elevation(x,z+STEP),z+STEP)
             for v in [a,d,b,b,d,c]:
                 var hue=.045*sin(v.x*.11+v.z*.05)+.05*cos(v.z*.19)
-                var color:=Color(.89+hue*.15,.93+hue*.10,.86+hue*.13)
+                var color:=Color(.81+hue*.15,.91+hue*.10,.76+hue*.13)
                 tool.set_color(color)
                 tool.set_uv(Vector2(v.x,v.z)*.20)
                 tool.add_vertex(v)
@@ -195,6 +195,7 @@ func _terrain() -> void:
     node.mesh=mesh
     var grassy:=StandardMaterial3D.new()
     grassy.vertex_color_use_as_albedo=true
+    grassy.albedo_color=Color("9db79b")
     grassy.albedo_texture=load("res://assets/external/polyhaven_leafy_grass/diffuse_512.jpg")
     grassy.normal_enabled=true
     grassy.normal_texture=load("res://assets/external/polyhaven_leafy_grass/normal_gl_512.jpg")
@@ -660,13 +661,13 @@ func _farm_fields() -> void:
 func update_environment(time_of_day: float, night_lighting: float, weather_type: String, weather_strength: float, delta: float) -> void:
     day_factor=night_lighting
     sun.rotation_degrees=Vector3(-10.0-65.0*night_lighting, -35.0+time_of_day*5.0,0)
-    sun.light_energy=.10+.95*night_lighting*(1.0-weather_strength*.42)
+    sun.light_energy=.10+.76*night_lighting*(1.0-weather_strength*.42)
     var golden: float = smoothstep(13.0,16.0,time_of_day) * (1.0-smoothstep(18.0,20.0,time_of_day))
-    sun.light_color=Color("ffe0b0").lerp(Color("f4b47d"),golden*.75).lerp(Color("d2dfed"),1.0-night_lighting)
+    sun.light_color=Color("ffe0c0").lerp(Color("efd3ac"),golden*.30).lerp(Color("d1deea"),1.0-night_lighting)
     var env:=world_environment.environment
-    env.ambient_light_energy=.25+.48*night_lighting*(1.0-weather_strength*.30)
-    env.fog_light_color=Color("b0c7b7").lerp(Color("e9be8d"),golden*.72)
-    env.fog_density=.0023 + (.017 if weather_type=="fog" else .008 if weather_type=="mist" else .002)*weather_strength
+    env.ambient_light_energy=.16+.30*night_lighting*(1.0-weather_strength*.30)
+    env.fog_light_color=Color("9ebcb6").lerp(Color("c7bda7"),golden*.22)
+    env.fog_density=.0016 + (.017 if weather_type=="fog" else .008 if weather_type=="mist" else .002)*weather_strength
     for lamp in lanterns:
         lamp.light_energy=1.4*(1.0-smoothstep(.3,.7,night_lighting))
     for smoke in chimney_smoke:
