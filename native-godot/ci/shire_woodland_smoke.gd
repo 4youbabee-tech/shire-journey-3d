@@ -1,5 +1,5 @@
 extends SceneTree
-## Integration check for new playable-scene tree geometry and efficient batches.
+## Imported Blender tree evidence within the actual gameplay scene.
 func _initialize() -> void:
     call_deferred("_check")
 
@@ -8,24 +8,29 @@ func _check() -> void:
         push_error("Unable to open Shire for woodland verification")
         quit(161)
         return
-    for i in range(4):
+    for i in range(5):
         await process_frame
     var woods: Node = current_scene.find_child("ShireLayeredWoodland",true,false)
-    if woods == null:
-        push_error("Shire woodland not integrated in playable Godot scene")
+    if woods == null or woods.get_meta("blender_hero_assets",false) != true:
+        push_error("Missing genuine Blender branch-and-leaf woodland in playable Shire")
         quit(162)
         return
-    var expected: Array[String] = ["01_BarkTrunks","02_BranchWhorls","03_DeepLeafVolume","04_MidLeafVolume","05_SunlitLeafTips"]
-    for name in expected:
-        var batch = woods.get_node_or_null(name)
-        if not batch is MultiMeshInstance3D or batch.multimesh == null or batch.multimesh.instance_count == 0:
-            push_error("Missing actual woodland GPU geometry batch: " + name)
+    var total := 0
+    for species in ["Oak","Beech","Alder","Willow"]:
+        var instance: Node = woods.get_node_or_null("Hero_"+species+"_GPU")
+        if not instance is MultiMeshInstance3D or instance.multimesh == null:
+            push_error("Missing actual imported hero tree mesh: "+species)
             quit(163)
             return
-    var trunks: MultiMeshInstance3D = woods.get_node("01_BarkTrunks")
-    if trunks.multimesh.instance_count != 68:
-        push_error("Expected 68 real tree trunk instances, got %d" % trunks.multimesh.instance_count)
-        quit(164)
+        var batch: MultiMesh = instance.multimesh
+        if batch.mesh.get_surface_count() < 4:
+            push_error("Missing independent bark/leaf GLB surfaces: "+species)
+            quit(164)
+            return
+        total += batch.instance_count
+    if total != 78:
+        push_error("Expected 68 authored trees plus 10 willows: %d" % total)
+        quit(165)
         return
-    print("PASS: 68 layered Shire trees, branches and 5 GPU batches in playable world")
+    print("PASS: 78 actual Blender modeled trees, 4 species and material-batched GPU placements")
     quit(0)

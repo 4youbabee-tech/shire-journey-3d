@@ -66,8 +66,6 @@ func _ready() -> void:
     _neighbour_errand_props()
     ShirePhotorealProps.gardens(self,Callable(self,"elevation"))
     _trees()
-    # Original layered woodland silhouettes, instanced in shared GPU batches.
-    preload("res://scripts/shire_tree_grove.gd").populate(self,Callable(self,"elevation"),Callable(self,"_river_x"))
     _grass_and_flowers()
     ShireWorldDressing.populate(self,Callable(self,"elevation"))
     ShireHomesteadExteriors.populate(self,Callable(self,"elevation"))
@@ -458,7 +456,8 @@ func _bridge() -> void:
 
 func _party_field() -> void:
     var at:=Vector3(-2,elevation(-2,-3),-3)
-    _import("old_oak_1",at,1.7)
+    var party_oak: String = "shire_hero_oak" if ResourceLoader.exists("res://assets/models/shire_hero_oak.glb") else "old_oak_1"
+    _import(party_oak,at,1.35)
     # Original feast carpentry and food; existing quest stations remain untouched.
     for i in range(2):
         var xy: Vector2 = [Vector2(-7.0,-11.0),Vector2(5.5,-12.0)][i]
@@ -560,18 +559,9 @@ func set_party_prepared(id: String, ready: bool) -> void:
         party_decorations[id].visible = ready
 
 func _trees() -> void:
-    for i in range(77):
-        var x=rng.randf_range(-95,95);var z=rng.randf_range(-95,95)
-        if Vector2(x,z).distance_to(Vector2(-24,-20))<12 or Vector2(x,z).distance_to(Vector2(17,8))<13 or absf(x-_river_x(z))<5:
-            continue
-        if Vector2(x,z).distance_to(Vector2(0,0))<14:
-            continue
-        var model="old_oak_%d" % (i%3+1)
-        _import(model,Vector3(x,elevation(x,z)-.25,z),rng.randf_range(.72,1.22))
-    for i in range(10):
-        var z=-80+float(i)*17
-        var x=_river_x(z)-5.5
-        _import("river_willow",Vector3(x,elevation(x,z),z),.9)
+    # Real tree architecture from four original Blender GLBs; 78 placements
+    # are GPU instanced, replacing the repeated old oaks and sphere canopies.
+    ShireTreeGrove.populate(self,Callable(self,"elevation"),Callable(self,"_river_x"))
 
 func _grass_and_flowers() -> void:
     # One MultiMesh batch for 1200 grass blades. No thousands of Node3D draw calls.

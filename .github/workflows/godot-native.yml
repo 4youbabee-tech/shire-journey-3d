@@ -30,6 +30,19 @@ jobs:
           blender -b --factory-startup -t 2 --python native-godot/tools/blender_build_bag_end.py
       - name: Generate three handcrafted Blender world assets and source projects
         run: blender -b --factory-startup -t 2 --python native-godot/tools/blender_build_shire_districts.py
+      - name: Author four real woodland Blender GLBs and editable source projects
+        run: blender -b --factory-startup -t 2 --python native-godot/tools/blender_build_shire_hero_trees.py
+      - name: Enforce botanical geometry budgets and original asset provenance
+        run: python3 native-godot/tools/verify_shire_hero_trees.py
+      - name: Upload real woodland editable Blender sources and GLBs
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShireJourney-HeroWoodland-Blender-GLB
+          path: |
+            blender-production/shire_botanical_hero/*.blend
+            native-godot/assets/models/shire_hero_*.glb
+            native-godot/assets/models/shire_hero_*.source.json
+          retention-days: 14
       - name: Verify Shire craftwork GLBs, material batching and provenance
         run: python3 native-godot/tools/verify_shire_districts.py
       - name: Upload editable market, mill and feast Blender sources
@@ -124,6 +137,8 @@ jobs:
         run: godot --headless --path native-godot --script res://ci/shire_district_art_smoke.gd
       - name: Verify layered Shire woodland actually instantiates in Godot
         run: godot --headless --path native-godot --script res://ci/shire_woodland_smoke.gd
+      - name: Verify authored GLB botanical surfaces inside actual running Shire scene
+        run: godot --headless --path native-godot --script res://ci/shire_hero_botanical_smoke.gd
       - name: Verify 14-chapter bilingual screenplay graph and Shire journal beats
         run: godot --headless --path native-godot --script res://ci/campaign_story_smoke.gd
       - name: Verify 14 animated Blender wildlife in the Godot world

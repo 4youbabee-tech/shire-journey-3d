@@ -1,36 +1,56 @@
 class_name ShireTreeGrove
 extends RefCounted
-## Authored original stylized woodland. GPU instancing, no colliders or animation
-## scripts per tree; purpose-built for 720p / low-VRAM Chapter I.
-const TREE_COUNT := 68
+## Chapter I visual hero grove. Editable ORIGINAL-GAME Blender trunk/branch/leaf meshes.
+## The meshes are instanced by GPU; each species shares a mesh and its PBR surfaces.
+## Provenance: VISUAL-ONLY composition reference, no movie geometry or materials.
+const GROVE_SEED := 2026101704
+const MAIN_TREES := 68
+const WILLOWS := 10
+const SPECIES := ["oak","beech","alder","willow"]
+const ASSET_ROOT := "res://assets/models/shire_hero_"
 
-static func _material(colour: Color) -> StandardMaterial3D:
-    var mat := StandardMaterial3D.new()
-    mat.albedo_color = colour
-    mat.roughness = 0.98
-    mat.metallic = 0.0
-    return mat
+static func _hero_mesh(species: String) -> Mesh:
+    var path: String = ASSET_ROOT + species + ".glb"
+    if not ResourceLoader.exists(path):
+        return null
+    var packed: PackedScene = load(path) as PackedScene
+    if packed == null:
+        return null
+    var root: Node = packed.instantiate()
+    var candidates: Array[Node] = root.find_children("*","MeshInstance3D",true,false)
+    var result: Mesh = null
+    for candidate in candidates:
+        var instance: MeshInstance3D = candidate as MeshInstance3D
+        if instance != null and instance.mesh != null:
+            result = instance.mesh
+            break
+    root.free()
+    return result
 
-static func _batch(parent: Node3D, title: String, geometry: Mesh, placements: Array[Transform3D], tint: Color) -> void:
-    if placements.is_empty():
-        return
-    var instances := MultiMesh.new()
-    instances.transform_format = MultiMesh.TRANSFORM_3D
-    instances.mesh = geometry
-    instances.instance_count = placements.size()
-    for idx in range(placements.size()):
-        instances.set_instance_transform(idx, placements[idx])
-    var visual := MultiMeshInstance3D.new()
-    visual.name = title
-    visual.multimesh = instances
-    visual.material_override = _material(tint)
-    visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-    parent.add_child(visual)
+static func _append(transforms: Array[Transform3D], x: float, y: float,
+        z: float, scale_value: float, yaw: float) -> void:
+    transforms.append(Transform3D(Basis(Vector3.UP,yaw).scaled(Vector3.ONE*scale_value),
+        Vector3(x,y-.13,z)))
 
-static func _placement(pos: Vector3, size: Vector3, yaw: float = 0.0, incline: float = 0.0) -> Transform3D:
-    var axes := Basis(Vector3.UP, yaw)
-    axes = axes.rotated(axes.x.normalized(), incline)
-    return Transform3D(axes.scaled(size), pos)
+static func _batch(parent: Node3D, species: String,
+        placements: Array[Transform3D]) -> bool:
+    var model: Mesh = _hero_mesh(species)
+    if model == null or model.get_surface_count() < 3 or placements.is_empty():
+        return false
+    var copies := MultiMesh.new()
+    copies.transform_format = MultiMesh.TRANSFORM_3D
+    copies.mesh = model
+    copies.instance_count = placements.size()
+    for i in range(placements.size()):
+        copies.set_instance_transform(i,placements[i])
+    var view := MultiMeshInstance3D.new()
+    view.name = "Hero_" + species.capitalize() + "_GPU"
+    view.multimesh = copies
+    # Preserve mesh's bark and four different leaf material surfaces.
+    # Large plant canopies should not cast thousands of overlapping shadows.
+    view.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+    parent.add_child(view)
+    return true
 
 static func populate(parent: Node3D, elevation: Callable, river_x: Callable) -> void:
     if parent.get_node_or_null("ShireLayeredWoodland") != null:
@@ -39,79 +59,67 @@ static func populate(parent: Node3D, elevation: Callable, river_x: Callable) -> 
     grove.name = "ShireLayeredWoodland"
     parent.add_child(grove)
     var rng := RandomNumberGenerator.new()
-    rng.seed = 2026101704
-    var bark: Array[Transform3D] = []
-    var branches: Array[Transform3D] = []
-    var foliage_light: Array[Transform3D] = []
-    var foliage_mid: Array[Transform3D] = []
-    var foliage_dark: Array[Transform3D] = []
-    var leafy := SphereMesh.new()
-    leafy.radial_segments = 9
-    leafy.rings = 5
-    var trunk := CylinderMesh.new()
-    trunk.top_radius = 0.24
-    trunk.bottom_radius = 0.41
-    trunk.height = 1.0
-    trunk.radial_segments = 7
-    var twig := CylinderMesh.new()
-    twig.top_radius = 0.075
-    twig.bottom_radius = 0.12
-    twig.height = 1.0
-    twig.radial_segments = 5
+    rng.seed = GROVE_SEED
+    var trees: Dictionary = {"oak":[],"beech":[],"alder":[],"willow":[]}
     var placed := 0
-    # Three distinct silhouettes: field oak, slender beech and riverside alder.
-    # Keep village roads, accessible doors, party field and water clear.
-    for attempt in range(TREE_COUNT * 6):
-        if placed >= TREE_COUNT:
+    var doors: Array[Vector2] = [
+        Vector2(-24,-20),Vector2(-44,-26),Vector2(-45,-3),
+        Vector2(-18,-39),Vector2(2,30),Vector2(18,28),
+        Vector2(-62,-12),Vector2(-61,11),Vector2(-34,45),Vector2(32,40)
+    ]
+    for attempt in range(MAIN_TREES*7):
+        if placed >= MAIN_TREES:
             break
         var x := rng.randf_range(-94.0,94.0)
         var z := rng.randf_range(-91.0,91.0)
+        var point := Vector2(x,z)
         if absf(x-float(river_x.call(z))) < 10.0:
             continue
-        if Vector2(x,z).distance_to(Vector2(-24.0,-20.0)) < 17.0:
+        if point.distance_to(Vector2(17.0,8.0)) < 18.0:
             continue
-        if Vector2(x,z).distance_to(Vector2(17.0,8.0)) < 19.0:
+        if point.length() < 15.0:
             continue
-        if Vector2(x,z).length() < 16.0:
-            continue
-        var doors := [Vector2(-44,-26),Vector2(-45,-3),Vector2(-18,-39),Vector2(2,30),Vector2(18,28),Vector2(-62,-12),Vector2(-61,11),Vector2(-34,45),Vector2(32,40)]
         var blocked := false
         for door in doors:
-            if Vector2(x,z).distance_to(door) < 9.0:
+            if point.distance_to(door) < (15.0 if door==Vector2(-24,-20) else 8.5):
                 blocked = true
                 break
         if blocked:
             continue
-        var kind := placed % 3
-        var size := rng.randf_range(0.82,1.22)
-        var height := (6.9 if kind == 0 else 8.1 if kind == 1 else 5.9) * size
-        var ground := float(elevation.call(x,z))
-        var yaw := rng.randf_range(-PI,PI)
-        bark.append(_placement(Vector3(x,ground+height*0.42,z),Vector3(size,height*0.84,size),yaw))
-        var crown_y := ground+height*(0.88 if kind == 1 else 0.79)
-        var spread := (2.45 if kind == 0 else 1.6 if kind == 1 else 2.2)*size
-        var upper := (2.0 if kind == 0 else 2.9 if kind == 1 else 1.7)*size
-        foliage_dark.append(_placement(Vector3(x,crown_y,z),Vector3(spread*1.2,upper*1.08,spread*1.1),yaw))
-        for segment in range(5 if kind == 0 else 4):
-            var angle := yaw + TAU*float(segment)/(5.0 if kind == 0 else 4.0)
-            var direction := Vector3(cos(angle),0.0,sin(angle))
-            var out := spread*rng.randf_range(0.58,0.84)
-            var rise := rng.randf_range(-0.3,0.7)*size
-            var start := Vector3(x,ground+height*0.67,z)
-            var endpoint := Vector3(x,crown_y+rise,z)+direction*out
-            var delta := endpoint-start
-            var basis := Basis(Quaternion(Vector3.UP,delta.normalized()))
-            branches.append(Transform3D(basis.scaled(Vector3(size*0.85,delta.length(),size*0.85)),(start+endpoint)*0.5))
-            var tuft := Vector3(spread*0.72,upper*0.68,spread*0.72)
-            var transform := _placement(endpoint,tuft,angle)
-            if segment % 2 == 0:
-                foliage_mid.append(transform)
-            else:
-                foliage_light.append(transform)
-        foliage_light.append(_placement(Vector3(x,crown_y+upper*0.56,z),Vector3(spread*0.68,upper*0.76,spread*0.66),yaw))
+        var kind: String = SPECIES[placed%3]
+        var height: float = float(elevation.call(x,z))
+        _append(trees[kind],x,height,z,rng.randf_range(.78,1.22),
+                rng.randf_range(-PI,PI))
         placed += 1
-    _batch(grove,"01_BarkTrunks",trunk,bark,Color("68503a"))
-    _batch(grove,"02_BranchWhorls",twig,branches,Color("574432"))
-    _batch(grove,"03_DeepLeafVolume",leafy,foliage_dark,Color("426448"))
-    _batch(grove,"04_MidLeafVolume",leafy,foliage_mid,Color("66844d"))
-    _batch(grove,"05_SunlitLeafTips",leafy,foliage_light,Color("87a660"))
+    # Drooping, slender willows trace one river bank; avoid the bridge approach.
+    for i in range(WILLOWS):
+        var z: float = -79.0+float(i)*16.0
+        if absf(z-8.0) < 10.0:
+            z += 11.0
+        var x: float = float(river_x.call(z))-7.4
+        _append(trees["willow"],x,float(elevation.call(x,z)),z,
+                rng.randf_range(.91,1.17),rng.randf_range(-PI,PI))
+    var imported := 0
+    for kind in SPECIES:
+        var transforms: Array[Transform3D] = []
+        for transform in trees[kind]:
+            transforms.append(transform)
+        if _batch(grove,kind,transforms):
+            imported += 1
+    # A source checkout before Blender generation still displays the old mesh kit.
+    # CI always generates + verifies all four edited Blender sources before import.
+    if imported != SPECIES.size():
+        for child in grove.get_children():
+            child.queue_free()
+        var old := load("res://assets/models/old_oak_1.glb") as PackedScene
+        var old_willow := load("res://assets/models/river_willow.glb") as PackedScene
+        for kind in SPECIES:
+            for transform in trees[kind]:
+                var source: PackedScene = old_willow if kind=="willow" else old
+                var instance: Node3D = source.instantiate() as Node3D
+                instance.transform = transform
+                grove.add_child(instance)
+        grove.set_meta("blender_hero_assets",false)
+    else:
+        grove.set_meta("blender_hero_assets",true)
+    grove.set_meta("tree_count",MAIN_TREES+WILLOWS)
