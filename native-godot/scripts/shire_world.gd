@@ -396,6 +396,11 @@ func _market() -> void:
         _import("market_stall",Vector3(x,elevation(x,8),8),1.0)
         _import("oak_barrel",Vector3(x-1.7,elevation(x-1.7,10),10),1.0)
     _import("market_wagon",Vector3(23,elevation(23,13)+.1,13),.8)
+    # Blender-authored produce, pottery, awnings and wicker market dressings.
+    for i in range(3):
+        var px: float = 12.0+float(i)*5.5
+        var craft := _import("shire_market_craftwork",Vector3(px,elevation(px,8),8),.84)
+        craft.name="ShireMarketCraftwork%d" % i
     for i in range(6):
         box(self,Vector3(10.0+i*1.5,elevation(10.0+i*1.5,15)+.2,15),Vector3(.85,.4,.8),Color("917249"))
 
@@ -404,6 +409,9 @@ func _watermill() -> void:
     box(self,Vector3(x,y+2.1,z),Vector3(8.8,4.2,7.3),Color("a88e69"))
     var roof:=box(self,Vector3(x,y+4.6,z),Vector3(10,1.0,8.6),Color("765337"))
     roof.rotation.z=.10
+    # Real GLB with pitched timber roof, shingles and coopered storage.
+    var mill_art := _import("shire_mill_craftwork",Vector3(x,y,z),1.0)
+    mill_art.name="ShireMillCraftwork"
     wheel=_import("watermill_wheel",Vector3(37,y+2.2,-16.7),1.05)
     wheel.rotation.y=PI/2.0
     for i in range(5):
@@ -423,6 +431,11 @@ func _bridge() -> void:
 func _party_field() -> void:
     var at:=Vector3(-2,elevation(-2,-3),-3)
     _import("old_oak_1",at,1.7)
+    # Original feast carpentry and food; existing quest stations remain untouched.
+    for i in range(2):
+        var xy: Vector2 = [Vector2(-7.0,-11.0),Vector2(5.5,-12.0)][i]
+        var feast_art := _import("shire_feast_craftwork",Vector3(xy.x,elevation(xy.x,xy.y),xy.y),.92)
+        feast_art.name="ShireFeastCraftwork%d" % i
     for i in range(10):
         var angle=i*TAU/10.0
         var x=-2+cos(angle)*9.0;var z=-3+sin(angle)*9.0
