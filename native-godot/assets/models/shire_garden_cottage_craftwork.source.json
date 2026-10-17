@@ -6,8 +6,8 @@
   "license": "Original procedural Blender geometry and packed texture",
   "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
   "editable": "blender-production/shire_districts/shire_facade_garden_cottage.blend",
-  "sha256": "ebb202c375c924757cf7a114f4d27889bfa7f3ac38aeab6fc428c4685412917c",
-  "bytes": 1589176,
-  "authored_parts": 196,
+  "sha256": "da98d8d86795d19e0783382bcee66f302c8681c87d6a938adb0fa03adfbccf4d",
+  "bytes": 2109352,
+  "authored_parts": 262,
   "batched_meshes": 10
 }

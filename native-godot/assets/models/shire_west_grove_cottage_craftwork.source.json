@@ -6,8 +6,8 @@
   "license": "Original procedural Blender geometry and packed texture",
   "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
   "editable": "blender-production/shire_districts/shire_facade_west_grove_cottage.blend",
-  "sha256": "cc7ea060329877e33244845e5c19839ca150e5e37a2d8a79325d1cbd1247a1c5",
-  "bytes": 1575716,
-  "authored_parts": 196,
+  "sha256": "7fc9d66f3140bc5d00589ec17032a133b074c07f7f9dffc54fe0a9e6fc16f04a",
+  "bytes": 2095896,
+  "authored_parts": 262,
   "batched_meshes": 10
 }
