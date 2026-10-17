@@ -29,8 +29,8 @@ func _initialize() -> void:
     # Cover player-facing field observations in an existing mandatory CI smoke.
     var library=load("res://scripts/shire_discoveries.gd")
     var journal=library.new()
-    if library.SITES.size()!=12:
-        push_error("Expected 12 Shire field observation sites")
+    if library.SITES.size()<21:
+        push_error("Missing the expanded 21 Shire field observation sites")
         quit(95)
         return
     var known: Dictionary={}
@@ -54,10 +54,10 @@ func _initialize() -> void:
             return
     var restored=library.new()
     restored.unpack(journal.pack())
-    if restored.seen.size()!=12:
+    if restored.seen.size()!=library.SITES.size():
         push_error("Field note save roundtrip invalid")
         quit(99)
         return
-    print("PASS: 12 original bilingual Shire field notes, interior lock and persistence")
+    print("PASS: expanded original bilingual Shire field notes, interior lock and persistence")
     print("PASS: 14 author-written bilingual chapter screenplay outlines and nine in-game journal beats")
     quit(0)
