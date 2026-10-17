@@ -184,3 +184,7 @@ for name,make in [("shire_market_craftwork",market),
                   ("shire_mill_craftwork",mill),
                   ("shire_feast_craftwork",feast)]:
     export(name,make)
+
+# Every existing Blender CI run now authors nine individual domestic exteriors.
+import runpy
+runpy.run_path(str(root/"tools/blender_build_shire_facades.py"),run_name="__main__")

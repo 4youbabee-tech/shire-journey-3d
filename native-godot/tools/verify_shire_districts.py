@@ -26,3 +26,7 @@ try:
 except Exception as e:
     print("FAIL Blender district:",repr(e),file=sys.stderr)
     sys.exit(1)
+
+# Require actual nine-house Blender exports before accepting market/district art.
+import runpy
+runpy.run_path(str(Path(__file__).resolve().parent/"verify_shire_facades.py"),run_name="__main__")

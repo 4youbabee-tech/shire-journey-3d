@@ -44,17 +44,17 @@ func _ready() -> void:
     _lanes()
     _water()
     _hobbit_hole(Vector2(-24,-20),1.65,true)
-    _hobbit_hole(Vector2(-44,-26),1.16,false)
-    _hobbit_hole(Vector2(-45,-3),1.12,false)
-    _hobbit_hole(Vector2(-18,-39),1.18,false)
-    _hobbit_hole(Vector2(2,30),.97,false)
-    _hobbit_hole(Vector2(18,28),1.17,false)
+    _hobbit_hole(Vector2(-44,-26),1.16,false,"bagshot_cottage")
+    _hobbit_hole(Vector2(-45,-3),1.12,false,"garden_cottage")
+    _hobbit_hole(Vector2(-18,-39),1.18,false,"hill_cottage")
+    _hobbit_hole(Vector2(2,30),.97,false,"northern_cottage")
+    _hobbit_hole(Vector2(18,28),1.17,false,"market_cottage")
     # More inhabited homesteads on Bagshot Row and the southern farmland.
     # Use the same curated facade family until bespoke Blender interiors replace them.
-    _hobbit_hole(Vector2(-62,-12),.91,false)
-    _hobbit_hole(Vector2(-61,11),1.04,false)
-    _hobbit_hole(Vector2(-34,45),.94,false)
-    _hobbit_hole(Vector2(32,40),1.07,false)
+    _hobbit_hole(Vector2(-62,-12),.91,false,"west_row_cottage")
+    _hobbit_hole(Vector2(-61,11),1.04,false,"west_grove_cottage")
+    _hobbit_hole(Vector2(-34,45),.94,false,"longacre_cottage")
+    _hobbit_hole(Vector2(32,40),1.07,false,"east_orchard_cottage")
     _farm_fields()
     _market()
     ShireLicensedProps.dress_market(self,Callable(self,"elevation"))
@@ -262,7 +262,7 @@ func _water() -> void:
     river.material_override=water
     add_child(river)
 
-func _hobbit_hole(where: Vector2, scale_factor: float, main_house: bool) -> void:
+func _hobbit_hole(where: Vector2, scale_factor: float, main_house: bool, homestead_id: String="") -> void:
     var center:=Vector3(where.x,elevation(where.x,where.y),where.y)
     var house:=Node3D.new()
     house.position=center
@@ -273,6 +273,16 @@ func _hobbit_hole(where: Vector2, scale_factor: float, main_house: bool) -> void
     sph(house,Vector3(0,1.12,-.05),Vector3(4.0,1.9,3.8),Color("6e5438"))
     sph(house,Vector3(0,2.2,.85),Vector3(4.55,.83,3.8),Color("698845"))
     ShireArchitecture.decorate(house,main_house)
+    # Author-made Blender decoration only: gameplay and collision stay unchanged.
+    if not homestead_id.is_empty():
+        var path: String="res://assets/models/shire_"+homestead_id+"_craftwork.glb"
+        if ResourceLoader.exists(path):
+            var craftwork: PackedScene=load(path) as PackedScene
+            if craftwork != null:
+                var facade: Node3D=craftwork.instantiate() as Node3D
+                if facade != null:
+                    facade.name="ShireCraftedFacade_"+homestead_id
+                    house.add_child(facade)
     if main_house:
         var path_to_crafted := "res://assets/models/bag_end_crafted_portal.glb"
         if ResourceLoader.exists(path_to_crafted):
