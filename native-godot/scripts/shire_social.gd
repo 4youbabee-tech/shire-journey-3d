@@ -206,7 +206,14 @@ func unpack(raw: Dictionary) -> void:
     discovered.clear()
     events.clear()
     favours.clear()
-    for pair in [["discovered",discovered],["events",events],["favours",favours]]:
+    # JSON decodes integer discovery days as floats. Re-establish the
+    # integer-day contract used by record() and the save/load comparisons.
+    if raw.get("discovered") is Dictionary:
+        for id in raw["discovered"].keys().slice(0,200):
+            discovered[str(id).substr(0,70)] = clampi(int(raw["discovered"][id]),0,100000)
+    # These maps have heterogeneous values; preserve their types.
+    for pair in [["events",events],["favours",favours]]:
         if raw.get(pair[0]) is Dictionary:
-            for id in raw[pair[0]].keys().slice(0,200): pair[1][str(id).substr(0,70)] = raw[pair[0]][id]
+            for id in raw[pair[0]].keys().slice(0,200):
+                pair[1][str(id).substr(0,70)] = raw[pair[0]][id]
     wisdom = clampi(int(raw.get("wisdom",0)),0,10000)

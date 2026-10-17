@@ -20,6 +20,28 @@ func _run_smoke() -> void:
         push_error("Social persistence roundtrip failed")
         quit(2)
         return
+    # Regression for JSON save/load: discovery-day values 0.0 and 3.0 must
+    # be restored to integers, without generating any duplicate rewards.
+    var household_source = load("res://scripts/shire_social.gd").new()
+    household_source.record("home_bagshot_cottage", "Visited the home", "زيارة المنزل", 0)
+    household_source.record("cottage_bagshot_cottage_reading", "Read the journal", "قراءة الدفتر", 3)
+    var household_json = JSON.parse_string(JSON.stringify(household_source.pack()))
+    if not household_json is Dictionary:
+        push_error("Social JSON save failed to decode")
+        quit(58)
+        return
+    var household_restored = load("res://scripts/shire_social.gd").new()
+    household_restored.unpack(household_json)
+    if household_restored.discovered != household_source.discovered or household_restored.wisdom != household_source.wisdom or typeof(household_restored.discovered["home_bagshot_cottage"]) != TYPE_INT or typeof(household_restored.discovered["cottage_bagshot_cottage_reading"]) != TYPE_INT:
+        push_error("Household JSON roundtrip changed integer discovery days or wisdom")
+        quit(59)
+        return
+    var before_household_replay: int = household_restored.wisdom
+    if household_restored.record("cottage_bagshot_cottage_reading", "Read again", "قراءة مجددا", 3) or household_restored.wisdom != before_household_replay:
+        push_error("Household reward duplicated after JSON restore")
+        quit(60)
+        return
+
     for i in range(54):
         copy.meet("villager_%02d" % i,0)
     if copy.bonds.size()<55:
