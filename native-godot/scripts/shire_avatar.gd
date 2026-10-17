@@ -9,6 +9,8 @@ var is_imported := false
 var external_animation: AnimationPlayer
 var idle_clip := ""
 var walk_clip := ""
+var run_clip := ""
+var turn_clip := ""
 var talk_clip := ""
 var greet_clip := ""
 var working_clip := ""
@@ -95,6 +97,8 @@ func build(character_id: String, cloth: Color, seed_number: int, rich_detail: bo
                         for clip in external_animation.get_animation_list():
                             if idle_clip.is_empty() and str(clip).to_lower().contains("idle"): idle_clip=str(clip)
                             if walk_clip.is_empty() and str(clip).to_lower().contains("walk"): walk_clip=str(clip)
+                            if run_clip.is_empty() and ("run" in str(clip).to_lower() or "sprint" in str(clip).to_lower()): run_clip=str(clip)
+                            if turn_clip.is_empty() and ("turn" in str(clip).to_lower() or "rotate" in str(clip).to_lower()): turn_clip=str(clip)
                             if talk_clip.is_empty() and ("talk" in str(clip).to_lower() or "interact" in str(clip).to_lower()): talk_clip=str(clip)
                             if greet_clip.is_empty() and ("wave" in str(clip).to_lower() or "greet" in str(clip).to_lower()): greet_clip=str(clip)
                             if working_clip.is_empty() and ("work" in str(clip).to_lower() or "look" in str(clip).to_lower()): working_clip=str(clip)
@@ -210,13 +214,28 @@ func set_detail_range(distance: float) -> void:
     if face_detail != null:
         face_detail.visible = distance < 19.0
 
-func animate_walk(walking: bool, seconds: float, delta: float, distance: float, companion: bool = false) -> void:
+## Runs distinguishable motion when licensed GLB ships a run clip; safe walking fallback.
+## No invented skeletal deformation or facial visemes are claimed.
+func select_motion(walking: bool, running: bool = false) -> String:
+    if walking and running and not run_clip.is_empty():
+        return run_clip
+    if walking and not walk_clip.is_empty():
+        return walk_clip
+    if speaking and speech_remaining > 0.0 and not talk_clip.is_empty():
+        return talk_clip
+    if social_gesture and not greet_clip.is_empty():
+        return greet_clip
+    if social_gesture and not working_clip.is_empty():
+        return working_clip
+    return idle_clip
+
+func animate_walk(walking: bool, seconds: float, delta: float, distance: float, companion: bool = false, running: bool = false) -> void:
     speech_remaining=maxf(0.0,speech_remaining-delta)
     if animation_full_detail:
         _face_pose(seconds,delta,distance)
     if is_imported:
         if is_instance_valid(external_animation):
-            var clip: String = walk_clip if walking else talk_clip if speech_remaining>0.0 and not talk_clip.is_empty() else greet_clip if social_gesture and not greet_clip.is_empty() else working_clip if social_gesture and not working_clip.is_empty() else idle_clip
+            var clip: String=select_motion(walking,running)
             if not clip.is_empty() and external_animation.has_animation(clip):
                 if external_animation.current_animation != clip:
                     external_animation.play(clip,0.20)

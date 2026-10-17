@@ -72,7 +72,11 @@ const COTTAGE_DOORS := [
     ["garden_cottage","North Garden Home",-45.0,-7.29],
     ["hill_cottage","South Hill Home",-18.0,-43.52],
     ["northern_cottage","North Lane Home",2.0,26.28],
-    ["market_cottage","Market Hill Home",18.0,23.52]
+    ["market_cottage","Market Hill Home",18.0,23.52],
+    ["west_row_cottage","Western Row Home",-62.0,-15.49],
+    ["west_grove_cottage","Western Grove Home",-61.0,7.02],
+    ["longacre_cottage","Longacre House",-34.0,41.40],
+    ["east_orchard_cottage","Eastern Orchard Home",32.0,35.90]
 ]
 const INTERIOR_ORIGIN := Vector3(1000.0, 0.0, 1000.0)
 var nearest_landmark_id: String = ""

@@ -8,7 +8,7 @@ func _check() -> void:
         return
     for _i in range(7):
         await process_frame
-    var result: Array[Node] = current_scene.find_children("ShireWildlifeGLB",true,false)
+    var result: Array[Node] = current_scene.find_children("ShireWildlifeGLB","",true,false)
     if result.size()<14:
         push_error("Expected nine hens and five rabbits imported from Blender; got %d" % result.size())
         quit(96)

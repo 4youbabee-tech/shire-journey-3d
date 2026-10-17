@@ -113,5 +113,5 @@ func _physics_process(dt: float) -> void:
         visual.position.y=sin(Time.get_ticks_msec()*0.014)*0.045
     else:
         visual.position.y=move_toward(visual.position.y,0.0,dt*2.0)
-    avatar.animate_walk(direction.length()>0.05,Time.get_ticks_msec()*.001,dt,0.0)
+    avatar.animate_walk(direction.length()>0.05,Time.get_ticks_msec()*.001,dt,0.0,false,scale_speed>1.01)
     footsteps.tick(Vector2(velocity.x,velocity.z).length(),is_on_floor(),active,dt)

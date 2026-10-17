@@ -84,7 +84,8 @@ func _garden_props(where: Vector3, id: int) -> void:
 func populate(terrain: Callable) -> void:
     var house_gardens: Array[Vector2]=[
         Vector2(-34,-27),Vector2(-50,-25),Vector2(-52,-2),
-        Vector2(-24,-44),Vector2(8,32),Vector2(23,29)
+        Vector2(-24,-44),Vector2(8,32),Vector2(23,29),
+        Vector2(-69,-13),Vector2(-68,10),Vector2(-39,43),Vector2(38,42)
     ]
     for i in range(house_gardens.size()):
         var xy: Vector2=house_gardens[i]

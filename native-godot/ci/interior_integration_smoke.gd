@@ -60,6 +60,34 @@ func _run() -> void:
         push_error("Cannot exit cottage")
         quit(38)
         return
+    # New Western Row / Grove / Longacre / Orchard houses must be *enterable*.
+    # Check exact active door proximity and a save-load round trip for each house.
+    var newly_enterable := [
+        ["west_row_cottage","Western Row Home",-62.0,-15.49],
+        ["west_grove_cottage","Western Grove Home",-61.0,7.02],
+        ["longacre_cottage","Longacre House",-34.0,41.40],
+        ["east_orchard_cottage","Eastern Orchard Home",32.0,35.90]
+    ]
+    for entry in newly_enterable:
+        player.position=game.call("_ground",float(entry[2]),float(entry[3]))
+        var nearby: Array=game.call("_nearest_cottage_door")
+        if nearby.is_empty() or str(nearby[0])!=str(entry[0]):
+            push_error("New cottage entrance cannot be reached: "+str(entry[0]))
+            quit(48)
+            return
+        game.call("_enter_cottage",nearby)
+        if game.get("inside_cottage")!=true:
+            push_error("Could not enter new cottage: "+str(entry[0]))
+            quit(49)
+            return
+        game.call("save_game",false)
+        game.call("_exit_cottage")
+        game.call("load_game")
+        if game.get("inside_cottage")!=true or str(game.get("current_cottage_id"))!=str(entry[0]):
+            push_error("New cottage failed interior save-load: "+str(entry[0]))
+            quit(50)
+            return
+        game.call("_exit_cottage")
     game.call("_new_game")
     game.call("_start_cinema","years")
     var scene_cinema: Node=game.get("cinema")
