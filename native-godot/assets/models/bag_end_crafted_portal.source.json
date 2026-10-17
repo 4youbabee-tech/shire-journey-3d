@@ -1,0 +1,8 @@
+{
+  "origin": "ORIGINAL-GAME",
+  "state": "CANDIDATE_NOT_FINAL",
+  "generator": "tools/blender_build_bag_end.py",
+  "license": "original authored geometry and original baked texture",
+  "bytes": 1296876,
+  "sha256": "5855652089abdb0bf08f38315f0a0e4fe15f6024a8b6be11ede35538031436d6"
+}
