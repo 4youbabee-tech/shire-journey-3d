@@ -1,0 +1,13 @@
+{
+  "asset": "shire_market_cottage_craftwork",
+  "house_id": "market_cottage",
+  "motif": "market",
+  "provenance": "ORIGINAL-GAME",
+  "license": "Original procedural Blender geometry and packed texture",
+  "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
+  "editable": "blender-production/shire_districts/shire_facade_market_cottage.blend",
+  "sha256": "a0f4f6b4e63c6207b494a45c09c7510da260fa9d83ab09b7ff0aa56af1c999d0",
+  "bytes": 1432740,
+  "authored_parts": 196,
+  "batched_meshes": 9
+}

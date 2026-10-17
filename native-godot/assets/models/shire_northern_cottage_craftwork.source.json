@@ -1,0 +1,13 @@
+{
+  "asset": "shire_northern_cottage_craftwork",
+  "house_id": "northern_cottage",
+  "motif": "weaving",
+  "provenance": "ORIGINAL-GAME",
+  "license": "Original procedural Blender geometry and packed texture",
+  "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
+  "editable": "blender-production/shire_districts/shire_facade_northern_cottage.blend",
+  "sha256": "0861b6bf4aafb34ab819cde58616eac426c0c332c2122b9ba6cc1fbcb28bf2b5",
+  "bytes": 1364388,
+  "authored_parts": 187,
+  "batched_meshes": 9
+}

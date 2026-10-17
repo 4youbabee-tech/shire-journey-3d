@@ -1,0 +1,13 @@
+{
+  "asset": "shire_west_row_cottage_craftwork",
+  "house_id": "west_row_cottage",
+  "motif": "carpentry",
+  "provenance": "ORIGINAL-GAME",
+  "license": "Original procedural Blender geometry and packed texture",
+  "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
+  "editable": "blender-production/shire_districts/shire_facade_west_row_cottage.blend",
+  "sha256": "cbdcad28babe3a7709dd7001304317f21031d8b224cb689680cbd9619c9e3244",
+  "bytes": 1376676,
+  "authored_parts": 187,
+  "batched_meshes": 9
+}

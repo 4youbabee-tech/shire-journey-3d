@@ -1,0 +1,13 @@
+{
+  "asset": "shire_hill_cottage_craftwork",
+  "house_id": "hill_cottage",
+  "motif": "baking",
+  "provenance": "ORIGINAL-GAME",
+  "license": "Original procedural Blender geometry and packed texture",
+  "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
+  "editable": "blender-production/shire_districts/shire_facade_hill_cottage.blend",
+  "sha256": "44c38e322641e17a7bae47c501cfd1f20827b9bf2c836e6f527a6f4b24bc641e",
+  "bytes": 1342676,
+  "authored_parts": 184,
+  "batched_meshes": 10
+}

@@ -1,0 +1,13 @@
+{
+  "asset": "shire_bagshot_cottage_craftwork",
+  "house_id": "bagshot_cottage",
+  "motif": "letters",
+  "provenance": "ORIGINAL-GAME",
+  "license": "Original procedural Blender geometry and packed texture",
+  "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
+  "editable": "blender-production/shire_districts/shire_facade_bagshot_cottage.blend",
+  "sha256": "28bbd505ac9b402292839d1438737af3ca208a0a19c263e29388c2f628e39a9d",
+  "bytes": 1351152,
+  "authored_parts": 184,
+  "batched_meshes": 10
+}

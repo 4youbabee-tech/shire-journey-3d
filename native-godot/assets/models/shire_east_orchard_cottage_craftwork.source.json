@@ -1,0 +1,13 @@
+{
+  "asset": "shire_east_orchard_cottage_craftwork",
+  "house_id": "east_orchard_cottage",
+  "motif": "orchard",
+  "provenance": "ORIGINAL-GAME",
+  "license": "Original procedural Blender geometry and packed texture",
+  "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
+  "editable": "blender-production/shire_districts/shire_facade_east_orchard_cottage.blend",
+  "sha256": "e31fd9ace7955eed126745797e407be6d41801d0eac37098e402607b27548639",
+  "bytes": 1584640,
+  "authored_parts": 196,
+  "batched_meshes": 9
+}
