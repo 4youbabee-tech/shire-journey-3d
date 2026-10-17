@@ -19,22 +19,45 @@ func _capture() -> void:
     # CI's interior save/load smoke can leave a user:// save; never photograph a stale location.
     game.call("_new_game")
     var player = game.get("frodo")
-    # Stable, unobstructed exterior composition: look northwest towards Bag End.
-    # The former southwestern shot now intersects expanding homestead/foliage sets.
-    # Keep the exact same strict screenshot QA gate; change the camera, not thresholds.
-    player.position = game.call("_ground",-12.0,-29.0) + Vector3(0,.35,0)
-    player.yaw = 2.24
-    player.rotation.y = 2.24
-    player.first_person = false
-    player._update_camera()
-    if game.get("inside_bag_end") == true or game.get("inside_cottage") == true:
+    # Capture with an independent spectator camera. Frodo's gameplay camera can
+    # spring-arm clamp behind new buildings, terrain or orchard furniture.
+    # Moving the player did not fix 2 consecutive obscured Hobbiton screenshots.
+    player.active=false
+    if game.get("inside_bag_end")==true or game.get("inside_cottage")==true:
         push_error("Exterior capture still inside an interior")
         quit(7)
         return
     DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://dist"))
-    if not await _save_frame("in_engine_hobbiton.png"):
-        quit(4)
-        return
+    var spectator:=Camera3D.new()
+    spectator.name="QA_Independent_Exterior_Camera"
+    spectator.fov=66.0
+    spectator.near=.08
+    game.add_child(spectator)
+    spectator.current=true
+    # Each photo is a real frame of this chapter, sampled from fixed elevated
+    # viewpoints. Selection happens later using unmodified strict pixel gates.
+    var views: Array=[
+        ["bagend",Vector2(-39.0,-47.0),Vector2(-24.0,-20.0),8.0],
+        ["party",Vector2(-10.0,18.0),Vector2(-2.0,-3.0),8.5],
+        ["market",Vector2(10.0,25.0),Vector2(17.0,8.0),8.0],
+        ["mill",Vector2(52.0,-3.0),Vector2(32.0,-20.0),10.0],
+        ["highridge",Vector2(-6.0,-52.0),Vector2(-24.0,-20.0),12.0]
+    ]
+    for view in views:
+        var pos: Vector2=view[1]
+        var aim: Vector2=view[2]
+        var altitude: float=float(view[3])
+        var camera_ground: Vector3=game.call("_ground",pos.x,pos.y)
+        var target_ground: Vector3=game.call("_ground",aim.x,aim.y)
+        spectator.global_position=camera_ground+Vector3.UP*altitude
+        spectator.look_at(target_ground+Vector3.UP*2.3,Vector3.UP)
+        if not await _save_frame("in_engine_hobbiton_candidate_%s.png" % str(view[0])):
+            quit(4)
+            return
+    spectator.current=false
+    spectator.queue_free()
+    player.active=true
+    player.camera.current=true
     game.call("_enter_bag_end")
     if not await _save_frame("in_engine_bagend.png"):
         quit(5)
@@ -44,7 +67,7 @@ func _capture() -> void:
     if not await _save_frame("in_engine_cottage.png"):
         quit(6)
         return
-    print("SAVED 3 IN-ENGINE SCREENS: HOBBITON, BAG END, COTTAGE")
+    print("SAVED 5 HOBBITON CANDIDATES + BAG END + COTTAGE; strict selection follows")
     quit(0)
 
 func _save_frame(filename: String) -> bool:
