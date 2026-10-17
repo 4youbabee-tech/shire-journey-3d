@@ -37,7 +37,7 @@ func _verify() -> void:
         push_error("Hobbiton homes / scenic cottages / market stalls unbuilt")
         quit(193)
         return
-    if bridge.find_children("BridgeStoneVoussoir","MeshInstance3D",true,false).size() < 30:
+    if bridge.find_children("BridgeStoneVoussoir_*","MeshInstance3D",true,false).size() < 30:
         push_error("Stone bridge arch not physically modeled in world")
         quit(194)
         return

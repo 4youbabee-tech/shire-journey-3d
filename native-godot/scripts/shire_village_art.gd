@@ -24,7 +24,8 @@ static func _zone(parent: Node3D, label: String) -> Node3D:
 static func _box(parent: Node3D, label: String, at: Vector3,
         dimensions: Vector3, colour: String, yaw: float = 0.0) -> MeshInstance3D:
     var visual := MeshInstance3D.new()
-    visual.name = label
+    # Distinct mesh node for every stone, roof piece and flower.
+    visual.name = label + "_" + str(parent.get_child_count())
     var block := BoxMesh.new()
     block.size = dimensions
     visual.mesh = block
@@ -38,7 +39,8 @@ static func _box(parent: Node3D, label: String, at: Vector3,
 static func _sphere(parent: Node3D, label: String, at: Vector3,
         dimensions: Vector3, colour: String) -> MeshInstance3D:
     var visual := MeshInstance3D.new()
-    visual.name = label
+    # Distinct mesh node for every stone, roof piece and flower.
+    visual.name = label + "_" + str(parent.get_child_count())
     var mesh := SphereMesh.new()
     mesh.radial_segments = 10
     mesh.rings = 6
