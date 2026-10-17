@@ -66,6 +66,8 @@ func _ready() -> void:
     _neighbour_errand_props()
     ShirePhotorealProps.gardens(self,Callable(self,"elevation"))
     _trees()
+    # Original layered woodland silhouettes, instanced in shared GPU batches.
+    preload("res://scripts/shire_tree_grove.gd").populate(self,Callable(self,"elevation"),Callable(self,"_river_x"))
     _grass_and_flowers()
     ShireWorldDressing.populate(self,Callable(self,"elevation"))
     ShireHomesteadExteriors.populate(self,Callable(self,"elevation"))
