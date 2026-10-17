@@ -14,6 +14,7 @@ func _ready() -> void:
     _build()
     ShireLicensedProps.dress_cottage(self,variant_id)
     ShirePhotorealProps.cottage(self,variant_id)
+    ShireHomeCraft.dress(self,variant_id)
 
 func _material(hex: String) -> StandardMaterial3D:
     if materials.has(hex):

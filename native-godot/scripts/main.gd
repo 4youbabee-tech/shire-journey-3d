@@ -803,8 +803,11 @@ func _interact_cottage() -> void:
         return
     if place=="":
         return
-    social.record("cottage_"+current_cottage_id+"_"+place,"Explored "+place+" in "+current_cottage_name,"استكشفت "+current_cottage_name,clock.day_index())
-    _show_notice("A small story from ordinary Shire life.", "تفصيل صغير من حياة الشاير اليومية.")
+    var domestic_story: Dictionary=ShireHomeCraft.vignette(current_cottage_id,place)
+    if domestic_story.is_empty():
+        return
+    social.record("cottage_"+current_cottage_id+"_"+place,str(domestic_story["en"]),str(domestic_story["ar"]),clock.day_index())
+    _show_notice(str(domestic_story["en"]),str(domestic_story["ar"]))
     save_game(false)
 
 func _near_bag_end_door() -> bool:
