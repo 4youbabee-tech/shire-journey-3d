@@ -4,7 +4,7 @@
   "status": "CANDIDATE_NOT_FINAL",
   "generator": "tools/blender_build_shire_districts.py",
   "license": "original geometry, original painted albedo",
-  "sha256": "8ab96664202323c69c32471a1aa82b54d9e1c38d4d0dc8f2d38b32e348df391c",
+  "sha256": "892402e67584cea6fdf7126f5ae870930f9cc1306938a88d8f81f16f926f50ff",
   "bytes": 2123580,
   "authored_meshes": 289,
   "optimized_meshes": 4

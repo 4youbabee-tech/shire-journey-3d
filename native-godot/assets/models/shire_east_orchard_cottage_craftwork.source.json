@@ -6,7 +6,7 @@
   "license": "Original procedural Blender geometry and packed texture",
   "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
   "editable": "blender-production/shire_districts/shire_facade_east_orchard_cottage.blend",
-  "sha256": "f4acc9773a437cf2c410af84ac5e7e70845688e64d463514190199a908af37b3",
+  "sha256": "56e192b235db110bb266a4cef7713bbd1a635ecd13ba564659d578ac803f9951",
   "bytes": 2104828,
   "authored_parts": 262,
   "batched_meshes": 9

@@ -6,7 +6,7 @@
   "license": "Original procedural Blender geometry and packed texture",
   "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
   "editable": "blender-production/shire_districts/shire_facade_hill_cottage.blend",
-  "sha256": "b8286514c85c0c579342d55de843799847439a9b2f2c0669715642d02e773ee5",
+  "sha256": "62355199853a07ccd8b747e7dc34be820d25500150a3be9a521fd8f39ea9978e",
   "bytes": 1862848,
   "authored_parts": 250,
   "batched_meshes": 10

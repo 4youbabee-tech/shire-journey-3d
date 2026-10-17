@@ -3,7 +3,7 @@
   "origin": "ORIGINAL-GAME",
   "status": "ANIMATED_ART_CANDIDATE_NOT_FINAL",
   "license": "Blender-authored geometry, no external scans or model likenesses",
-  "sha256": "427d324a43c716428b98c30af7d36c741301efabc53d1da0bec2cc77ba1983fd",
+  "sha256": "1c48c6f6c30b19f1d40b648bc3fb8cc0cadbad84a0bac1ece254b764ebd57896",
   "bytes": 406784,
   "authored_parts": 28,
   "optimized_scene_meshes": 9,
