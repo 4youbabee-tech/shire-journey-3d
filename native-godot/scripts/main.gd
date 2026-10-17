@@ -807,7 +807,11 @@ func _interact_cottage() -> void:
     if domestic_story.is_empty():
         return
     social.record("cottage_"+current_cottage_id+"_"+place,str(domestic_story["en"]),str(domestic_story["ar"]),clock.day_index())
-    _show_notice(str(domestic_story["en"]),str(domestic_story["ar"]))
+    var ending: Dictionary=ShireHouseholdChronicle.complete_if_ready(social,current_cottage_id,clock.day_index())
+    if ending.is_empty():
+        _show_notice(str(domestic_story["en"]),str(domestic_story["ar"]))
+    else:
+        _show_notice(str(ending["en"]),str(ending["ar"]))
     save_game(false)
 
 func _near_bag_end_door() -> bool:

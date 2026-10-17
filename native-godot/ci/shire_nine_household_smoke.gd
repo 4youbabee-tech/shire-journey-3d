@@ -83,6 +83,10 @@ func _check() -> void:
                 push_error("House domestic event not recorded: "+key)
                 quit(149)
                 return
+        if not game.get("social").discovered.has("household_chronicle_"+id):
+            push_error("Household story not completed after reading/pantry/hearth: "+id)
+            quit(156)
+            return
         var discovery_before: Dictionary=game.get("social").discovered.duplicate(true)
         var wisdom_before: int=game.get("social").wisdom
         game.call("save_game",false)
@@ -100,7 +104,7 @@ func _check() -> void:
                 quit(152)
                 return
         if restored_social.discovered!=discovery_before or restored_social.wisdom!=wisdom_before:
-            push_error("Domestic reward changed across save/load: "+id)
+            push_error("Domestic reward changed across save/load: %s wisdom %d -> %d keys %s -> %s" % [id,wisdom_before,restored_social.wisdom,str(discovery_before),str(restored_social.discovered)])
             quit(153)
             return
         for station in ["reading","pantry","hearth"]:

@@ -123,6 +123,39 @@ def build(kind,m):
             cube("WeatheredRoofTile",(px,py,pz),(.56,.07,.58),m["slate"])
             if (col+row)%4==0:
                 orb("RoofGardenMoss",(px,py+.07,pz),(.16,.06,.16),m["leaf"])
+    # Weathered masonry, occupied leadlight windows and original rainwater craft.
+    # Reuse the existing palette so nine GLBs retain material batching.
+    cx=-2.7 if kind in ("letters","weaving","herbs","orchard") else 2.7
+    cube("HearthChimneyFieldstone",(cx,3.23,1.67),(.84,1.22,.76),m["stone"])
+    cube("WeatheredChimneyCap",(cx,3.9,1.67),(1.10,.18,1.02),m["slate"])
+    cube("SootDarkenedFlue",(cx,4.0,1.67),(.44,.055,.43),m["iron"])
+    for row in range(3):
+        for side in (-1,1):
+            for col in range(3):
+                cube("IndividualChimneyStone",(cx+side*.42,2.86+row*.29,
+                     1.39+col*.29),(.12,.17,.22),m["stone"])
+    for side in (-1,1):
+        x=side*2.4
+        cube("AmberLeadedGlassWindow",(x,1.37,-3.50),(1.31,1.11,.043),m["glass"])
+        for stripe in range(5):
+            px=x-.53+stripe*.26
+            cube("IronWindowMullion",(px,1.37,-3.56),(.026,1.06,.045),m["iron"])
+        for stripe in range(4):
+            py=.96+stripe*.27
+            cube("IronWindowCrossbar",(x,py,-3.57),(1.29,.025,.052),m["iron"])
+        cube("HandCarvedOakEaveGutter",(side*2.24,2.70,-3.50),(2.3,.14,.19),m["oak"])
+        cylinder("RainwaterDrainPipe",(side*3.36,1.30,-3.50),.045,2.28,m["iron"])
+        cylinder("HouseholdRainBarrel",(side*3.36,.40,-3.68),.36,.68,m["oak"])
+        cylinder("RainBarrelIronRim",(side*3.36,.67,-3.68),.37,.05,m["iron"])
+        for tip in range(5):
+            z=2.45+tip*.32
+            orb("LivingRoofEdgeHerbs",(side*(2.14+.07*tip),2.89,z),
+                (.20,.09,.16),m["leaf"])
+    for i in range(7):
+        angle=math.tau*i/7
+        orb("CarvedHouseholdPorchEmblem",(math.cos(angle)*.28,
+            2.48+math.sin(angle)*.28,-3.95),(.09,.085,.05),
+            m["accent"] if i%2 else m["brass"])
     # One believable amber entrance lamp without additional GPU lights.
     cylinder("OilLanternAmberGlass",(1.66,2.07,-4.15),.14,.35,m["glass"])
     cube("OilLanternWroughtCage",(1.66,2.30,-4.15),(.33,.07,.30),m["iron"])
