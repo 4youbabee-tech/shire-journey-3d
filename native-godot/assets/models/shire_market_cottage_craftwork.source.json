@@ -6,7 +6,7 @@
   "license": "Original procedural Blender geometry and packed texture",
   "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
   "editable": "blender-production/shire_districts/shire_facade_market_cottage.blend",
-  "sha256": "f77275bf44ff470309795c129f3b6d8043fad2719faacab2d61060a6b3ca17ae",
+  "sha256": "d5433ba584c7e8775da543127c40d67e24158f0ddaff8d9890abd6e6f27c6283",
   "bytes": 1952924,
   "authored_parts": 262,
   "batched_meshes": 9
