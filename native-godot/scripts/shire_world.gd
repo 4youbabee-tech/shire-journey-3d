@@ -65,6 +65,8 @@ func _ready() -> void:
     _party_field()
     _neighbour_errand_props()
     ShirePhotorealProps.gardens(self,Callable(self,"elevation"))
+    # Reuse real 1K CC0 PBR shrub scan as >120 GPU instances throughout town.
+    ShirePhotogrammetricGardens.populate(self,Callable(self,"elevation"),Callable(self,"_river_x"))
     _trees()
     _grass_and_flowers()
     ShireWorldDressing.populate(self,Callable(self,"elevation"))

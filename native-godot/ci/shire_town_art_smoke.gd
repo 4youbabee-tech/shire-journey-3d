@@ -12,6 +12,8 @@ func _verify() -> void:
     for i in range(6):
         await process_frame
     var game: Node = current_scene
+    # A previous CI smoke can leave a saved interior; isolate scene state.
+    game.call("_new_game")
     var art: Node = game.find_child("HobbitonCompleteVillageArt",true,false)
     var ecology: Node = game.find_child("HobbitonLayeredGroundEcology",true,false)
     if art == null or ecology == null or art.get_meta("live_gameplay_world",false) != true:
@@ -72,6 +74,20 @@ func _verify() -> void:
     if instances < 6000:
         push_error("Expected thousands of instanced plants, not decorative few: %d" % instances)
         quit(199)
+        return
+    # A real licensed photogrammetric model, not placeholder capsules.
+    var shrub_layer: Node=game.find_child("HobbitonPhotogrammetricShrubClusters",true,false)
+    if shrub_layer == null or shrub_layer.get_meta("verified_cc0_photogrammetry",false) != true:
+        push_error("Verified Poly Haven photogrammetric shrubs missing from the playable village")
+        quit(201)
+        return
+    if int(shrub_layer.get_meta("visible_shrubs",0)) < 120:
+        push_error("Too few instanced photogrammetric shrub clusters")
+        quit(202)
+        return
+    if shrub_layer.find_children("*","MultiMeshInstance3D",true,false).size() < 1:
+        push_error("Photogrammetric shrubs are not material-preserving GPU meshes")
+        quit(203)
         return
     if game.get("inside_cottage") == true or game.get("inside_bag_end") == true:
         push_error("Whole town build unexpectedly entered a house")
