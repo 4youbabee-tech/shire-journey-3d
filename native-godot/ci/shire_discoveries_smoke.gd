@@ -6,8 +6,8 @@ func _initialize() -> void:
 func _verify() -> void:
     var source=load("res://scripts/shire_discoveries.gd")
     var notes=source.new()
-    if source.SITES.size()!=12:
-        push_error("Expected 12 original field notes")
+    if source.SITES.size()!=21:
+        push_error("Expected 21 original village and household field notes")
         quit(121)
         return
     var ids: Dictionary={}
@@ -44,7 +44,7 @@ func _verify() -> void:
             return
     var copy=source.new()
     copy.unpack(notes.pack())
-    if copy.seen.size()!=12:
+    if copy.seen.size()!=21:
         push_error("Field-note save roundtrip failed")
         quit(128)
         return
@@ -63,5 +63,5 @@ func _verify() -> void:
         push_error("Field-note reset failed")
         quit(131)
         return
-    print("PASS: 12 bilingual Shire field notes, reachability, dedup and persistence")
+    print("PASS: 21 bilingual Shire field notes, reachability, dedup and persistence")
     quit(0)

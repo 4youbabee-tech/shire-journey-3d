@@ -38,6 +38,11 @@ func _check() -> void:
             quit(143)
             return
         distinct_motifs[craft_motif]=true
+        var porch: Node=game.find_child("ShireHomesteadExterior_"+id,true,false)
+        if porch==null or porch.find_children("*","MeshInstance3D",true,false).size()<30:
+            push_error("Household exterior props missing: "+id)
+            quit(155)
+            return
         person.position=game.call("_ground",float(entry[2]),float(entry[3]))
         var door: Array=game.call("_nearest_cottage_door")
         if door.is_empty() or str(door[0])!=id:
@@ -87,7 +92,7 @@ func _check() -> void:
             push_error("House state failed save/load: "+id)
             quit(150)
             return
-        var restored_social: Node=game.get("social")
+        var restored_social: ShireSocial=game.get("social")
         for station in ["reading","pantry","hearth"]:
             var saved_key: String="cottage_"+id+"_"+station
             if not restored_social.discovered.has(saved_key):

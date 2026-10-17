@@ -38,7 +38,25 @@ const SITES := [
   "text_ar":"تقل البيوت هنا وتتلاشى أصوات القرية خلف الأسيجة."},
  {"id":"mill_brook","pos":Vector2(40.0,-18.0),"en":"Follow the water below the mill","ar":"تتبّع مجرى الماء قرب الطاحونة",
   "text_en":"The current carries leaves past the wheel, working long after the miller goes home.",
-  "text_ar":"يحمل التيار أوراق الشجر قرب العجلة، ويواصل الماء عمله بعد عودة الطحّان."}
+  "text_ar":"يحمل التيار أوراق الشجر قرب العجلة، ويواصل الماء عمله بعد عودة الطحّان."},
+ {"id":"bagshot_letter","pos":Vector2(-36.8,-33.5),"en":"Read a letter on Bagshot Row","ar":"اقرأ رسالة في صف باغشوت",
+  "text_en":"A cousin's sealed letter waits beside the porch, ready for the evening reading.","text_ar":"تنتظر رسالة مختومة من أحد الأقارب قرب الرواق لتُقرأ عند حلول المساء."},
+ {"id":"north_garden_seeds","pos":Vector2(-37.8,-10.5),"en":"Inspect the spring seed trays","ar":"تفحّص صواني بذور الربيع",
+  "text_en":"Every labelled sprout carries the careful hopes of the northern gardeners.","text_ar":"تحمل كل شتلة موسومة آمال البستانيين الذين يعتنون بحدائق الشمال."},
+ {"id":"south_hill_copper","pos":Vector2(-10.8,-46.5),"en":"Study the bright cooking pots","ar":"تأمل قدور الطبخ اللامعة",
+  "text_en":"Polished copper vessels are ready for bread and soup shared with travellers.","text_ar":"تنتظر الأواني النحاسية المصقولة خبزًا وحساءً يُقدّمان للمسافرين."},
+ {"id":"north_lane_wool","pos":Vector2(9.2,22.5),"en":"Inspect the household wool","ar":"تفحّص صوف أهل الحارة",
+  "text_en":"Soft dyed wool will become warm blankets when the winter nights grow long.","text_ar":"سيتحوّل الصوف المصبوغ الناعم إلى أغطية دافئة حين تطول ليالي الشتاء."},
+ {"id":"market_hill_produce","pos":Vector2(25.2,20.5),"en":"Examine the produce table","ar":"تفحّص طاولة المحاصيل",
+  "text_en":"Fresh vegetables are sorted into crates for the first market visitors.","text_ar":"تُفرز الخضراوات الطازجة في صناديق قبل وصول أوائل زوار السوق."},
+ {"id":"western_row_joinery","pos":Vector2(-54.8,-19.5),"en":"Inspect the carpenter's workbench","ar":"تفحّص منضدة النجّار",
+  "text_en":"Little pegs and measured wood tell of a new round door for a neighbour.","text_ar":"تحكي الأوتاد الصغيرة والأخشاب المقاسة عن باب دائري جديد لأحد الجيران."},
+ {"id":"western_grove_herbs","pos":Vector2(-53.8,3.5),"en":"Examine the woodland herbs","ar":"تفحّص أعشاب الغابة",
+  "text_en":"Carefully dried leaves wait in the shade for a cold season's herbal tea.","text_ar":"تنتظر الأوراق المجففة بعناية في الظلّ لتصبح شايًا عشبيًا في موسم البرد."},
+ {"id":"longacre_sheaves","pos":Vector2(-26.8,37.5),"en":"Inspect the harvest sacks","ar":"تفحّص أكياس الحصاد",
+  "text_en":"Grain saved from the autumn fields will carry many families through winter.","text_ar":"ستعين الحبوب المحفوظة من حقول الخريف عائلات كثيرة خلال الشتاء."},
+ {"id":"eastern_orchard_apples","pos":Vector2(39.2,32.5),"en":"Inspect the orchard apple crates","ar":"تفحّص صناديق تفاح البستان",
+  "text_en":"The ripest apples are put aside for neighbours preparing the next feast.","text_ar":"تُحفظ أكثر حبات التفاح نضجًا للجيران الذين يستعدون للوليمة المقبلة."}
 ]
 var seen: Dictionary = {}
 
