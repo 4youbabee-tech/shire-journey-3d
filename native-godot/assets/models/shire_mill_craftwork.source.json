@@ -1,0 +1,11 @@
+{
+  "asset": "shire_mill_craftwork",
+  "origin": "ORIGINAL-GAME",
+  "status": "CANDIDATE_NOT_FINAL",
+  "generator": "tools/blender_build_shire_districts.py",
+  "license": "original geometry, original painted albedo",
+  "sha256": "806fcc3ffbadeab9b059ecddc792be26b6d11ba509867a23832a227d4eb20c40",
+  "bytes": 2123580,
+  "authored_meshes": 289,
+  "optimized_meshes": 4
+}

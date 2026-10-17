@@ -1,0 +1,11 @@
+{
+  "asset": "shire_feast_craftwork",
+  "origin": "ORIGINAL-GAME",
+  "status": "CANDIDATE_NOT_FINAL",
+  "generator": "tools/blender_build_shire_districts.py",
+  "license": "original geometry, original painted albedo",
+  "sha256": "4c3ad3f33d2782c018cfd2f333576b65d94ce5a5fb804424236550b916c25e40",
+  "bytes": 460200,
+  "authored_meshes": 68,
+  "optimized_meshes": 10
+}
