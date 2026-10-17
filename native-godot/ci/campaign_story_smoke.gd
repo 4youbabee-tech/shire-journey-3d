@@ -26,5 +26,38 @@ func _initialize() -> void:
             push_error("Bilingual Shire gameplay stage outline missing")
             quit(94)
             return
+    # Cover player-facing field observations in an existing mandatory CI smoke.
+    var library=load("res://scripts/shire_discoveries.gd")
+    var journal=library.new()
+    if library.SITES.size()!=12:
+        push_error("Expected 12 Shire field observation sites")
+        quit(95)
+        return
+    var known: Dictionary={}
+    for site in library.SITES:
+        var id: String=str(site["id"])
+        if known.has(id) or str(site.get("en","")).is_empty() or str(site.get("ar","")).is_empty() or str(site.get("text_en","")).is_empty() or str(site.get("text_ar","")).is_empty():
+            push_error("Duplicate or untranslated Shire field note "+id)
+            quit(96)
+            return
+        known[id]=true
+        var p: Vector2=site["pos"]
+        var spot:=Vector3(p.x,0.0,p.y)
+        if not journal.nearest(spot,true).is_empty() or str(journal.nearest(spot).get("id",""))!=id:
+            push_error("Indoor access or overlapping field note "+id)
+            quit(97)
+            return
+        var reward: Dictionary=journal.discover(id)
+        if reward.is_empty() or not journal.discover(id).is_empty():
+            push_error("Field note not collectible exactly once "+id)
+            quit(98)
+            return
+    var restored=library.new()
+    restored.unpack(journal.pack())
+    if restored.seen.size()!=12:
+        push_error("Field note save roundtrip invalid")
+        quit(99)
+        return
+    print("PASS: 12 original bilingual Shire field notes, interior lock and persistence")
     print("PASS: 14 author-written bilingual chapter screenplay outlines and nine in-game journal beats")
     quit(0)

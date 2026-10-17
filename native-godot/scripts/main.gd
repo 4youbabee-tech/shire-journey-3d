@@ -1015,6 +1015,7 @@ func _toggle_journal() -> void:
     var current_beat: Dictionary = CampaignAtlasScript.shire_focus(stage)
     entries.append(foraging.progress_text())
     entries.append("Collect two of each harvest type; deliver at the market.")
+    entries.append("FIELD NOTES / ملاحظات الشاير: %d / %d" % [discoveries.seen.size(),DiscoveriesScript.SITES.size()])
     entries.append("")
     entries.append("STORY | " + str(current_beat.get("en","")))
     entries.append(str(current_beat.get("ar","")))

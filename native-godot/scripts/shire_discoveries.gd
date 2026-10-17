@@ -20,7 +20,25 @@ const SITES := [
   "text_ar":"تُظهر صفوف الزرع لماذا يقدّر أهل الشاير العمل المتقن والصبر."},
  {"id":"willows","pos":Vector2(37.0,-42.0),"en":"Pause by the river willows","ar":"توقف عند صفصاف النهر",
   "text_en":"The reeds lean over the banks, and willow branches stir when the wind shifts.",
-  "text_ar":"تميل أعواد القصب فوق الضفاف وتتحرك أغصان الصفصاف مع تغيّر الريح."}
+  "text_ar":"تميل أعواد القصب فوق الضفاف وتتحرك أغصان الصفصاف مع تغيّر الريح."} ,
+ {"id":"orchard","pos":Vector2(-79.0,15.0),"en":"Inspect the orchard boundary","ar":"تفحّص أطراف البستان",
+  "text_en":"Fallen apples nourish soil and insects, while the harvest feeds neighbours.",
+  "text_ar":"يغذّي التفاح المتساقط التربة والحشرات، كما يطعم المحصول أهل القرية."},
+ {"id":"hedgerow","pos":Vector2(-43.0,17.0),"en":"Listen to the hens by the hedge","ar":"أنصت إلى الدجاج قرب السياج",
+  "text_en":"Small feet stir the grass. Even a quiet homestead has its own busy rhythms.",
+  "text_ar":"تقلّب الأقدام الصغيرة العشب؛ حتى الدار الهادئة لها إيقاع مليء بالحركة."},
+ {"id":"hillpath","pos":Vector2(-49.0,-39.0),"en":"Follow the worn hillside path","ar":"تأمل الدرب فوق التل",
+  "text_en":"Countless familiar journeys have worn the track: to a neighbour's door and home before dusk.",
+  "text_ar":"رسمت الرحلات المتكررة هذا الدرب: إلى باب جار، ثم العودة إلى البيت قبل المساء."},
+ {"id":"party_tree","pos":Vector2(-4.0,-8.0),"en":"Study the grass at Party Field","ar":"تأمل العشب في حقل الاحتفال",
+  "text_en":"Grass bears the tracks of tables and laughter; fresh shoots will follow the feast.",
+  "text_ar":"يحفظ العشب آثار الطاولات والضحكات، ثم تنمو براعم جديدة بعد الوليمة."},
+ {"id":"north_lane","pos":Vector2(9.0,63.0),"en":"Look down the northern lane","ar":"انظر إلى امتداد الطريق الشمالي",
+  "text_en":"The cottages thin out, and the village sounds fade behind the hedges.",
+  "text_ar":"تقل البيوت هنا وتتلاشى أصوات القرية خلف الأسيجة."},
+ {"id":"mill_brook","pos":Vector2(40.0,-18.0),"en":"Follow the water below the mill","ar":"تتبّع مجرى الماء قرب الطاحونة",
+  "text_en":"The current carries leaves past the wheel, working long after the miller goes home.",
+  "text_ar":"يحمل التيار أوراق الشجر قرب العجلة، ويواصل الماء عمله بعد عودة الطحّان."}
 ]
 var seen: Dictionary = {}
 
