@@ -6,7 +6,7 @@
   "license": "Original procedural Blender geometry and packed texture",
   "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
   "editable": "blender-production/shire_districts/shire_facade_longacre_cottage.blend",
-  "sha256": "05eff8e99a46ef4054587ad799f544e1377cfdd16d780084e5458e49542d4797",
+  "sha256": "fff2b218e8bc0671906b2a491c7e10509b00e98e402f588ed5ab52de8ed3e683",
   "bytes": 1859304,
   "authored_parts": 250,
   "batched_meshes": 10

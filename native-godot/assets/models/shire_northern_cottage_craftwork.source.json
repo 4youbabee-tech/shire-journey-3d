@@ -6,7 +6,7 @@
   "license": "Original procedural Blender geometry and packed texture",
   "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
   "editable": "blender-production/shire_districts/shire_facade_northern_cottage.blend",
-  "sha256": "ecc9ad218b23cd94e7cc5d51a43953452ccbdcd04f8bfd61345c70b95e5e91d4",
+  "sha256": "114da1fdb6ca9bd34a66c802abf7c4593578093f083b87fbd27a44506fde15d9",
   "bytes": 1884572,
   "authored_parts": 253,
   "batched_meshes": 9

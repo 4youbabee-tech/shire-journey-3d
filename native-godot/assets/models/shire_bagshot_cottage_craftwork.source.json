@@ -6,7 +6,7 @@
   "license": "Original procedural Blender geometry and packed texture",
   "status": "INTEGRATED_NOT_VISUALLY_ACCEPTED",
   "editable": "blender-production/shire_districts/shire_facade_bagshot_cottage.blend",
-  "sha256": "79c27d4dc33ce44d21f4d579660185dd434383387b10727874f73b779e2b63a7",
+  "sha256": "d2fe263631e5dd07c93fff821645d7ccd06e8f7ce0cbb982c59a4478c9106f0d",
   "bytes": 1871340,
   "authored_parts": 250,
   "batched_meshes": 10
