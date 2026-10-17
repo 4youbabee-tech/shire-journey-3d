@@ -78,12 +78,33 @@ func _check() -> void:
                 push_error("House domestic event not recorded: "+key)
                 quit(149)
                 return
+        var discovery_before: Dictionary=game.get("social").discovered.duplicate(true)
+        var wisdom_before: int=game.get("social").wisdom
         game.call("save_game",false)
         game.call("_exit_cottage")
         game.call("load_game")
         if game.get("inside_cottage")!=true or str(game.get("current_cottage_id"))!=id:
             push_error("House state failed save/load: "+id)
             quit(150)
+            return
+        var restored_social: Node=game.get("social")
+        for station in ["reading","pantry","hearth"]:
+            var saved_key: String="cottage_"+id+"_"+station
+            if not restored_social.discovered.has(saved_key):
+                push_error("Domestic discovery lost on load: "+saved_key)
+                quit(152)
+                return
+        if restored_social.discovered!=discovery_before or restored_social.wisdom!=wisdom_before:
+            push_error("Domestic reward changed across save/load: "+id)
+            quit(153)
+            return
+        for station in ["reading","pantry","hearth"]:
+            var offset: Vector3=ShireCottage.READING if station=="reading" else ShireCottage.PANTRY if station=="pantry" else ShireCottage.HEARTH
+            person.position=Vector3(1000,0,1000)+offset+Vector3.UP*.15
+            game.call("_interact_cottage")
+        if restored_social.discovered!=discovery_before or restored_social.wisdom!=wisdom_before:
+            push_error("Household rewards duplicated after reload: "+id)
+            quit(154)
             return
         game.call("_exit_cottage")
     if distinct_motifs.size()!=9 or narratives.size()!=27:
