@@ -12,6 +12,7 @@ const DialogueScript=preload("res://scripts/shire_dialogue.gd")
 const SocialScript=preload("res://scripts/shire_social.gd")
 const BagEndScript=preload("res://scripts/shire_bag_end.gd")
 const ActivityScript=preload("res://scripts/shire_activities.gd")
+const ForagingScript=preload("res://scripts/shire_foraging.gd")
 const ErrandScript=preload("res://scripts/shire_neighbour_errands.gd")
 const MapScript=preload("res://scripts/shire_map.gd")
 const CottageScript=preload("res://scripts/shire_cottage.gd")
@@ -22,6 +23,7 @@ const FireworksScript=preload("res://scripts/shire_fireworks.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
 var activities: ShireActivities
+var foraging: ShireForaging
 var errands: ShireNeighbourErrands
 var discoveries: ShireDiscoveries
 var cinema: ShireChapterCinema
@@ -104,6 +106,7 @@ const LANDMARKS = [
 func _ready() -> void:
     social=SocialScript.new()
     activities=ActivityScript.new()
+    foraging=ForagingScript.new()
     errands=ErrandScript.new()
     discoveries=DiscoveriesScript.new()
     clock=ClockScript.new()
@@ -140,6 +143,7 @@ func _new_game() -> void:
         _exit_cottage()
     stage=0
     activities.reset()
+    foraging.reset()
     errands.reset()
     for stop in ErrandScript.STOPS:
         shire.set_errand_completed(str(stop["id"]),false)
@@ -488,6 +492,10 @@ func _interaction_prompt() -> void:
     if not cottage_door.is_empty():
         prompt_label.text="[E] Enter %s | ادخل المنزل" % str(cottage_door[1])
         return
+    var gathering: Dictionary=foraging.nearby(frodo.position,clock.day_index())
+    if not gathering.is_empty():
+        prompt_label.text="[E] %s | %s" % [str(gathering["en"]),str(gathering["ar"])]
+        return
     if fireworks.can_interact(frodo.position,stage):
         prompt_label.text="[E] Watch Gandalf\'s fireworks | شاهد ألعاب غاندالف النارية"
         return
@@ -546,6 +554,10 @@ func _unhandled_input(event: InputEvent) -> void:
             _enter_cottage(_nearest_cottage_door())
             get_viewport().set_input_as_handled()
         else:
+            if not foraging.nearby(frodo.position,clock.day_index()).is_empty():
+                _forage_action()
+                get_viewport().set_input_as_handled()
+                return
             if fireworks.can_interact(frodo.position,stage):
                 _launch_fireworks()
                 get_viewport().set_input_as_handled()
@@ -582,6 +594,17 @@ func _complete_neighbour_errand(id: String) -> void:
     else:
         _show_notice(str(result["en"]),str(result["ar"]))
     _update_quest()
+    save_game(false)
+
+func _forage_action() -> void:
+    if inside_bag_end or inside_cottage:
+        return
+    var task: Dictionary=foraging.nearby(frodo.position,clock.day_index())
+    var result: Dictionary=foraging.perform(task,clock.day_index())
+    if result.is_empty():
+        return
+    social.record(str(result["id"]),str(result["en"]),str(result["ar"]),clock.day_index())
+    _show_notice(str(result["en"]),str(result["ar"]))
     save_game(false)
 
 func _launch_fireworks() -> void:
@@ -888,7 +911,7 @@ func save_game(notify: bool=true) -> void:
         "schema":2,"clock":clock.pack(),"stage":stage,
         "flags":quest_flags.duplicate(true),"weather_seed":weather.seed,
         "player":{"pos":[saved_player_pos.x,saved_player_pos.y,saved_player_pos.z],"yaw":frodo.yaw,"camera_first":camera_before_bag_end if (inside_bag_end or inside_cottage) else frodo.first_person,"inside_bag_end":inside_bag_end,"inside_cottage":inside_cottage,"cottage_id":current_cottage_id},
-        "npcs":people_state,"social":social.pack(),"activities":activities.pack(),"neighbour_errands":errands.pack(),"discoveries":discoveries.pack(),"fireworks":fireworks.pack(),
+        "npcs":people_state,"social":social.pack(),"foraging":foraging.pack(),"activities":activities.pack(),"neighbour_errands":errands.pack(),"discoveries":discoveries.pack(),"fireworks":fireworks.pack(),
         "animals":animals.map(func(pet): return pet.pack())}
     var file:=FileAccess.open(SAVE_FILE,FileAccess.WRITE)
     if file:
@@ -917,6 +940,7 @@ func load_game() -> void:
         _exit_cottage()
     social.unpack(raw.get("social",{}))
     activities.unpack(raw.get("activities",{}))
+    foraging.unpack(raw.get("foraging",{}))
     errands.unpack(raw.get("neighbour_errands",{}))
     for stop in ErrandScript.STOPS:
         var errand_id: String=str(stop["id"])
@@ -989,6 +1013,9 @@ func _toggle_journal() -> void:
     if not journal_panel.visible: return
     var entries: Array[String]=["THE SHIRE JOURNAL | يوميات الشاير", "Wisdom / الحكمة: %d  |  Places: %d / %d" % [social.wisdom,social.discovered.size(),LANDMARKS.size()+1],""]
     var current_beat: Dictionary = CampaignAtlasScript.shire_focus(stage)
+    entries.append(foraging.progress_text())
+    entries.append("Collect two of each harvest type; deliver at the market.")
+    entries.append("")
     entries.append("STORY | " + str(current_beat.get("en","")))
     entries.append(str(current_beat.get("ar","")))
     var pending: Dictionary=errands.current()

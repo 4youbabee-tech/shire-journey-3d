@@ -66,6 +66,7 @@ func _ready() -> void:
     ShirePhotorealProps.gardens(self,Callable(self,"elevation"))
     _trees()
     _grass_and_flowers()
+    ShireWorldDressing.populate(self,Callable(self,"elevation"))
     _lantern_posts()
     village_life=preload("res://scripts/shire_village_life.gd").new()
     village_life.name="AnimatedDomesticDetails"

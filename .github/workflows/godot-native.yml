@@ -126,6 +126,8 @@ jobs:
         run: godot --headless --path native-godot --script res://ci/shire_wildlife_smoke.gd
       - name: Test Frodo, Sam, Bilbo and Gandalf live skeletal imports and gait states
         run: godot --headless --path native-godot --script res://ci/hero_rig_smoke.gd
+      - name: Verify orchard, river reeds and full foraging market loop
+        run: godot --headless --path native-godot --script res://ci/shire_foraging_smoke.gd
       - name: Simulate opening scene for 120 frames
         run: godot --headless --path native-godot --quit-after 120
       - name: Capture in-engine screenshot via virtual display
