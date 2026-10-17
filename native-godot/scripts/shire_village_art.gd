@@ -104,7 +104,7 @@ static func populate(world: Node3D, height: Callable, river_x: Callable) -> void
     _roads(_zone(village,"EightRoadsideStoneBorders"),height)
     _farm(_zone(village,"FarmlandFencesAndSheds"),height)
     village.set_meta("live_gameplay_world",true)
-    village.set_meta("scenic_houses",8)
+    village.set_meta("scenic_houses",18)
     village.set_meta("homes_dressed",10)
     village.set_meta("districts",7)
 
@@ -184,7 +184,13 @@ static func _hamlet(zone: Node3D, height: Callable, river_x: Callable) -> void:
         Vector3(-81,-39,.88),Vector3(-78,9,1.12),
         Vector3(-70,54,.94),Vector3(-49,57,1.03),
         Vector3(-12,56,.84),Vector3(8,47,1.05),
-        Vector3(25,59,.83),Vector3(59,40,1.07)
+        Vector3(25,59,.83),Vector3(59,40,1.07),
+        # Additional small settlements form the layered northern skyline.
+        Vector3(-87,-19,.86),Vector3(-84,31,.92),
+        Vector3(-68,67,1.10),Vector3(-51,69,.90),
+        Vector3(-33,65,1.03),Vector3(-12,72,.83),
+        Vector3(5,72,.98),Vector3(22,68,.94),
+        Vector3(58,64,.89),Vector3(66,17,.97)
     ]
     var mound: Mesh = _make_hill_mesh()
     for i in range(locations.size()):

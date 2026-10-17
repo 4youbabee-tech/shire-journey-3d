@@ -51,6 +51,7 @@ func _capture() -> void:
         ["mill",Vector2(52.0,-3.0),Vector2(32.0,-20.0),10.0],
         ["highridge",Vector2(-6.0,-52.0),Vector2(-24.0,-20.0),12.0],
         ["village_valley",Vector2(-18.0,-65.0),Vector2(9.0,-9.0),7.0],
+        ["hero_road",Vector2(-29.0,-40.0),Vector2(16.0,8.0),5.2],
         ["waterfront",Vector2(12.0,-37.0),Vector2(34.0,-12.0),7.5]
     ]
     for view in views:
@@ -59,8 +60,12 @@ func _capture() -> void:
         var altitude: float=float(view[3])
         var camera_ground: Vector3=game.call("_ground",pos.x,pos.y)
         var target_ground: Vector3=game.call("_ground",aim.x,aim.y)
+        # Crowd visibility / rig LOD follows the live playable hero, not an
+        # independent QA spectator. Sample each location with the player present,
+        # so real local villagers and animations render in the captured town.
+        player.position=camera_ground+Vector3.UP*.25
         spectator.global_position=camera_ground+Vector3.UP*altitude
-        spectator.look_at(target_ground+Vector3.UP*2.3,Vector3.UP)
+        spectator.look_at(target_ground+Vector3.UP*1.2,Vector3.UP)
         if not await _save_frame("in_engine_hobbiton_candidate_%s.png" % str(view[0])):
             quit(4)
             return

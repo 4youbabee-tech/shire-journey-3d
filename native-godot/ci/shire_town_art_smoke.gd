@@ -35,7 +35,7 @@ func _verify() -> void:
     var scenic: Node = art.get_node("DistantHobbitonHamlets")
     var vendors: Node = art.get_node("MarketFestivalDistrict")
     var bridge: Node = art.get_node("MasonryBridgeOverWater")
-    if homes.get_child_count() != 10 or scenic.get_child_count() < 8 or vendors.get_child_count() < 4:
+    if homes.get_child_count() != 10 or scenic.get_child_count() < 18 or vendors.get_child_count() < 4:
         push_error("Hobbiton homes / scenic cottages / market stalls unbuilt")
         quit(193)
         return

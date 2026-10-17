@@ -25,7 +25,12 @@ var airborne_life: ShireAirborneLife
 func elevation(x: float,z: float) -> float:
     var roll:=2.0*sin(x*.029)*cos(z*.024)+1.3*sin(x*.066+z*.019)+.7*cos(z*.081)
     var bag_hill:=5.5*exp(-((x+24)*(x+24)+(z+21)*(z+21))/750.0)
-    return roll+bag_hill
+    # Raise Hobbiton's north-facing backdrop into naturally connected green
+    # terraces so markets, cottages and lanes occupy a true layered valley.
+    # All geometry, gameplay footpaths and NPC terrain use this same elevation.
+    var north_ridge:=6.3*exp(-((x+10.0)*(x+10.0)+(z-52.0)*(z-52.0))/2200.0)
+    var west_terraces:=3.2*exp(-((x+67.0)*(x+67.0)+(z-28.0)*(z-28.0))/1500.0)
+    return roll+bag_hill+north_ridge+west_terraces
 
 func material(color: Color, roughness: float=.86) -> StandardMaterial3D:
     var key: String=str(color.to_html())+str(roughness)
