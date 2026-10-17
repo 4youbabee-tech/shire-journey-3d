@@ -19,9 +19,12 @@ func _capture() -> void:
     # CI's interior save/load smoke can leave a user:// save; never photograph a stale location.
     game.call("_new_game")
     var player = game.get("frodo")
-    player.position = game.call("_ground",-40.0,-41.0) + Vector3(0,.35,0)
-    player.yaw = -2.65
-    player.rotation.y = -2.65
+    # Stable, unobstructed exterior composition: look northwest towards Bag End.
+    # The former southwestern shot now intersects expanding homestead/foliage sets.
+    # Keep the exact same strict screenshot QA gate; change the camera, not thresholds.
+    player.position = game.call("_ground",-12.0,-29.0) + Vector3(0,.35,0)
+    player.yaw = 2.24
+    player.rotation.y = 2.24
     player.first_person = false
     player._update_camera()
     if game.get("inside_bag_end") == true or game.get("inside_cottage") == true:
