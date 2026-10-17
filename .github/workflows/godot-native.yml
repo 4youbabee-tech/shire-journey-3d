@@ -43,6 +43,19 @@ jobs:
             native-godot/assets/models/shire_hero_*.glb
             native-godot/assets/models/shire_hero_*.source.json
           retention-days: 14
+      - name: Model an original multi-material stone bridge in editable Blender
+        run: blender -b --factory-startup -t 2 --python native-godot/tools/blender_build_shire_bridge.py
+      - name: Verify newly modeled bridge file integrity and geometry
+        run: python3 native-godot/tools/verify_shire_bridge.py
+      - name: Upload editable Blender stone bridge and playable GLB
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShireJourney-StoneBridge-Original-Blender-GLB
+          path: |
+            blender-production/shire_landmarks/stone_bridge_hero.blend
+            native-godot/assets/models/shire_stone_bridge_hero.glb
+            native-godot/assets/models/shire_stone_bridge_hero.source.json
+          retention-days: 14
       - name: Verify Shire craftwork GLBs, material batching and provenance
         run: python3 native-godot/tools/verify_shire_districts.py
       - name: Upload editable market, mill and feast Blender sources

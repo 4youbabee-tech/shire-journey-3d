@@ -49,6 +49,11 @@ func _verify() -> void:
         push_error("Stone bridge PBR photographed texture and normal mapping missing")
         quit(205)
         return
+    var hero_bridge: Node = bridge.get_node_or_null("AuthoredBlenderStoneBridgeHero")
+    if hero_bridge == null or hero_bridge.find_children("*","MeshInstance3D",true,false).size() < 4:
+        push_error("Actual 3D Blender stone bridge not integrated into the playable crossing")
+        quit(206)
+        return
     if art.find_children("*","MeshInstance3D",true,false).size() < 260:
         push_error("Whole town is still missing authored set-dressing meshes")
         quit(195)

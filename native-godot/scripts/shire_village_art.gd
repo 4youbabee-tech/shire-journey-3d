@@ -349,6 +349,20 @@ static func _bridge(zone: Node3D, height: Callable, river_x: Callable) -> void:
         _box(zone,"CrossingWeatheredStonePaving",
             Vector3(x,base_y+.70,8.0),
             Vector3(.86,.07,3.93),"a69a7e" if i%3==0 else "978970")
+    # The actual Blender-authored stone bridge replaces low-detail stone
+    # visualization while keeping the old interaction and crossing collision.
+    var path: String = "res://assets/models/shire_stone_bridge_hero.glb"
+    if ResourceLoader.exists(path):
+        var packed: PackedScene = load(path) as PackedScene
+        if packed != null:
+            var detailed: Node3D = packed.instantiate() as Node3D
+            detailed.name = "AuthoredBlenderStoneBridgeHero"
+            detailed.position = Vector3(center_x,base_y,8.0)
+            zone.add_child(detailed)
+            # Retain legacy names as testable fallback, but do not double render.
+            for old in zone.get_children():
+                if old is MeshInstance3D:
+                    old.visible = false
 
 static func _roads(zone: Node3D, height: Callable) -> void:
     var tracks: Array[Vector3] = [
