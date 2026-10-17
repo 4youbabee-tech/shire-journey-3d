@@ -1,0 +1,11 @@
+{
+  "asset": "shire_hen_animated",
+  "origin": "ORIGINAL-GAME",
+  "status": "ANIMATED_ART_CANDIDATE_NOT_FINAL",
+  "license": "Blender-authored geometry, no external scans or model likenesses",
+  "sha256": "1ab33390e7868f7a921941e5f0430dc32cf9039bffc08971587d6166daddda6b",
+  "bytes": 406784,
+  "authored_parts": 28,
+  "optimized_scene_meshes": 9,
+  "blender_source": "blender-production/shire_wildlife/shire_hen_animated.blend"
+}
