@@ -27,7 +27,7 @@ static func _hero_mesh(species: String) -> Mesh:
     root.free()
     return result
 
-static func _append(transforms: Array[Transform3D], x: float, y: float,
+static func _append(transforms: Array, x: float, y: float,
         z: float, scale_value: float, yaw: float) -> void:
     transforms.append(Transform3D(Basis(Vector3.UP,yaw).scaled(Vector3.ONE*scale_value),
         Vector3(x,y-.13,z)))

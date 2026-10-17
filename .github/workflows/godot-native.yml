@@ -135,6 +135,8 @@ jobs:
         run: godot --headless --path native-godot --script res://ci/hero_art_smoke.gd
       - name: Verify six new Blender district objects inside running Godot scene
         run: godot --headless --path native-godot --script res://ci/shire_district_art_smoke.gd
+      - name: Verify seven built village districts, ten gardened homes and whole-town ecology
+        run: godot --headless --path native-godot --script res://ci/shire_town_art_smoke.gd
       - name: Verify layered Shire woodland actually instantiates in Godot
         run: godot --headless --path native-godot --script res://ci/shire_woodland_smoke.gd
       - name: Verify authored GLB botanical surfaces inside actual running Shire scene

@@ -27,6 +27,14 @@ func _capture() -> void:
         push_error("Exterior capture still inside an interior")
         quit(7)
         return
+    # Fixed genuine late-afternoon game time for side-by-side art comparison.
+    # The normal game retains its full playable time/weather simulation.
+    var qa_clock: ShireClock = game.get("clock")
+    var qa_weather: ShireWeather = game.get("weather")
+    qa_clock.elapsed = 600.0
+    qa_weather.override_kind = "clear"
+    for wait in range(4):
+        await process_frame
     DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://dist"))
     var spectator:=Camera3D.new()
     spectator.name="QA_Independent_Exterior_Camera"
@@ -41,7 +49,9 @@ func _capture() -> void:
         ["party",Vector2(-10.0,18.0),Vector2(-2.0,-3.0),8.5],
         ["market",Vector2(10.0,25.0),Vector2(17.0,8.0),8.0],
         ["mill",Vector2(52.0,-3.0),Vector2(32.0,-20.0),10.0],
-        ["highridge",Vector2(-6.0,-52.0),Vector2(-24.0,-20.0),12.0]
+        ["highridge",Vector2(-6.0,-52.0),Vector2(-24.0,-20.0),12.0],
+        ["village_valley",Vector2(-18.0,-65.0),Vector2(9.0,-9.0),7.0],
+        ["waterfront",Vector2(12.0,-37.0),Vector2(34.0,-12.0),7.5]
     ]
     for view in views:
         var pos: Vector2=view[1]
@@ -67,7 +77,7 @@ func _capture() -> void:
     if not await _save_frame("in_engine_cottage.png"):
         quit(6)
         return
-    print("SAVED 5 HOBBITON CANDIDATES + BAG END + COTTAGE; strict selection follows")
+    print("SAVED 7 REAL IN-ENGINE HOBBITON ANGLES + BAG END + COTTAGE; strict selection follows")
     quit(0)
 
 func _save_frame(filename: String) -> bool:

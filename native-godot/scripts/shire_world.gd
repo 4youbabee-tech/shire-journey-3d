@@ -70,6 +70,10 @@ func _ready() -> void:
     ShireWorldDressing.populate(self,Callable(self,"elevation"))
     ShireHomesteadExteriors.populate(self,Callable(self,"elevation"))
     ShireCountrysideCraft.populate(self,Callable(self,"elevation"))
+    # Full settlement production pass: homes, rear hamlets, market, mill,
+    # masonry bridge, all walking lanes, fenced farms and real ground ecology.
+    ShireVillageArt.populate(self,Callable(self,"elevation"),Callable(self,"_river_x"))
+    ShireLandscapeArt.populate(self,Callable(self,"elevation"),Callable(self,"_river_x"))
     _lantern_posts()
     village_life=preload("res://scripts/shire_village_life.gd").new()
     village_life.name="AnimatedDomesticDetails"
@@ -88,7 +92,7 @@ func _lighting() -> void:
     var sky:=Sky.new()
     var atmosphere:=ProceduralSkyMaterial.new()
     atmosphere.sky_top_color=Color("618bb0")
-    atmosphere.sky_horizon_color=Color("cce4d0")
+    atmosphere.sky_horizon_color=Color("f4dcc1")
     atmosphere.ground_bottom_color=Color("4f654b")
     sky.sky_material=atmosphere
     env.sky=sky
@@ -99,14 +103,14 @@ func _lighting() -> void:
     env.adjustment_enabled=true
     env.adjustment_brightness=1.025
     env.adjustment_contrast=1.075
-    env.adjustment_saturation=0.92
+    env.adjustment_saturation=1.02
     env.fog_enabled=true
     env.fog_density=.0023
-    env.fog_light_color=Color("778e82")
+    env.fog_light_color=Color("d1bca0")
     world_environment.environment=env
     sun=DirectionalLight3D.new()
     sun.rotation_degrees=Vector3(-38,-32,0)
-    sun.light_color=Color("ffdfaa")
+    sun.light_color=Color("ffe0b0")
     sun.light_energy=.95
     sun.shadow_blur=1.35
     sun.shadow_enabled=true
@@ -263,7 +267,24 @@ func _water() -> void:
     river=MeshInstance3D.new()
     river.mesh=surface.commit()
     var water:=ShaderMaterial.new()
-    var code="shader_type spatial; render_mode blend_mix, cull_disabled, depth_draw_opaque; uniform vec4 water_color : source_color = vec4(0.13,0.39,0.46,0.82); void fragment() { float r = sin(UV.x * 52.0 + TIME * 1.0) * 0.06 + sin(UV.y * 83.0 - TIME * 0.9) * 0.04; ALBEDO = water_color.rgb + vec3(r); ROUGHNESS = 0.13; METALLIC=0.03; ALPHA = water_color.a; }"
+    # Layered water flow: two wave frequencies and view-dependent roughness,
+    # no separate billboard or fake screenshot. Compatible with GL 3.3.
+    var code = """shader_type spatial;
+render_mode blend_mix, cull_disabled, depth_draw_opaque;
+uniform vec4 water_color : source_color = vec4(0.18, 0.39, 0.38, 0.91);
+void fragment() {
+    vec2 moving = UV * 3.0 + vec2(TIME * 0.035, -TIME * 0.075);
+    float broad = sin(moving.x * 18.0 + sin(moving.y * 7.0)) * 0.045;
+    float fine = sin(moving.x * 44.0 + moving.y * 23.0) * 0.024;
+    float sparkle = sin(moving.y * 73.0 - TIME * 1.3) * 0.012;
+    float foam = smoothstep(0.065, 0.11, broad + fine);
+    vec3 tone = water_color.rgb + vec3(broad + fine + sparkle);
+    ALBEDO = mix(tone, vec3(0.43, 0.56, 0.47), foam * 0.20);
+    ROUGHNESS = clamp(0.15 + abs(fine) * 2.0, 0.10, 0.32);
+    METALLIC = 0.018;
+    ALPHA = water_color.a;
+}
+"""
     water.shader=Shader.new()
     water.shader.code=code
     river.material_override=water
@@ -638,9 +659,11 @@ func update_environment(time_of_day: float, night_lighting: float, weather_type:
     day_factor=night_lighting
     sun.rotation_degrees=Vector3(-10.0-65.0*night_lighting, -35.0+time_of_day*5.0,0)
     sun.light_energy=.10+.95*night_lighting*(1.0-weather_strength*.42)
-    sun.light_color=Color("ffd49c").lerp(Color("e5eff7"),1.0-night_lighting)
+    var golden: float = smoothstep(13.0,16.0,time_of_day) * (1.0-smoothstep(18.0,20.0,time_of_day))
+    sun.light_color=Color("ffe0b0").lerp(Color("f4b47d"),golden*.75).lerp(Color("d2dfed"),1.0-night_lighting)
     var env:=world_environment.environment
-    env.ambient_light_energy=.20+.45*night_lighting*(1.0-weather_strength*.30)
+    env.ambient_light_energy=.25+.48*night_lighting*(1.0-weather_strength*.30)
+    env.fog_light_color=Color("b0c7b7").lerp(Color("e9be8d"),golden*.72)
     env.fog_density=.0023 + (.017 if weather_type=="fog" else .008 if weather_type=="mist" else .002)*weather_strength
     for lamp in lanterns:
         lamp.light_energy=1.4*(1.0-smoothstep(.3,.7,night_lighting))
