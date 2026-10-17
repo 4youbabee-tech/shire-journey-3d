@@ -12,6 +12,7 @@ const DialogueScript=preload("res://scripts/shire_dialogue.gd")
 const SocialScript=preload("res://scripts/shire_social.gd")
 const BagEndScript=preload("res://scripts/shire_bag_end.gd")
 const ActivityScript=preload("res://scripts/shire_activities.gd")
+const ErrandScript=preload("res://scripts/shire_neighbour_errands.gd")
 const MapScript=preload("res://scripts/shire_map.gd")
 const CottageScript=preload("res://scripts/shire_cottage.gd")
 const SoundZoneScript=preload("res://scripts/shire_sound_zones.gd")
@@ -21,6 +22,7 @@ const FireworksScript=preload("res://scripts/shire_fireworks.gd")
 const SAVE_FILE="user://shire_journey_godot_save_v2.json"
 var social: ShireSocial
 var activities: ShireActivities
+var errands: ShireNeighbourErrands
 var discoveries: ShireDiscoveries
 var cinema: ShireChapterCinema
 var fireworks: ShireFireworks
@@ -102,6 +104,7 @@ const LANDMARKS = [
 func _ready() -> void:
     social=SocialScript.new()
     activities=ActivityScript.new()
+    errands=ErrandScript.new()
     discoveries=DiscoveriesScript.new()
     clock=ClockScript.new()
     weather=WeatherScript.new()
@@ -137,6 +140,9 @@ func _new_game() -> void:
         _exit_cottage()
     stage=0
     activities.reset()
+    errands.reset()
+    for stop in ErrandScript.STOPS:
+        shire.set_errand_completed(str(stop["id"]),false)
     discoveries.reset()
     fireworks.reset()
     for station in ShireActivities.STATIONS:
@@ -384,6 +390,9 @@ func _objective() -> String:
 
 func _update_quest() -> void:
     quest_label.text=_objective()
+    var pending: Dictionary=errands.current()
+    if stage<5 and not pending.is_empty():
+        quest_label.text+="\nNeighbour help %d/3: %s" % [errands.progress(),str(pending["en"])]
 
 func _process(dt: float) -> void:
     if paused_by_user or journal_panel.visible or map_panel.visible or (is_instance_valid(cinema) and cinema.active):
@@ -486,6 +495,10 @@ func _interaction_prompt() -> void:
     if not party_station.is_empty():
         prompt_label.text="[E] %s | %s (%d/3)" % [party_station["en"],party_station["ar"],activities.progress()]
         return
+    var pending: Dictionary=errands.available_at(frodo.position,stage)
+    if not pending.is_empty():
+        prompt_label.text="[E] %s | %s" % [str(pending["en"]),str(pending["ar"])]
+        return
     var site: Dictionary=discoveries.nearest(frodo.position,inside_bag_end or inside_cottage)
     if not site.is_empty():
         prompt_label.text="[E] %s | %s" % [str(site["en"]),str(site["ar"])]
@@ -542,15 +555,34 @@ func _unhandled_input(event: InputEvent) -> void:
                 _prepare_party_station(str(party_station["id"]))
                 get_viewport().set_input_as_handled()
             else:
-                var site: Dictionary=discoveries.nearest(frodo.position)
-                if not site.is_empty():
-                    _discover_landmark(str(site["id"]))
+                var pending: Dictionary=errands.available_at(frodo.position,stage)
+                if not pending.is_empty():
+                    _complete_neighbour_errand(str(pending["id"]))
                     get_viewport().set_input_as_handled()
                 else:
-                    var npc:=_nearest_npc()
-                    if npc:
-                        _begin_conversation(npc)
+                    var site: Dictionary=discoveries.nearest(frodo.position)
+                    if not site.is_empty():
+                        _discover_landmark(str(site["id"]))
                         get_viewport().set_input_as_handled()
+                    else:
+                        var npc:=_nearest_npc()
+                        if npc:
+                            _begin_conversation(npc)
+                            get_viewport().set_input_as_handled()
+
+func _complete_neighbour_errand(id: String) -> void:
+    var result: Dictionary=errands.complete(id,stage)
+    if result.is_empty():
+        return
+    shire.set_errand_completed(id,true)
+    social.record("neighbour_errand_"+id,str(result["en"]),str(result["ar"]),clock.day_index())
+    if bool(result["finished"]):
+        social.events["neighbour_errands_finished"]=true
+        _show_notice("The village kitchen is ready. Thank you!", "أصبح مطبخ القرية جاهزًا، شكرًا لك!")
+    else:
+        _show_notice(str(result["en"]),str(result["ar"]))
+    _update_quest()
+    save_game(false)
 
 func _launch_fireworks() -> void:
     var outcome: Dictionary=fireworks.launch(stage)
@@ -856,7 +888,7 @@ func save_game(notify: bool=true) -> void:
         "schema":2,"clock":clock.pack(),"stage":stage,
         "flags":quest_flags.duplicate(true),"weather_seed":weather.seed,
         "player":{"pos":[saved_player_pos.x,saved_player_pos.y,saved_player_pos.z],"yaw":frodo.yaw,"camera_first":camera_before_bag_end if (inside_bag_end or inside_cottage) else frodo.first_person,"inside_bag_end":inside_bag_end,"inside_cottage":inside_cottage,"cottage_id":current_cottage_id},
-        "npcs":people_state,"social":social.pack(),"activities":activities.pack(),"discoveries":discoveries.pack(),"fireworks":fireworks.pack(),
+        "npcs":people_state,"social":social.pack(),"activities":activities.pack(),"neighbour_errands":errands.pack(),"discoveries":discoveries.pack(),"fireworks":fireworks.pack(),
         "animals":animals.map(func(pet): return pet.pack())}
     var file:=FileAccess.open(SAVE_FILE,FileAccess.WRITE)
     if file:
@@ -885,6 +917,10 @@ func load_game() -> void:
         _exit_cottage()
     social.unpack(raw.get("social",{}))
     activities.unpack(raw.get("activities",{}))
+    errands.unpack(raw.get("neighbour_errands",{}))
+    for stop in ErrandScript.STOPS:
+        var errand_id: String=str(stop["id"])
+        shire.set_errand_completed(errand_id,errands.completed.has(errand_id))
     discoveries.unpack(raw.get("discoveries",{}))
     fireworks.unpack(raw.get("fireworks",{}))
     for station in ShireActivities.STATIONS:
@@ -955,6 +991,12 @@ func _toggle_journal() -> void:
     var current_beat: Dictionary = CampaignAtlasScript.shire_focus(stage)
     entries.append("STORY | " + str(current_beat.get("en","")))
     entries.append(str(current_beat.get("ar","")))
+    var pending: Dictionary=errands.current()
+    if stage<5 and not pending.is_empty():
+        entries.append("NEIGHBOURS %d/3 | %s" % [errands.progress(),str(pending["en"])])
+        entries.append(str(pending["ar"]))
+    elif errands.progress()==ErrandScript.STOPS.size():
+        entries.append("NEIGHBOURS 3/3 | Village kitchen supplied | تم تجهيز مطبخ القرية")
     entries.append("")
     for item in social.journal.slice(-8):
         entries.append("Day %d · %s" % [int(item.get("day",0)),str(item.get("en",""))])
@@ -968,4 +1010,9 @@ func _toggle_map() -> void:
     frodo.active = not map_panel.visible
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if map_panel.visible else Input.MOUSE_MODE_CAPTURED
     if map_panel.visible:
-        map_view.configure(LANDMARKS,Vector2(frodo.position.x,frodo.position.z))
+        var map_points: Array=LANDMARKS.duplicate(true)
+        var pending: Dictionary=errands.current()
+        if stage<5 and not pending.is_empty():
+            var marker: Vector2=pending["pos"]
+            map_points.append(["errand","Neighbour errand %d/3" % (errands.progress()+1),str(pending["ar"]),marker.x,marker.y])
+        map_view.configure(map_points,Vector2(frodo.position.x,frodo.position.z))

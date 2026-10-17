@@ -45,14 +45,16 @@ func _draw() -> void:
     draw_string(font,Vector2(27,34),"THE SHIRE  •  HOBBITON",HORIZONTAL_ALIGNMENT_LEFT,-1,18,ink)
     for location in locations:
         var p := project(Vector2(float(location[3]),float(location[4])))
-        draw_circle(p,5.8,Color("466746"))
-        draw_circle(p,3.2,Color("e9ddaf"))
+        var errand_marker: bool=str(location[0])=="errand"
+        draw_circle(p,9.0 if errand_marker else 5.8,Color("a5652f") if errand_marker else Color("466746"))
+        draw_circle(p,4.7 if errand_marker else 3.2,Color("ffe3a0") if errand_marker else Color("e9ddaf"))
         var label: String=str(location[1])
         # Stagger dense labels around Bag End so they remain legible.
         var shift := Vector2(9, -8)
         if str(location[0]) == "bagend": shift=Vector2(9,-17)
         if str(location[0]) == "bagshot": shift=Vector2(-102,17)
         if str(location[0]) == "garden": shift=Vector2(9,18)
+        if errand_marker: shift=Vector2(10,18)
         draw_string(font,p+shift,label,HORIZONTAL_ALIGNMENT_LEFT,-1,11,ink)
     var player_dot := project(player_position)
     draw_circle(player_dot,8.0,Color("7c3c2f"))

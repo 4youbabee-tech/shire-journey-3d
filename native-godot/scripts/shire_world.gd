@@ -12,6 +12,7 @@ var lanterns : Array[OmniLight3D] = []
 var chimney_smoke : Array[CPUParticles3D] = []
 var party_decorations: Dictionary = {}
 var party_stations: Dictionary = {}
+var errand_sites: Dictionary = {}
 var rainfall: CPUParticles3D
 var weather_particles : Array[MeshInstance3D] = []
 var rng:=RandomNumberGenerator.new()
@@ -61,6 +62,7 @@ func _ready() -> void:
     _watermill()
     _bridge()
     _party_field()
+    _neighbour_errand_props()
     ShirePhotorealProps.gardens(self,Callable(self,"elevation"))
     _trees()
     _grass_and_flowers()
@@ -488,6 +490,45 @@ func _party_field() -> void:
                 box(decorations,Vector3(px,1.15,0),Vector3(.2,.32,.22),Color("dcab52"))
                 sph(decorations,Vector3(px,1.38,0),Vector3(.15,.14,.15),Color("f3d998"))
 
+
+func _neighbour_errand_props() -> void:
+    # Original primitive-mesh set dressing: herb crate, flour and kitchen table.
+    var sites := [["garden_herbs",-32.0,-12.0],
+                  ["mill_flour",29.0,-24.0],
+                  ["party_delivery",-3.0,13.0]]
+    for site in sites:
+        var id: String=str(site[0])
+        var x: float=float(site[1])
+        var z: float=float(site[2])
+        var root:=Node3D.new()
+        root.name="NeighbourErrand_"+id
+        root.position=Vector3(x,elevation(x,z),z)
+        add_child(root)
+        errand_sites[id]=root
+        if id=="garden_herbs":
+            box(root,Vector3(0,.22,0),Vector3(1.15,.35,.84),Color("86643e"))
+            for n in range(6):
+                var px: float=-.39+float(n%3)*.39
+                var pz: float=-.22+float(n/3)*.41
+                box(root,Vector3(px,.55,pz),Vector3(.06,.49,.06),Color("577b46"))
+                sph(root,Vector3(px,.82,pz),Vector3(.20,.15,.15),Color("8fae5b"))
+        elif id=="mill_flour":
+            box(root,Vector3(0,.14,0),Vector3(1.5,.20,1.0),Color("745137"))
+            for n in range(3):
+                var px: float=-.43+float(n)*.43
+                sph(root,Vector3(px,.46,0),Vector3(.33,.39,.35),Color("d4c5a0"))
+                box(root,Vector3(px,.83,0),Vector3(.20,.055,.24),Color("b89d74"))
+        else:
+            box(root,Vector3(0,.71,0),Vector3(1.8,.18,1.3),Color("875f40"))
+            for side in [-.65,.65]:
+                box(root,Vector3(side,.35,0),Vector3(.15,.71,.94),Color("65503a"))
+            for n in range(3):
+                var px: float=-.48+float(n)*.46
+                box(root,Vector3(px,.92,0),Vector3(.36,.24,.36),Color("a88854"))
+
+func set_errand_completed(id: String, complete: bool) -> void:
+    if errand_sites.has(id):
+        errand_sites[id].visible=not complete
 
 func set_party_era(birthday_era: bool) -> void:
     for id in party_stations:
