@@ -2,6 +2,7 @@ extends Node3D
 ## SHIRE JOURNEY CHAPTER I: native Godot 4.3+ gameplay, not an HTML wrapper.
 ## Provenance: ORIGINAL-GAME gameplay based on film/book timelines without copying film dialogue.
 const WorldScript=preload("res://scripts/shire_world.gd")
+const CampaignAtlasScript=preload("res://scripts/shire_campaign_atlas.gd")
 const PlayerScript=preload("res://scripts/player.gd")
 const NPCScript=preload("res://scripts/shire_npc.gd")
 const AnimalScript=preload("res://scripts/shire_animal.gd")
@@ -947,7 +948,11 @@ func _toggle_journal() -> void:
     Input.mouse_mode=Input.MOUSE_MODE_VISIBLE if journal_panel.visible else Input.MOUSE_MODE_CAPTURED
     if not journal_panel.visible: return
     var entries: Array[String]=["THE SHIRE JOURNAL | يوميات الشاير", "Wisdom / الحكمة: %d  |  Places: %d / %d" % [social.wisdom,social.discovered.size(),LANDMARKS.size()+1],""]
-    for item in social.journal.slice(-12):
+    var current_beat: Dictionary = CampaignAtlasScript.shire_focus(stage)
+    entries.append("STORY | " + str(current_beat.get("en","")))
+    entries.append(str(current_beat.get("ar","")))
+    entries.append("")
+    for item in social.journal.slice(-8):
         entries.append("Day %d · %s" % [int(item.get("day",0)),str(item.get("en",""))])
         entries.append(str(item.get("ar","")))
     entries.append("Press J to return to the world | اضغط J للعودة")

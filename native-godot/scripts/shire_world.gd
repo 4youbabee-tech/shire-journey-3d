@@ -48,6 +48,12 @@ func _ready() -> void:
     _hobbit_hole(Vector2(-18,-39),1.18,false)
     _hobbit_hole(Vector2(2,30),.97,false)
     _hobbit_hole(Vector2(18,28),1.17,false)
+    # More inhabited homesteads on Bagshot Row and the southern farmland.
+    # Use the same curated facade family until bespoke Blender interiors replace them.
+    _hobbit_hole(Vector2(-62,-12),.91,false)
+    _hobbit_hole(Vector2(-61,11),1.04,false)
+    _hobbit_hole(Vector2(-34,45),.94,false)
+    _hobbit_hole(Vector2(32,40),1.07,false)
     _farm_fields()
     _market()
     ShireLicensedProps.dress_market(self,Callable(self,"elevation"))

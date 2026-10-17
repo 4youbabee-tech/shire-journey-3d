@@ -102,6 +102,8 @@ jobs:
         run: godot --headless --path native-godot --script res://ci/hero_art_smoke.gd
       - name: Verify six new Blender district objects inside running Godot scene
         run: godot --headless --path native-godot --script res://ci/shire_district_art_smoke.gd
+      - name: Verify 14-chapter bilingual screenplay graph and Shire journal beats
+        run: godot --headless --path native-godot --script res://ci/campaign_story_smoke.gd
       - name: Simulate opening scene for 120 frames
         run: godot --headless --path native-godot --quit-after 120
       - name: Capture in-engine screenshot via virtual display

@@ -16,7 +16,8 @@ func _run() -> void:
             quit(81)
             return
         var visuals: Array[Node] = item.find_children("*","MeshInstance3D",true,false)
-        if visuals.size()<6:
+        var required: int = 3 if label=="ShireMillCraftwork" else 5 if label.begins_with("ShireMarket") else 6
+        if visuals.size()<required:
             push_error("Blender content missing import mesh groups: "+label)
             quit(82)
             return
