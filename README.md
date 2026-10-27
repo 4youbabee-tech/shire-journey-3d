@@ -68,3 +68,9 @@ For truthful browser QA, the optional `?qa=1` hook permits controlled relocation
 **Evidence provenance:** PR-triggered GitHub Actions uses a synthetic merge commit by default; the browser QA workflow now checks out the actual PR head SHA and compares it against `EXPECTED_COMMIT_SHA` so later recordings and QA JSON can be tied to a reproducible exact-source commit. Scripted relocation in QA mode is not full-route navigation acceptance. See Docs for the original intermediate PR merge-ref run `40599606372` and its limitations.
 
 The `40600040728` Actions run is the first exact-HEAD source checkout receipt (`8e39c0d`) with full WebGL QA PASS; video/images archived as artifact `12777793020`. The current follow-up art refinement is an unverified candidate until its own exact-HEAD CI. The private ChatGPT Sites host has **not** been updated by any GitHub commit.
+
+## Storybook portraits and optional Arabic narration (0.2.1 candidate)
+
+All four talking NPCs now have original embedded SVG portraits illustrating their distinct costume and hair silhouettes in the Arabic conversation panel. Users may tap **استمع · صوت آلي** to hear the current original dialogue via the browser's system speech synthesizer when Arabic speech is available. This does **not** imitate film actors; voice support and quality vary by device/browser, and no voice file or cloud voice endpoint is provided by the game. No prose or script text from the films is copied.
+
+The four SVG images have an independent source/integrity regression test. Browser QA verifies portrait rendering in actual WebGL sessions. `package.json`, lockfile and client diagnostics use version 0.2.1. All changes remain separate from the UE4 project. This candidate is not yet approved for visual quality or device-performance gates.
