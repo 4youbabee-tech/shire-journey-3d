@@ -1,0 +1,40 @@
+# Current browser prototype state
+
+Date: 2026-10-28 (Asia/Beirut).
+
+## Authority and scope
+
+The owner explicitly requested an online engine/browser route after the UE4 attempt, and asked to preserve recognizable characters and the original story direction. The canonical UE4 repository and Governor remain unavailable in this session. This is a separate proof of concept, not an official PES Runtime session or a claim to advance canonical gates. No canonical branch or unrelated GitHub repository was changed.
+
+## M0 preparation actually performed
+
+- Inspected the attached source-rules, story/timeline and visual-atlas introductions from their actual PDFs.
+- Confirmed birthday preparations are an opening safe-window context; labeled the apple errand as ORIGINAL-GAME.
+- Consulted official Babylon npm documentation, engine specifications and Playground documentation.
+- Chose a self-contained Babylon browser implementation, with explicit static collision volumes and render-independent quest state.
+- Selected acceptance checks: complete quest order; collect only nearby apples; reject duplicates; save round trip and corrupt-save recovery; native ground/house/boundary collisions; actual browser render and controls when available.
+- Rollback: preserve source Git history; do not modify the canonical UE4 project. Reset only the browser-local demo save via an explicitly confirmed in-game action.
+
+## Implemented
+
+Third-person 3D world, keyboard/touch controls, three NPCs, original Arabic dialogue choices, original errand, collectible apples, journal, local save/load, optional synthesized birds, low-quality toggle, camera obstruction attempt, static geometry batching and a read-only QA surface.
+
+## Evidence
+
+- `npm run check`: PASS (JavaScript syntax).
+- `npm test`: PASS, 6 tests: complete quest gates; save recovery; interaction range/visited deduplication; dialogue coverage; actual Babylon NullEngine scene and native house/ground/boundary collision checks; local script/style integrity.
+- Native engine scene: 195 meshes including invisible collision geometry, 264686 triangles, 22 merged static batches, 26 explicit obstacle/boundary colliders, 4 characters including player.
+- Browser rasterization attempt: BLOCKED. The provided cloud browser returned `WebGL not supported` when constructing the real engine. The error is visible in the UI; the game does not substitute a mock image.
+- Browser movement/dialogue/touch/save-reload end-to-end: NOT RUN because rasterization is blocked.
+- Performance on the owner's target device: NOT RUN. Triangle/batch counts are not an FPS measurement.
+- Visual acceptance and actor/film resemblance: NOT ACCEPTED.
+
+## Missing
+
+Full trilogy, film scene sequences, voice acting, actor voices, facial lip sync, house interiors, larger maps, combat, production animation assets, adaptive pathfinding, cloud saves and multiplayer. No guarantee of full-game completion is made by this prototype.
+
+## Storage and next step
+
+The first private Sites deployment succeeded: https://shire-journey-a-morning.mavos-8036.chatgpt.site . Deployment ID: `appgdep_6ae126c912408191a74140bd950c5297`. The matching source SHA is the Git HEAD supplied to publication, not a SHA invented in this document. Record deployment receipts outside the candidate to avoid circular SHA mutation. The owner supplied the dedicated repository `4youbabee-tech/shire-journey-3d`; it initially contained only an 18-byte README. These sources are prepared for a single cohesive commit preserving that initial history. The game modules match deployed Site source `7b6d9f84e180d251be5b93c7b31c20830e67f682`. The engine is restored from a pinned npm dependency with SHA256 verification. No credentials were requested or entered.
+
+Next acceptance step: the owner opens the deployed URL in a WebGL-capable browser and provides actual render/interaction evidence. Fix any observed runtime defects before expanding the story.
