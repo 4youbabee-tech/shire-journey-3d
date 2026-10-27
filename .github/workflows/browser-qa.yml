@@ -1,0 +1,34 @@
+name: Browser-rendered QA evidence
+on:
+  push:
+    branches: [main, 'qa/**']
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  chromium-webgl:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check && npm test
+      - name: Install pinned QA browser automation
+        run: |
+          npm install --no-save --no-package-lock --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Exercise a real WebGL canvas and record playback
+        run: node tests/browser-qa.mjs
+      - name: Preserve screenshots, video and performance report even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shire-browser-evidence
+          path: qa-evidence/
+          retention-days: 14
+          if-no-files-found: warn

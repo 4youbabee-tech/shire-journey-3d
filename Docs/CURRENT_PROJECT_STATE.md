@@ -38,3 +38,11 @@ Full trilogy, film scene sequences, voice acting, actor voices, facial lip sync,
 The first private Sites deployment succeeded: https://shire-journey-a-morning.mavos-8036.chatgpt.site . Deployment ID: `appgdep_6ae126c912408191a74140bd950c5297`. The matching source SHA is the Git HEAD supplied to publication, not a SHA invented in this document. Record deployment receipts outside the candidate to avoid circular SHA mutation. The owner supplied the dedicated repository `4youbabee-tech/shire-journey-3d`; it initially contained only an 18-byte README. These sources are prepared for a single cohesive commit preserving that initial history. The game modules match deployed Site source `7b6d9f84e180d251be5b93c7b31c20830e67f682`. The engine is restored from a pinned npm dependency with SHA256 verification. No credentials were requested or entered.
 
 Next acceptance step: the owner opens the deployed URL in a WebGL-capable browser and provides actual render/interaction evidence. Fix any observed runtime defects before expanding the story.
+
+## Browser QA / character-motion candidate (2026-10-28)
+
+- Added articulated hobbit leg pivots and a simple procedural walk cycle, with idle settling. Bilbo and Sam now have distinct hair colors and handheld silhouette props (book and garden trowel). These are original stylized models, not validated screen-accurate likenesses.
+- Added a Chromium WebGL CI runner that attempts end-to-end desktop walking, dialogue, apple collection, save/reload, and simulated mobile joystick, touch camera and tap interaction. The runner records WebM videos, PNG captures, browser errors and sampled FPS to an Actions artifact.
+- At candidate authoring time: browser visual QA, mobile interaction, hardware FPS and visual acceptance are NOT RUN; the new workflow must report a successful run before any browser-playability claims are upgraded. CI SwiftShader is not the specified target device.
+- Local `npm ci`: BLOCKED by this execution container's inability to resolve registry.npmjs.org. Previous GitHub Actions `40596189871` passed at base commit `324e35f`; exact candidate HEAD must be re-tested by GitHub Actions.
+- The private ChatGPT Sites deployment has not been updated; GitHub and Sites deployments are separate. No Unreal source was changed.

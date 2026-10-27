@@ -54,3 +54,7 @@ The first private browser candidate is hosted at https://shire-journey-a-morning
 Read `Docs/CURRENT_PROJECT_STATE.md` and `Docs/PRODUCTION_COMPLETENESS_MATRIX.md` before making completion claims. This first revision is not the full game and is not visually accepted or device-tested.
 
 Babylon's license and notices are in `dist/vendor/`. Project art and dialogue are original generated code; no film extracts, book passages, audio tracks or uploaded reference PDFs are redistributed.
+
+## Browser-rendered QA candidate
+
+The optional `.github/workflows/browser-qa.yml` workflow runs Babylon inside real headless Chromium WebGL (SwiftShader), records desktop and mobile-emulated interaction videos/screenshots, tests a complete original errand and save/reload, and uploads a `qa-evidence` artifact with FPS samples and exceptions. Software-rendered CI FPS is **not** a performance measurement for the target i7/2GB Windows GPU. This does not update the separate private ChatGPT Sites deployment; a new deployment must be verified against its exact source commit.
