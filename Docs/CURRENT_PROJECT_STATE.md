@@ -46,3 +46,5 @@ Next acceptance step: the owner opens the deployed URL in a WebGL-capable browse
 - At candidate authoring time: browser visual QA, mobile interaction, hardware FPS and visual acceptance are NOT RUN; the new workflow must report a successful run before any browser-playability claims are upgraded. CI SwiftShader is not the specified target device.
 - Local `npm ci`: BLOCKED by this execution container's inability to resolve registry.npmjs.org. Previous GitHub Actions `40596189871` passed at base commit `324e35f`; exact candidate HEAD must be re-tested by GitHub Actions.
 - The private ChatGPT Sites deployment has not been updated; GitHub and Sites deployments are separate. No Unreal source was changed.
+
+- Candidate check run `40597790986`: **FAIL** in syntax check because an extra closing brace was inserted into the eye-loop of `dist/world.mjs` (line 65); browser steps NOT RUN. The brace was removed in the follow-up corrective candidate. This was a source-authoring defect, not a WebGL/engine failure. Await new exact-HEAD CI evidence.

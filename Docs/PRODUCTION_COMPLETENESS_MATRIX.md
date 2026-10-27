@@ -24,3 +24,5 @@ An engine construction or CI pass does not establish browser playability, visual
 | Emulated mobile joystick/camera/interact | Same runner | NOT RUN at document authoring; not a physical phone test |
 | 720p FPS evidence | CI artifact JSON | NOT MEASURED on target hardware; software SwiftShader samples only |
 | Site deployment linked to this commit | Separate ChatGPT Sites origin | NOT DEPLOYED / NOT VERIFIED |
+
+- `40597790986`: FAIL at JS syntax; no browser images/video or FPS generated. Root cause corrected in subsequent candidate; browser tests still require successful execution.
