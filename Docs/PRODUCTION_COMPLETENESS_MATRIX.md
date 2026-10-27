@@ -26,3 +26,5 @@ An engine construction or CI pass does not establish browser playability, visual
 | Site deployment linked to this commit | Separate ChatGPT Sites origin | NOT DEPLOYED / NOT VERIFIED |
 
 - `40597790986`: FAIL at JS syntax; no browser images/video or FPS generated. Root cause corrected in subsequent candidate; browser tests still require successful execution.
+
+- `40597990755` at `06bb84e`: real WebGL RENDER_OBSERVED and desktop movement video captured; source tests PASS; browser quest E2E FAIL at first waypoint because of time-step cap; dialogue, quest completion, mobile and target hardware NOT RUN. Software WebGL screenshot showed house-door occlusion and overexposure, corrected only in follow-up unverified source candidate.

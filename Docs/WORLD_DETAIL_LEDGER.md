@@ -10,3 +10,5 @@
 
 - Browser character-motion candidate: each hobbit receives independent procedural leg pivots; Bilbo carries an original miniature book and has silver-brown curls, Sam a garden trowel and sandy curls. Props and animations are source-authored, not yet render-observed or visually accepted. Gandalf's original staff remains unchanged.
 - Browser QA proposed: software-WebGL screenshots/video must not be counted as Windows target device evidence or Unreal acceptance.
+
+- Browser actual frame inspection run `40597990755`: grassy hill meshes occluded the iconic round house facades and high light strength washed out the path. Correction shifts house mound/roof back behind facade and reduces sun/fill lighting. Visual acceptance withheld until exact-head screenshot review.

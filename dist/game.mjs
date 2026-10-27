@@ -1,5 +1,5 @@
 import {createWorld} from './world.mjs';
-import {SAVE_KEY,NPCS,APPLES,freshState,restoreState,objective,nearestInteractable,talk,act,collect,dialogue,LORE} from './simulation.mjs';
+import {SAVE_KEY,NPCS,APPLES,frameDelta,freshState,restoreState,objective,nearestInteractable,talk,act,collect,dialogue,LORE} from './simulation.mjs';
 const $=s=>document.querySelector(s),canvas=$('#game');
 let engine,scene,world,state,started=false,activeNPC=null,journalOpen=false,yaw=0,pitch=.44,zoom=7.8,keys=new Set(),drag=null,joystick={x:0,y:0},toastTimer,saveTimer=0,time=0,soundEnabled=false,audio=null,audioTimer=null,destination=null;
 const errors=[],telemetry={frames:0,seconds:0,collisions:0,interactions:0,collects:0,saves:0};
@@ -54,6 +54,6 @@ async function boot(){try{const B=window.BABYLON;if(!B)throw Error('تعذّر �
  for(const npc of NPCS){const label=document.createElement('span');label.className='npc-label';label.id='label-'+npc.id;label.textContent=npc.name;label.hidden=true;$('#npc-labels').append(label);}
  if(new URLSearchParams(location.search).has('qa')){const pre=document.createElement('pre');pre.id='qa-diagnostics';pre.style.cssText='position:fixed;left:5px;bottom:2px;max-width:95%;font:8px monospace;color:white;background:#0008;pointer-events:none;z-index:2;direction:ltr;white-space:pre-wrap;max-height:36px;overflow:hidden';document.body.append(pre);}
  refresh();setupInput();await scene.whenReadyAsync();$('#loading').hidden=true;$('#welcome').hidden=false;$('#resume-note').hidden=state.stage===0;$('#start').textContent=state.stage>0?'أكمل الرحلة ←':'ابدأ الرحلة ←';$('#start').onclick=()=>{started=true;$('#welcome').hidden=true;$('#hud').hidden=false;canvas.focus();notify('مرحبًا في الشاير · قابل بيلبو قرب الباب الأخضر');};
- canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();notify('توقّف عرض الرسومات مؤقتًا. نحاول استعادته…');});canvas.addEventListener('webglcontextrestored',()=>notify('عاد عرض الرسومات'));engine.runRenderLoop(()=>{if(document.hidden)return;const dt=Math.min(engine.getDeltaTime()/1000,.04);animate(dt);scene.render();});window.__SHIRE__=Object.freeze({snapshot});
+ canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();notify('توقّف عرض الرسومات مؤقتًا. نحاول استعادته…');});canvas.addEventListener('webglcontextrestored',()=>notify('عاد عرض الرسومات'));engine.runRenderLoop(()=>{if(document.hidden)return;const dt=frameDelta(engine.getDeltaTime());animate(dt);scene.render();});window.__SHIRE__=Object.freeze({snapshot});
 }catch(e){fatal(e.message||String(e));}}
 boot();

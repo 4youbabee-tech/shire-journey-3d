@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {freshState,restoreState,act,collect,dialogue,talk,APPLES,nearestInteractable,objective} from '../dist/simulation.mjs';
+import {freshState,restoreState,frameDelta,act,collect,dialogue,talk,APPLES,nearestInteractable,objective} from '../dist/simulation.mjs';
 import {createWorld} from '../dist/world.mjs';
 await import('../dist/vendor/babylon.js');
 const B=globalThis.BABYLON;
+test('render-frame time does not artificially slow movement at 5-15 FPS',()=>{assert.equal(frameDelta(200),.2);assert.equal(frameDelta(150),.15);assert.equal(frameDelta(40),.04);assert.equal(frameDelta(4000),.2);assert.equal(frameDelta(-3),0);});
 test('complete quest in order; distance, prerequisites and duplicate pickup gates',()=>{
  const s=freshState();assert.equal(act(s,'finish'),false);assert.equal(collect(s,APPLES[0].id,APPLES[0]),false);assert.equal(talk(s,'bilbo'),true);assert.ok(dialogue(s,'bilbo').options.some(o=>o[1]==='accept'));assert.equal(act(s,'accept'),true);assert.equal(act(s,'accept'),false);assert.equal(act(s,'basket'),true);assert.equal(collect(s,APPLES[0].id,{x:0,z:0}),false);
  for(const a of APPLES){assert.equal(collect(s,a.id,a),true);assert.equal(collect(s,a.id,a),false);}assert.equal(s.stage,3);assert.equal(act(s,'finish'),false);assert.equal(act(s,'thank-sam'),true);assert.ok(dialogue(s,'bilbo').options.some(o=>o[1]==='finish'));assert.equal(act(s,'finish'),true);assert.equal(s.stage,5);assert.equal(s.completed,true);assert.equal(objective(s),'استمتع بوقتك في الشاير');

@@ -1,5 +1,7 @@
 // Render-independent game rules. Dialogue is original game writing, not film dialogue.
 export const SAVE_KEY='shire-journey-morning-v1';
+// Preserve real-time movement at low render FPS, but ignore huge stalled-tab jumps.
+export function frameDelta(elapsedMs){return Math.max(0,Math.min(elapsedMs/1000,.2));}
 export const NPCS=[{id:'bilbo',name:'بيلبو',en:'Bilbo',x:8,z:7},{id:'sam',name:'سام',en:'Sam',x:-6,z:1},{id:'gandalf',name:'غاندالف',en:'Gandalf',x:-2,z:17}];
 export const APPLES=[{id:'apple-0',x:-18,z:12},{id:'apple-1',x:-17,z:17},{id:'apple-2',x:-21,z:15}];
 export function freshState(){return {version:1,stage:0,apples:[],visited:[],position:{x:0,z:-15},completed:false};}
