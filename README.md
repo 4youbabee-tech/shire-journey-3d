@@ -54,3 +54,17 @@ The first private browser candidate is hosted at https://shire-journey-a-morning
 Read `Docs/CURRENT_PROJECT_STATE.md` and `Docs/PRODUCTION_COMPLETENESS_MATRIX.md` before making completion claims. This first revision is not the full game and is not visually accepted or device-tested.
 
 Babylon's license and notices are in `dist/vendor/`. Project art and dialogue are original generated code; no film extracts, book passages, audio tracks or uploaded reference PDFs are redistributed.
+
+## Browser-rendered QA candidate
+
+The optional `.github/workflows/browser-qa.yml` workflow runs Babylon inside real headless Chromium WebGL (SwiftShader), records desktop and mobile-emulated interaction videos/screenshots, tests a complete original errand and save/reload, and uploads a `qa-evidence` artifact with FPS samples and exceptions. Software-rendered CI FPS is **not** a performance measurement for the target i7/2GB Windows GPU. This does not update the separate private ChatGPT Sites deployment; a new deployment must be verified against its exact source commit.
+
+## Arabic character conversations and film chronology (candidate)
+
+The F1-01 birthday-preparation safe window now includes Frodo. All four NPCs accept **typed Arabic questions** using an offline contextual intent engine with short topic memory; the UI openly labels this as **not a free-generative LLM**. Only small topic IDs are saved, not the text users enter. Responses are original lines within each character's current knowledge; no copyrighted dialogue or movie audio is used. Film-story progression beyond the opening is not yet implemented.
+
+For truthful browser QA, the optional `?qa=1` hook permits controlled relocation between encounters after separate real WASD and joystick movement smoke tests. The visual artifact therefore proves WebGL rendering, UI, interaction and save-reload, but **not** continuous full-map pathfinding or target PC performance. The user-facing game without `?qa=1` has no relocation control.
+
+**Evidence provenance:** PR-triggered GitHub Actions uses a synthetic merge commit by default; the browser QA workflow now checks out the actual PR head SHA and compares it against `EXPECTED_COMMIT_SHA` so later recordings and QA JSON can be tied to a reproducible exact-source commit. Scripted relocation in QA mode is not full-route navigation acceptance. See Docs for the original intermediate PR merge-ref run `40599606372` and its limitations.
+
+The `40600040728` Actions run is the first exact-HEAD source checkout receipt (`8e39c0d`) with full WebGL QA PASS; video/images archived as artifact `12777793020`. The current follow-up art refinement is an unverified candidate until its own exact-HEAD CI. The private ChatGPT Sites host has **not** been updated by any GitHub commit.
