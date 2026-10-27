@@ -58,3 +58,9 @@ Babylon's license and notices are in `dist/vendor/`. Project art and dialogue ar
 ## Browser-rendered QA candidate
 
 The optional `.github/workflows/browser-qa.yml` workflow runs Babylon inside real headless Chromium WebGL (SwiftShader), records desktop and mobile-emulated interaction videos/screenshots, tests a complete original errand and save/reload, and uploads a `qa-evidence` artifact with FPS samples and exceptions. Software-rendered CI FPS is **not** a performance measurement for the target i7/2GB Windows GPU. This does not update the separate private ChatGPT Sites deployment; a new deployment must be verified against its exact source commit.
+
+## Arabic character conversations and film chronology (candidate)
+
+The F1-01 birthday-preparation safe window now includes Frodo. All four NPCs accept **typed Arabic questions** using an offline contextual intent engine with short topic memory; the UI openly labels this as **not a free-generative LLM**. Only small topic IDs are saved, not the text users enter. Responses are original lines within each character's current knowledge; no copyrighted dialogue or movie audio is used. Film-story progression beyond the opening is not yet implemented.
+
+For truthful browser QA, the optional `?qa=1` hook permits controlled relocation between encounters after separate real WASD and joystick movement smoke tests. The visual artifact therefore proves WebGL rendering, UI, interaction and save-reload, but **not** continuous full-map pathfinding or target PC performance. The user-facing game without `?qa=1` has no relocation control.

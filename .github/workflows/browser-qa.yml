@@ -1,7 +1,7 @@
 name: Browser-rendered QA evidence
 on:
   push:
-    branches: [main, 'qa/**']
+    branches: [main]
   pull_request:
     branches: [main]
 permissions:
@@ -17,7 +17,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - run: npm run check && npm test
+      - run: npm run check && node --check tests/browser-qa.mjs && npm test
       - name: Install pinned QA browser automation
         run: |
           npm install --no-save --no-package-lock --ignore-scripts playwright@1.56.1
