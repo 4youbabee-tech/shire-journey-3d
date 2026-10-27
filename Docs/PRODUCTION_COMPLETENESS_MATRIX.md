@@ -35,3 +35,6 @@ An engine construction or CI pass does not establish browser playability, visual
 
 - PR browser QA `40599606372`: PASS on synthetic merge ref `1a8f9bc` (artifact `12778800072`). WebGL real rendering PASS; dialogue + localized contextual chat PASS; quest functional DOM flow PASS with QA relocation; save/reload PASS; desktop movement smoke PASS; mobile touch emulation PASS. **Exact feature HEAD still NOT RUN** until corrected checkout. Full-map walking/pathfinding NOT RUN, physical device NOT RUN, visual resemblance NOT ACCEPTED.
 - Software SwiftShader samples were 3 FPS desktop median and 7 FPS mobile-emulated median. Target-device FPS NOT MEASURED and 30 FPS target NOT VERIFIED.
+
+- Exact-head run `40600040728`: PASS at SHA `8e39c0d`, artifact `12777793020`, 10 Node tests + real Chromium WebGL desktop/phone-emulated flow, no browser exceptions. Browser live dialogue, save and task gates PASS via QA relocation, full walking path NOT ACCEPTED. Rendering 2 FPS desktop / 6 FPS simulated mobile in **software GPU**, hardware target 30 FPS NOT VERIFIED.
+- Bilbo costume silhouette and Arabic metadata update: candidate SOURCE_AVAILABLE, RENDER_OBSERVED only after new exact-HEAD build. Character visual resemblance remains a design target, not an accepted claim.
