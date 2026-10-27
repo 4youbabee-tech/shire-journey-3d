@@ -21,3 +21,6 @@
 
 - Bilbo refined from owner-provided 3D Visual Asset Atlas: burgundy long coat panels/tails, pale shirt lapels, greying curls and leather book. Maintains original procedural stylized geometry, not actor face/film asset. Requires new render inspection before acceptance.
 - Browser QA-only position setter now requires localhost + `?qa=1`, unlike public play session; original side quest remains canon-neutral.
+
+- F1-01: four new original portrait illustrations (Bilbo rust waistcoat and brown curls, Sam gardener clothing and trowel, Gandalf pointed gray hat and beard, Frodo teal clothing and dark curls) are embedded SVG, independent of actor likeness and movie photography. They're supporting UI assets, NOT replacement 3D character meshes.
+- Optional Arabic system narration speaks only original text upon user click, never movie recordings or cloned character voices. It depends on installed browser voices and is not yet audited on target hardware.

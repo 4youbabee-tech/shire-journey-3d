@@ -38,3 +38,6 @@ An engine construction or CI pass does not establish browser playability, visual
 
 - Exact-head run `40600040728`: PASS at SHA `8e39c0d`, artifact `12777793020`, 10 Node tests + real Chromium WebGL desktop/phone-emulated flow, no browser exceptions. Browser live dialogue, save and task gates PASS via QA relocation, full walking path NOT ACCEPTED. Rendering 2 FPS desktop / 6 FPS simulated mobile in **software GPU**, hardware target 30 FPS NOT VERIFIED.
 - Bilbo costume silhouette and Arabic metadata update: candidate SOURCE_AVAILABLE, RENDER_OBSERVED only after new exact-HEAD build. Character visual resemblance remains a design target, not an accepted claim.
+
+- `40600431467` exact-head `8413ac7`: browser QA PASS; no full-route pathfinding proof or target-device performance acceptance.
+- Proposed 0.2.1 Arabic portrait UI: SVG source and tests added; browser screenshot/video validation PENDING. Optional Arabic browser-system narration is SOURCE_AVAILABLE only; device speech synthesis NOT RUN. True model-backed generative conversation NOT IMPLEMENTED.
