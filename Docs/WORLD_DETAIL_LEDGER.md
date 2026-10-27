@@ -16,3 +16,5 @@
 - F1-01 canon boundary from `01_STORY_AND_TIMELINE_BIBLE.pdf`: birthday preparation safe window; Bilbo leaves and Ring passes to Frodo only in a later irreversible main event, not caused by the original apple errand. Current conversations explicitly avoid revealing future character knowledge.
 - Browser newcomer Frodo: teal-blue waistcoat, dark curls, small satchel, modest hobbit stature; original procedurally shaped and not actor likeness. Physical scene still to be rechecked at exact candidate SHA.
 - Conversational tiers: current offline Arabic contextual intent+topic memory (real, no external tokens); future optional generative AI is not wired or claimed. Do not place client-side secret keys in a GitHub Pages static app. Responses not official film dialogue.
+
+- Browser visual evidence artifact `12778800072` shows grassy rounded hobbit houses with visible doors, party tree, Gandalf and distinct hobbit silhouettes; actual player view readable, but actor likeness and polished production animation have not met visual acceptance. Performance not extrapolated from SwiftShader.

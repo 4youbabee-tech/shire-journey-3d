@@ -1,5 +1,6 @@
 // Real Chromium+WebGL QA. The CI GPU is software SwiftShader, not the owner's target PC.
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import {createServer} from 'node:http';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {resolve,sep,extname} from 'node:path';
@@ -21,7 +22,9 @@ const server=createServer(async(req,res)=>{
 });
 await new Promise((ok,fail)=>server.once('error',fail).listen(0,'127.0.0.1',ok));
 const url=`http://127.0.0.1:${server.address().port}/?qa=1`;
-const report={commit:process.env.GITHUB_SHA||'local',environment:'GitHub Actions Chromium SwiftShader (software WebGL; NOT target hardware)',desktop:{},mobile:{},errors:[],status:'NOT RUN'};
+const checkoutSha=process.env.GITHUB_ACTIONS?execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim():'local';
+if(process.env.EXPECTED_COMMIT_SHA&&checkoutSha!==process.env.EXPECTED_COMMIT_SHA)throw Error('Exact-HEAD mismatch: checked out '+checkoutSha+' but expected '+process.env.EXPECTED_COMMIT_SHA);
+const report={commit:checkoutSha,environment:'GitHub Actions Chromium SwiftShader (software WebGL; NOT target hardware)',desktop:{},mobile:{},errors:[],status:'NOT RUN'};
 let browser;
 const snap=page=>page.evaluate(()=>window.__SHIRE__?.snapshot());
 const still=async(page,name)=>page.screenshot({path:resolve(out,name),animations:'disabled'});

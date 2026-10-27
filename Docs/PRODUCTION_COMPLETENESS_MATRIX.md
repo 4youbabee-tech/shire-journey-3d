@@ -32,3 +32,6 @@ An engine construction or CI pass does not establish browser playability, visual
 - `40598395983` at `3f28fc9`: JS tests PASS, Babylon WebGL screenshot real, but end-to-end travel FAIL on low-FPS software rendering. House doors visible; no chapter/gameplay completion proof, no 30 FPS device measurement.
 - New candidate: Frodo mesh and free-text Arabic contextual conversations SOURCE_AVAILABLE, local conversation engine unit tests PASS (3); integrated build, browser interaction and visual acceptance await exact-HEAD Actions evidence. **True generative AI: NOT IMPLEMENTED.**
 - Story: F1-01 pre-party canon context. Original apple-collection side activity only; movie plot cutscenes and locked ring-transfer outcome remain NOT IMPLEMENTED.
+
+- PR browser QA `40599606372`: PASS on synthetic merge ref `1a8f9bc` (artifact `12778800072`). WebGL real rendering PASS; dialogue + localized contextual chat PASS; quest functional DOM flow PASS with QA relocation; save/reload PASS; desktop movement smoke PASS; mobile touch emulation PASS. **Exact feature HEAD still NOT RUN** until corrected checkout. Full-map walking/pathfinding NOT RUN, physical device NOT RUN, visual resemblance NOT ACCEPTED.
+- Software SwiftShader samples were 3 FPS desktop median and 7 FPS mobile-emulated median. Target-device FPS NOT MEASURED and 30 FPS target NOT VERIFIED.
