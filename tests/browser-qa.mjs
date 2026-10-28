@@ -7,8 +7,8 @@ import {resolve,sep,extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {chromium} from 'playwright';
 
-const root=resolve(fileURLToPath(new URL('../dist/',import.meta.url)));
-const out=resolve('qa-evidence');
+const root=resolve(process.env.QA_DIST||fileURLToPath(new URL('../dist/',import.meta.url)));
+const out=resolve(process.env.QA_OUT||'qa-evidence');
 await mkdir(out,{recursive:true});
 const mime={'.html':'text/html; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8'};
 const server=createServer(async(req,res)=>{
@@ -24,7 +24,7 @@ await new Promise((ok,fail)=>server.once('error',fail).listen(0,'127.0.0.1',ok))
 const url=`http://127.0.0.1:${server.address().port}/?qa=1`;
 const checkoutSha=process.env.GITHUB_ACTIONS?execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim():'local';
 if(process.env.EXPECTED_COMMIT_SHA&&checkoutSha!==process.env.EXPECTED_COMMIT_SHA)throw Error('Exact-HEAD mismatch: checked out '+checkoutSha+' but expected '+process.env.EXPECTED_COMMIT_SHA);
-const report={commit:checkoutSha,environment:'GitHub Actions Chromium SwiftShader (software WebGL; NOT target hardware)',desktop:{},mobile:{},errors:[],status:'NOT RUN'};
+const report={commit:checkoutSha,environment:'Chromium SwiftShader (software WebGL; NOT target hardware)',host:process.env.GITHUB_ACTIONS?'GitHub Actions':'local Linux container',desktop:{},mobile:{},errors:[],status:'NOT RUN'};
 let browser;
 const snap=page=>page.evaluate(()=>window.__SHIRE__?.snapshot());
 const still=async(page,name)=>page.screenshot({path:resolve(out,name),animations:'disabled'});
@@ -32,6 +32,7 @@ async function ready(page){
  await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.querySelector('#welcome').hidden||!document.querySelector('#fatal').hidden,null,{timeout:90000});
  if(await page.locator('#fatal').isVisible())throw Error('WebGL/scene failed: '+await page.locator('#fatal-text').innerText());
+ if(process.env.GITHUB_ACTIONS)assert.equal((await snap(page)).commit,checkoutSha,'Published build identity matches tested checkout');
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
 }
 async function walk(page,key,ms){await page.keyboard.down(key);try{await page.waitForTimeout(ms);}finally{await page.keyboard.up(key);}}
@@ -63,6 +64,11 @@ try{
  const desktop=await browser.newContext({viewport:{width:1280,height:720},recordVideo:{dir:out,size:{width:1280,height:720}}});
  const page=await desktop.newPage();page.on('pageerror',e=>report.errors.push('desktop: '+e.message));
  await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();
+ await page.locator('#sound').click();
+ assert.match(await page.locator('#sound').innerText(),/مفعّلة/);
+ await page.locator('#journal-open').click();
+ await page.locator('#volume-music').fill('0');await page.locator('#volume-effects').fill('0.5');
+ await still(page,'desktop-audio-settings.png');await page.locator('#journal-close').click();
  const walkEvidence=await realWalk(page);await still(page,'desktop-moving.png');await qaReposition(page,8,7);
  await still(page,'desktop-arrived.png');await talk(page);assert.equal(await page.locator('#portrait svg').count(),1,'Bilbo SVG portrait visible');assert.ok(await page.locator('#npc-voice').isVisible(),'Browser narration button present');await still(page,'desktop-dialogue.png');
  await page.locator('#npc-chat-input').fill('من أنت؟');await page.locator('#npc-chat-send').click();
@@ -89,7 +95,7 @@ try{
  await ready(touch);await touch.locator('#start').tap();
  const joy=await touch.locator('#joystick').boundingBox();assert.ok(joy,'Touch joystick must be visible');
  const cdp=await mobile.newCDPSession(touch),cx=joy.x+joy.width/2,cy=joy.y+joy.height/2;
- const before=await snap(touch);await mobileHold(cdp,cx,cy,0,-32,2400);const moved=await snap(touch);
+ const before=await snap(touch);assert.equal(before.renderSize.scale,1.5);assert.equal(before.renderSize.shadows,false);await mobileHold(cdp,cx,cy,0,-32,2400);const moved=await snap(touch);
  assert.ok(moved.position.z-before.position.z>.1,'Touch joystick must move character forward');
  await still(touch,'mobile-joystick.png');
  // QA-only move after the independently verified real touch walking smoke.

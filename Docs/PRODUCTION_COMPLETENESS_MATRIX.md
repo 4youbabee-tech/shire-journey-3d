@@ -1,3 +1,20 @@
+# Current acceptance — 0.2.2 candidate
+
+| Gate | Status | Evidence / limitation |
+|---|---|---|
+| Base HEAD / previous Pages | PASS | 0a52cef; run 40752445899 |
+| Dependency restore / source / 12 tests | PASS locally | Babylon 9.32.1 checksum; joint and collision assertions |
+| Character rigid batching | PASS structurally | 346 -> 200 meshes; 336506 triangles unchanged |
+| Whole-head articulation | PASS engine logic | Eye vertices move with neck; hair/features parented together |
+| Desktop/touch browser | PENDING final SHA | Local final audio/input smoke PASS, software 6/20 FPS; not hardware acceptance |
+| PCM ambience / gain controls | PASS unit; listening NOT RUN | Original noise plus existing synthesized birds/music |
+| Production character art / animation clips | NOT IMPLEMENTED | Existing procedural silhouettes retained |
+| Frodo / pony / cart cinematic | NOT IMPLEMENTED | Supplied screenplay sequence inspected; see ledger |
+| Target PC 720p / physical phone 30 FPS | NOT RUN | SwiftShader never substitutes for owner GPU |
+| Final candidate merge / Pages SHA | PENDING | Must inspect exact-SHA CI and publication before release claim |
+
+The tables below are historical evidence, not current blanket acceptance.
+
 # Browser prototype verification matrix
 
 | Capability | Source | Static | Engine logic | Browser visual | Owner device |
@@ -45,3 +62,4 @@ An engine construction or CI pass does not establish browser playability, visual
 - Soundscape + NPC gestures candidate: SOURCE_AVAILABLE after push, JavaScript/unit/Chromium checks pending; original Web Audio synthesis, opt-in button, pause on background tab, no film recording. Actual phone audio and visual acceptance NOT TESTED.
 
 - Background farmers (3) / light swaying canopies (11): source candidate; PASS only after exact-head tests, still NOT PHYSICAL-DEVICE TESTED. No pathfinding/day schedule.
+
