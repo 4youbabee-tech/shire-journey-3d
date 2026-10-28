@@ -24,3 +24,5 @@
 
 - F1-01: four new original portrait illustrations (Bilbo rust waistcoat and brown curls, Sam gardener clothing and trowel, Gandalf pointed gray hat and beard, Frodo teal clothing and dark curls) are embedded SVG, independent of actor likeness and movie photography. They're supporting UI assets, NOT replacement 3D character meshes.
 - Optional Arabic system narration speaks only original text upon user click, never movie recordings or cloned character voices. It depends on installed browser voices and is not yet audited on target hardware.
+
+- Quiet Shire liveliness candidate: varied bird chirps, quiet original three-note pastoral synthetic motif and faint leaves; character head/arm idle gestures, no path-changing AI or new main plot. Chosen Web Audio oscillators to avoid asset downloads and preserve modest GPU load. Requires browser gesture to activate mobile sound.
