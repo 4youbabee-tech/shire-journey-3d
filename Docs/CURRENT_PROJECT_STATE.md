@@ -80,3 +80,5 @@ Next acceptance step: the owner opens the deployed URL in a WebGL-capable browse
 - Added original synthesized low-volume bell/melody accents, varied birds and leaf-like sounds behind a user-tapped sound button. This is not film music and not actor dialogue; depends on browser Web Audio support and manual activation. No external audio files or runtime network needed.
 - NPC idle head turning, hand gestures, and light swaying differ by character, with stronger gestures while speaking; no route-based NPC AI or real character voice acting is claimed.
 - Static source candidate at authoring; new exact-SHA CI/browser acceptance NOT RUN yet. Actual phone audio, UX and target hardware FPS require device evidence. Old release 0.2.1 remains published until separately merged/deployed.
+
+- Living Shire candidate: 3 non-dialogue background farmers/gardeners now pace fixed safe plots, 11 small upper canopies sway in an original wind loop, no navmesh or quest impact. CI/head validation and on-device performance NOT RUN at authoring. Original five interactive characters unchanged.

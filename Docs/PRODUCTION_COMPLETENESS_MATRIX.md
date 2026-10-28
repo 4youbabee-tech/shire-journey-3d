@@ -43,3 +43,5 @@ An engine construction or CI pass does not establish browser playability, visual
 - Proposed 0.2.1 Arabic portrait UI: SVG source and tests added; browser screenshot/video validation PENDING. Optional Arabic browser-system narration is SOURCE_AVAILABLE only; device speech synthesis NOT RUN. True model-backed generative conversation NOT IMPLEMENTED.
 
 - Soundscape + NPC gestures candidate: SOURCE_AVAILABLE after push, JavaScript/unit/Chromium checks pending; original Web Audio synthesis, opt-in button, pause on background tab, no film recording. Actual phone audio and visual acceptance NOT TESTED.
+
+- Background farmers (3) / light swaying canopies (11): source candidate; PASS only after exact-head tests, still NOT PHYSICAL-DEVICE TESTED. No pathfinding/day schedule.
