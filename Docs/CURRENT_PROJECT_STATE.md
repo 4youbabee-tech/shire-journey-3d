@@ -1,3 +1,13 @@
+# Browser release 0.3.0 — Living Hobbiton (2026-10-28)
+
+Preproduction: inspected `03_WORLD_LOCATIONS_AND_MAP_BIBLE` (The Shire / Hobbiton: warm domestic circular-door hill homes, gardens, primary routes, recognizable vistas; on-foot navigation), `06_GAMEPLAY_AND_SIDE_ACTIVITIES_BIBLE` (onboarding, low-threat conversations, safe save transitions), and `10_3D_VISUAL_ASSET_ATLAS_PRODUCTION` (location silhouettes, coherent source-led modeling). All new market and secondary neighborhood pieces are original game detail, not asserted film-specific events.
+
+Base exact main `38e901a39eed8c62cd33e38ae71c1492403b8dd5`, prior Actions Browser WebGL 40771183719 PASS and Pages 40771183673 PASS.
+
+Batch 2 scope: 4 to 17 hill houses; 4 to 12 connected pastoral roads; extended collision perimeter; garden benches, lanterns, shrubs, wells, produce marketplace; searchable parchment village map with player, characters, landmarks, quest apples; original short scripted pony/cart arrival with Frodo and Gandalf and a skip / journal replay control. Preserves existing five-stage apple quest, Arabic dialogues, save key/schema and eight characters. Static shared-material batching retained; no downloaded film models/audio. New test coverage for layout, cinematic restoration, map interaction and screenshots; target-device FPS is assessed only through physical testing.
+
+Acceptance: exact-HEAD Node tests + Chromium WebGL desktop/mobile and captured browser images required before merge. Never claim physical device 30 FPS from SwiftShader. Rollback: revert single candidate commit; no Unreal/PES changes.
+
 # Batch 1B 0.2.3 — proposed candidate (2026-10-28)
 
 Based on inspected main a56d91cbbd9f4b3f41a7c9b30d273ee23af7a509. Browser 0.2.2 had exact-HEAD QA PASS 40768052892 and Pages PASS 40768052890.

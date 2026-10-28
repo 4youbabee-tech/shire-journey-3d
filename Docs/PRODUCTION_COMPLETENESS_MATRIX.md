@@ -1,3 +1,13 @@
+# Browser 0.3.0 production acceptance (candidate before CI)
+
+| Feature | Acceptance gate |
+|---|---|
+| Expanded 17 hill homes / 12 road branches / market decorations | SOURCE_READY; collision, real Chrome screenshot required |
+| Map with player, landmarks, NPCs and active apple task | SOURCE_READY; keyboard, touch and overlay QA required |
+| Original Gandalf pony cart and Frodo encounter | SOURCE_READY; scene test + screenshot, exit restores actors |
+| Existing quest, saving, collisions, mobile controls | Regression tests required at exact PR SHA |
+| Hardware FPS / production-AAA characters / later film chapters | Not inferred from browser QA |
+
 # Batch 1B 0.2.3 — pre-CI acceptance
 
 | Gate | Evidence |

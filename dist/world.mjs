@@ -1,11 +1,12 @@
 // All art here is original procedural stylized geometry, not imported film assets.
+import {HOMES,ROADS,MAP_BOUNDS} from './village-layout.mjs';
 export function createWorld(B,scene,{shadows=true}={}){
  const V=B.Vector3, M=B.MeshBuilder;let seed=7349;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
  const mats={},statics=[],colliders=[],characters=[],apples=[],birds=[],leaves=[],workers=[];
  function mat(name,hex,emission=0){const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(hex);m.specularColor=new B.Color3(.03,.03,.03);if(emission)m.emissiveColor=m.diffuseColor.scale(emission);mats[name]=m;return m;}
  const grass=mat('meadow','#7f9f5c'),hill=mat('hill','#6d914d'),hill2=mat('distant hills','#709b70'),cream=mat('lime plaster','#e8d3a0'),wood=mat('oak timber','#715034'),dark=mat('dark timber','#493d2c'),pathmat=mat('warm gravel','#c5ac7a'),bark=mat('bark','#6d5338'),leaf=mat('summer leaves','#729c47'),leaf2=mat('sunlit leaves','#a0b95b'),leaf3=mat('deep leaves','#4d7b40'),door=mat('bag end green','#355f47'),brass=mat('warm brass','#dcac4e'),glass=mat('warm windows','#f4ca75',.3),stone=mat('path stone','#9d9a7b'),white=mat('cream cloth','#eee3c0'),red=mat('rust bunting','#b97151'),blue=mat('sky bunting','#7a9a9b'),yellow=mat('wildflower gold','#e8bc53'),pink=mat('wildflower pink','#d48c8f'),skin=mat('hobbit skin','#e5b18a'),hair=mat('brown curls','#65412b'),bilboHair=mat('Bilbo silver-brown hair','#76634d'),samHair=mat('Sam sandy curls','#8b693e'),frodoHair=mat('Frodo dark curls','#47372c'),bookLeather=mat('Bilbo book leather','#54382d'),trousers=mat('trousers','#685a3b'),feetmat=mat('bare feet','#dca77c'),eye=mat('eyes','#27372b'),shirt=mat('cream shirt','#f5e6bc'),vest=mat('player vest','#99704a'),cloak=mat('green cloak','#506950'),samvest=mat('sam waistcoat','#a78e56'),bilbovest=mat('bilbo waistcoat','#a9664b'),bilboCoat=mat('Bilbo burgundy coat','#663c4e'),frodoVest=mat('Frodo blue waistcoat','#426b70'),grey=mat('grey robes','#969e9a'),hatmat=mat('blue grey hat','#7c8f94'),beard=mat('grey beard','#d8d9cb'),applemat=mat('red apples','#ce6941');
  const sun=new B.DirectionalLight('warm morning sunlight',new V(-.8,-1.6,.65),scene);sun.position=new V(35,55,-30);sun.intensity=1.05;sun.diffuse=new B.Color3(1,.91,.73);const hemi=new B.HemisphericLight('sky fill',new V(0,1,0),scene);hemi.intensity=.6;hemi.groundColor=B.Color3.FromHexString('#66794c');
- scene.clearColor=B.Color4.FromHexString('#bcd9dfff');scene.fogMode=B.Scene.FOGMODE_LINEAR;scene.fogStart=50;scene.fogEnd=150;scene.fogColor=B.Color3.FromHexString('#bcd9df');scene.ambientColor=new B.Color3(.09,.09,.07);scene.collisionsEnabled=true;scene.skipPointerMovePicking=true;
+ scene.clearColor=B.Color4.FromHexString('#bcd9dfff');scene.fogMode=B.Scene.FOGMODE_LINEAR;scene.fogStart=70;scene.fogEnd=190;scene.fogColor=B.Color3.FromHexString('#bcd9df');scene.ambientColor=new B.Color3(.09,.09,.07);scene.collisionsEnabled=true;scene.skipPointerMovePicking=true;
  const shadow=shadows?new B.ShadowGenerator(1024,sun):null;if(shadow){shadow.usePercentageCloserFiltering=true;shadow.filteringQuality=B.ShadowGenerator.QUALITY_LOW;shadow.bias=.005;shadow.normalBias=.3;shadow.darkness=.22;}
  function finish(mesh,material,x,y,z,staticMesh=true,parent=null){mesh.material=material;mesh.position.set(x,y,z);mesh.isPickable=false;if(parent)mesh.parent=parent;else if(staticMesh)statics.push(mesh);mesh.receiveShadows=true;return mesh;}
  function sphere(name,x,y,z,sx,sy,sz,material,staticMesh=true,parent=null,segments=10){const m=M.CreateSphere(name,{diameter:1,segments},scene);m.scaling.set(sx,sy,sz);return finish(m,material,x,y,z,staticMesh,parent);}
@@ -17,7 +18,7 @@ export function createWorld(B,scene,{shadows=true}={}){
  // A broad, quiet horizon gives the village a real landscape silhouette.
  for(let i=0;i<16;i++){const angle=i/16*Math.PI*2;const r=64+random()*20;sphere('rolling distant hill',Math.cos(angle)*r,-3+random()*2,Math.sin(angle)*r,37+random()*20,14+random()*16,35+random()*18,i%2?hill2:hill);}
  function path(points,width=2.5){const p=B.Curve3.CreateCatmullRomSpline(points.map(([x,z])=>new V(x,.035,z)),10,false).getPoints();const left=[],right=[];for(let i=0;i<p.length;i++){const t=p[Math.min(i+1,p.length-1)].subtract(p[Math.max(i-1,0)]).normalize(),n=new V(t.z,0,-t.x);left.push(p[i].add(n.scale(width/2)));right.push(p[i].subtract(n.scale(width/2)));}const m=M.CreateRibbon('winding village path',{pathArray:[left,right],sideOrientation:B.Mesh.DOUBLESIDE},scene);m.material=pathmat;m.receiveShadows=true;statics.push(m);}
- path([[0,-25],[0,-14],[1,-6],[1,1],[4,6],[3,12],[-1,19],[1,30]],3.1);path([[1,0],[-5,1],[-10,5],[-16,10],[-20,16]],2);path([[4,6],[8,7],[11,10]],1.9);path([[-1,19],[-7,23],[-12,25]],1.8);
+ for(const road of ROADS)path(road.points,road.width);
  function tree(x,z,s=1,kind='normal'){
   cyl('tapering trunk',x,1.5*s,z,.55*s,3*s,bark,true,null,.3*s,8);blocker('tree trunk collision',x,1.5*s,z,.65*s,3*s,.65*s);
   beam([x,1.6*s,z],[x-.8*s,3*s,z],.2*s,bark);beam([x,1.8*s,z],[x+.9*s,3.2*s,z+.3*s],.2*s,bark);
@@ -38,9 +39,40 @@ export function createWorld(B,scene,{shadows=true}={}){
   cyl('stone doorstep',x,.09,z-1.1*s,2.5*s,.18,stone);cyl('chimney',x+1.7*s,4.6*s,z+2*s,.7*s,2*s,stone,true,null,.65*s,6);cyl('chimney cap',x+1.7*s,5.6*s,z+2*s,1*s,.2*s,cream);
   blocker('hobbit house solid interior',x,2*s,z+2.5*s,6*s,4*s,6*s);
  }
- house(11,11,1.2);house(-12,7,.9,red);house(-12,27,.85,blue);house(19,25,.75,door);
+ for(const home of HOMES)house(home.x,home.z,home.s,home.color==='rust'?red:home.color==='blue'?blue:door);
  function fence(points){for(let i=0;i<points.length;i++){const [x,z]=points[i];cyl('fence post',x,.55,z,.16,1.1,wood,true,null,.1,6);if(i){const [px,pz]=points[i-1];beam([x,.4,z],[px,.4,pz],.09,wood);beam([x,.8,z],[px,.8,pz],.09,wood);}}}
  fence([[-15,0],[-13,0],[-11,0],[-9,0],[-8,-1]]);fence([[-17,8],[-19,8],[-21,8],[-23,8],[-25,10],[-25,12]]);fence([[15,7],[17,7],[19,7],[21,7]]);fence([[-7,25],[-7,27],[-7,29]]);
+ // Village dressing uses shared materials and static batching; no moving story anchors.
+ function bench(x,z,angle=0){
+  const group=new B.TransformNode('village bench frame',scene);group.position.set(x,0,z);group.rotation.y=angle;
+  for(const dx of [-.7,.7]){const leg=cyl('bench supports',dx,.36,0,.12,.72,wood,false,group);statics.push(leg);}
+  const seat=M.CreateBox('oak bench seat',{width:1.85,height:.15,depth:.56},scene);finish(seat,wood,0,.75,0,false,group);statics.push(seat);
+  const back=M.CreateBox('oak bench back',{width:1.85,height:.65,depth:.13},scene);finish(back,wood,0,1.12,.25,false,group);statics.push(back);
+ }
+ for(const [x,z,angle] of [[-26,-12,0],[-4,-29,.4],[21,-18,.8],[30,29,-.4],[-21,30,.2],[-34,3,1]])bench(x,z,angle);
+ for(const [x,z] of [[-30,-14],[10,-26],[29,-13],[35,22],[-27,35],[0,38],[20,17],[-14,0]]){
+  cyl('oak lamp post',x,1.5,z,.14,3,wood,true,null,.12,7);
+  sphere('warm lantern glass',x,3.12,z,.5,.6,.5,glass);
+  const cap=M.CreateCylinder('lantern roof',{diameter:1,height:.16,tessellation:6},scene);finish(cap,dark,x,3.51,z);
+ }
+ for(let i=0;i<45;i++){const x=-44+random()*88,z=-41+random()*89;
+  if(Math.abs(x)<9&&z>-21&&z<19)continue;
+  sphere('wild hedge bush',x,.32,z,.75+random()*.6,.8+random()*.45,.8+random()*.6,i%3?leaf3:leaf2,true,null,7);
+ }
+ for(const [x,z] of [[-29,-15],[27,-8]]){
+  cyl('stone well base',x,.5,z,2.15,1,stone,true,null,null,14);
+  ring('well rim',x,1.05,z,2.3,.25,cream);
+  for(const side of [-.82,.82])cyl('well support',x+side,2,z,.15,2,wood);
+  const roof=M.CreateCylinder('well timber canopy',{diameter:2.6,height:.3,tessellation:4},scene);finish(roof,wood,x,3.05,z);
+ }
+ // The village square, produce stalls, barrels and baskets make roads feel inhabited.
+ for(const [x,z] of [[23,-12],[29,-16],[25,-21]]){
+  const stall=M.CreateBox('market produce stall',{width:2.2,height:.16,depth:1.15},scene);finish(stall,wood,x,1,z);
+  for(const dx of [-.93,.93])for(const dz of [-.48,.48])cyl('market table post',x+dx,.5,z+dz,.13,.98,wood);
+  const awning=M.CreateBox('striped canvas stall roof',{width:2.65,height:.18,depth:1.6},scene);finish(awning,(Math.round(x)%2)?red:blue,x,2.53,z);
+  for(const dx of [-.9,.9])for(const dz of [-.44,.44])cyl('market canopy pole',x+dx,1.8,z+dz,.09,1.5,wood);
+  for(let j=0;j<5;j++){sphere('market produce',x-.85+j*.42,1.18,z,.25,.23,.3,j%2?yellow:applemat,true,null,8);}
+ }
  // Garden beds, pumpkins and flowers make the homes feel inhabited.
  for(let row=0;row<3;row++){path([[-15+row,-1],[-15+row,-5]],.5);for(let j=0;j<5;j++){sphere('cabbage',-15+row,.22,-1-j*.8,.43,.42,.43,leaf3);}}
  for(let i=0;i<7;i++)sphere('pumpkin',-9+random()*2,.24,3+random(),.5,.43,.48,i%2?red:yellow);
@@ -58,8 +90,8 @@ export function createWorld(B,scene,{shadows=true}={}){
  // Clouds share the sky's palette; birds animate separately.
  const cloud=mat('clouds','#edf0df',.2);for(let i=0;i<9;i++){const x=-70+i*17,z=45+random()*35;for(let j=0;j<3;j++)sphere('soft cloud',x+j*3,23+Math.sin(i)*3,z,9,2.1,4,cloud);}
  for(let i=0;i<5;i++){const root=new B.TransformNode('swallow',scene);const wingL=beam([0,0,0],[-.35,.08,.08],.045,dark,'bird wing',false,root);const wingR=beam([0,0,0],[.35,.08,.08],.045,dark,'bird wing',false,root);birds.push({root,wingL,wingR,phase:i*1.2});}
- // Closed village boundary, generous enough for the entire implemented area.
- blocker('west boundary',-33,3,5,1,6,62);blocker('east boundary',33,3,5,1,6,62);blocker('south boundary',0,3,-25,66,6,1);blocker('north boundary',0,3,34,66,6,1);
+ // Expanded village bounds leave walkable routes behind the original village center.
+ blocker('west boundary',MAP_BOUNDS.minX,3,2.5,1,6,MAP_BOUNDS.maxZ-MAP_BOUNDS.minZ);blocker('east boundary',MAP_BOUNDS.maxX,3,2.5,1,6,MAP_BOUNDS.maxZ-MAP_BOUNDS.minZ);blocker('south boundary',0,3,MAP_BOUNDS.minZ,MAP_BOUNDS.maxX-MAP_BOUNDS.minX,6,1);blocker('north boundary',0,3,MAP_BOUNDS.maxZ,MAP_BOUNDS.maxX-MAP_BOUNDS.minX,6,1);
  function character(id,x,z,{wizard=false,waistcoat=vest,player=false}={}){
   const root=new B.TransformNode(id,scene);root.position.set(x,0,z);const parts=[];const S=(name,px,py,pz,sx,sy,sz,mt,segments=10)=>{const m=sphere(name,px,py,pz,sx,sy,sz,mt,false,root,segments);parts.push(m);return m;};const C=(name,px,py,pz,d,h,mt,top=null)=>{const m=cyl(name,px,py,pz,d,h,mt,false,root,top);parts.push(m);return m;};
   const height=wizard?1.45:1;const torso=S('waistcoat',0,.87*height,0,.68, .8*height,.42,wizard?grey:waistcoat);S('shirt collar',0,1.18*height,-.02,.47,.18,.4,shirt);
@@ -100,6 +132,6 @@ export function createWorld(B,scene,{shadows=true}={}){
  // Merge static geometry by material: a few dozen draws, rather than hundreds.
  const groups=new Map();for(const mesh of statics){const key=mesh.material.uniqueId;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(mesh);}let mergedCount=0;for(const group of groups.values()){const m=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);if(m){m.name='batched '+m.material.name;m.receiveShadows=true;m.freezeWorldMatrix();if(shadow&& !['warm gravel','clouds','pond water'].includes(m.material.name))shadow.addShadowCaster(m);mergedCount++;}}
  const body=M.CreateSphere('player collision ellipsoid',{diameter:1,segments:6},scene);body.position.set(0,.72,-15);body.isVisible=false;body.isPickable=false;body.ellipsoid=new V(.32,.7,.32);body.checkCollisions=true;
- return {player,body,characters,workers,leaves,apples,birds,sun,hemi,shadow,colliders,ground,water,stats:{staticBatches:mergedCount,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,animatedCanopies:leaves.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
+ return {player,body,characters,workers,leaves,apples,birds,sun,hemi,shadow,colliders,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,roads:ROADS.length,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,animatedCanopies:leaves.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
 }
 

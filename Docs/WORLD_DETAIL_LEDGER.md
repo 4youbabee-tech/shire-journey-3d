@@ -38,3 +38,9 @@
 
 ## Batch 1B artistic/engineering decision
 - Preserve prior Babylon procedural art, collision and narrative. Three original non-dialogue villagers gain deterministic travel-and-tend gestures using unchanged geometry. Adaptive scaling only after sustained measured GPU frame rate; initial detail remains unchanged until sampled. No new canonical scene or character model accepted.
+
+## 2026-10-28 Browser 0.3.0 art direction / source provenance
+- WORLD BIBLE: the Shire/Hobbiton = pastoral hills, Hobbit-holes and gardens, onboarding and exploration; Bag End remains the dominant navigational landmark. Routes are legible without forcing map usage.
+- LAYOUT: 17 procedurally modeled original Hobbit dwellings and 12 roads; market, lanterns, benches, two wells and shrubs are small-game design interpretation and do not assert film-canonicity.
+- STORY: original short arrival of a pony-cart with Gandalf and Frodo inspired by the source safe window, without copied screenplay dialogue or film audio. Explicit skip/replay; no canonical Ring action changed.
+- TECHNICAL: no texture network requests; retain merged static materials and low-triangle details, expanded village boundaries with save validation, test scene/character restoration and screen-rendered evidence. Performance on owner device remains a separate metric.

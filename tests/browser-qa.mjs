@@ -63,8 +63,8 @@ try{
  browser=await chromium.launch({headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
  const desktop=await browser.newContext({viewport:{width:1280,height:720},recordVideo:{dir:out,size:{width:1280,height:720}}});
  const page=await desktop.newPage();page.on('pageerror',e=>report.errors.push('desktop: '+e.message));
- await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();assert.equal((await snap(page)).quality.mode,'auto');
- await page.locator('#sound').click();
+ await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();assert.equal((await snap(page)).quality.mode,'auto');assert.equal((await snap(page)).cinematic.active,true);await still(page,'desktop-arrival-cinematic.png');await page.locator('#arrival-skip').click();assert.equal((await snap(page)).cinematic.active,false);
+ await page.locator('#map-open').click();assert.ok(await page.locator('#world-map').isVisible());await still(page,'desktop-village-map.png');await page.locator('#map-close').click();await page.locator('#sound').click();
  assert.match(await page.locator('#sound').innerText(),/مفعّلة/);
  await page.locator('#journal-open').click();
  await page.locator('#volume-music').fill('0');await page.locator('#volume-effects').fill('0.5');
@@ -92,7 +92,7 @@ try{
  await desktop.close();
  const mobile=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,recordVideo:{dir:out,size:{width:390,height:844}}});
  const touch=await mobile.newPage();touch.on('pageerror',e=>report.errors.push('mobile: '+e.message));
- await ready(touch);await touch.locator('#start').tap();
+ await ready(touch);await touch.locator('#start').tap();if((await snap(touch)).cinematic.active)await touch.locator('#arrival-skip').tap();await touch.locator('#map-open').tap();assert.ok(await touch.locator('#world-map').isVisible());await still(touch,'mobile-village-map.png');await touch.locator('#map-close').tap();
  const joy=await touch.locator('#joystick').boundingBox();assert.ok(joy,'Touch joystick must be visible');
  const cdp=await mobile.newCDPSession(touch),cx=joy.x+joy.width/2,cy=joy.y+joy.height/2;
  const before=await snap(touch);assert.equal(before.renderSize.scale,1.5);assert.equal(before.renderSize.shadows,false);assert.equal(before.quality.mode,'auto');await mobileHold(cdp,cx,cy,0,-32,2400);const moved=await snap(touch);

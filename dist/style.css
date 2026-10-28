@@ -8,3 +8,23 @@
 
 
 #audio-settings{border:1px solid #c9bb93;border-radius:5px;padding:10px;margin:12px 0}#audio-settings label{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;margin:8px 0}#audio-settings input{width:55%;accent-color:#496749}#audio-settings small{font-size:10px;color:#667155}
+
+/* 0.3: legible village wayfinding, cinema and parchment map. */
+#arrival-cinematic{position:fixed;inset:0;z-index:24;pointer-events:none;background:linear-gradient(to bottom,#15241988 0%,transparent 28%,transparent 57%,#172b1ab8 100%);color:#fff7df;direction:rtl}
+#arrival-cinematic .cinematic-topline{position:absolute;top:6%;right:5%;font:600 13px Georgia,serif;letter-spacing:1px;text-shadow:0 2px 6px #0008}
+#arrival-cinematic #arrival-caption{position:absolute;bottom:11%;left:12%;right:12%;font:600 clamp(16px,2.4vw,25px)/1.7 Tahoma,sans-serif;text-align:center;text-shadow:0 2px 8px #000c}
+#arrival-skip{position:absolute;bottom:4%;left:5%;pointer-events:auto;border:1px solid #f0d49b88;border-radius:22px;padding:10px 22px;background:#203d2abb;color:#fff5d5;font:13px Tahoma,sans-serif;cursor:pointer}
+#world-map{position:fixed;inset:0;z-index:32;background:#111f19c9;overflow-y:auto;padding:22px;display:flex;align-items:center;justify-content:center;direction:rtl;backdrop-filter:blur(4px)}
+#world-map[hidden],#arrival-cinematic[hidden]{display:none!important}
+.map-frame{position:relative;width:min(94vw,740px);max-height:95vh;overflow:auto;box-sizing:border-box;border:8px solid #75603f;border-radius:9px;padding:18px 20px 24px;background:#e8d5a9;box-shadow:0 25px 80px #0009;color:#3c4833;text-align:center}
+.map-heading h2{font:600 28px Georgia,Tahoma,serif;margin:0}.map-heading p,.map-frame>p{font:12px/1.65 Tahoma,sans-serif}.map-heading small{letter-spacing:2px}
+#map-close{position:absolute;top:8px;left:10px;font-size:27px;border:0;background:#796342;color:#fff5d7;border-radius:50%;width:38px;height:38px;cursor:pointer}
+#village-map{width:min(100%,580px);height:auto;display:block;max-height:65vh;object-fit:contain;margin:12px auto;border:2px solid #a99769;background:#e5d5a8;box-shadow:inset 0 0 20px #51442744}
+.map-key{font:12px/1.7 Tahoma,sans-serif}
+#map-open{white-space:nowrap}
+@media(max-width:600px){
+ #world-map{padding:8px}.map-frame{width:100%;padding:12px;border-width:5px}.map-heading h2{font-size:22px}
+ .map-heading p,.map-frame>p{font-size:11px}
+ #village-map{max-height:61vh}#map-open{font-size:10px!important;padding:8px 6px!important}
+ #arrival-skip{bottom:3%;left:3%}
+}

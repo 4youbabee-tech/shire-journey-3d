@@ -1,3 +1,7 @@
+# Shire Journey 0.3.0 — Living Hobbiton
+
+Explore seventeen hillside homes along twelve pastoral road routes, a produce market, lanterns, wells, gardens and woodland. Press **M** / tap **الخريطة** to open an original in-game village map with roads, landmarks, friends, the player and active apple markers. Begin a new game with a skippable original 17-second Gandalf pony-cart / Frodo arrival vignette; replay from the journal. The quest, Arabic conversations, auto-save, collision and WebGL quality controls remain available. No external runtime art/music source or actor recording is imported.
+
 # 0.2.3 candidate — responsive rendering and living Shire gardens
 
 The quality button cycles auto / high / light; auto adjusts render resolution only after sustained FPS evidence and restores detail when possible. Gardeners now pause to tend crops without new geometry. The cart arrival cinematic and real-device 30 FPS remain unverified.
