@@ -44,3 +44,5 @@
 - LAYOUT: 17 procedurally modeled original Hobbit dwellings and 12 roads; market, lanterns, benches, two wells and shrubs are small-game design interpretation and do not assert film-canonicity.
 - STORY: original short arrival of a pony-cart with Gandalf and Frodo inspired by the source safe window, without copied screenplay dialogue or film audio. Explicit skip/replay; no canonical Ring action changed.
 - TECHNICAL: no texture network requests; retain merged static materials and low-triangle details, expanded village boundaries with save validation, test scene/character restoration and screen-rendered evidence. Performance on owner device remains a separate metric.
+
+- CINEMATIC VISUAL REVIEW: initial shot showed an unflattering cropped close-up of primitive cart and pony; reframe the original-game arrival as a medium/wide Shire road shot with scenery and Gandalf visible. Preserve skip and full automatic return; time is monotonic real elapsed instead of frame-rate-dependent simulation stepping.

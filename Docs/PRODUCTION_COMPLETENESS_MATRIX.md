@@ -1,3 +1,6 @@
+## 0.3.0 visual evidence before framing refinement
+Exact-head Chromium at `932f2a999aae75f0d108fe2d49c3bdb091c8d6f7`: PASS all browser/map/story tests and 17/17 Node tests; screenshots artifact 12853642534. Visual review found cinematic too close to pony; a wider camera and real-time timeline are corrective candidates requiring new screenshot QA. SwiftShader median desktop 2 FPS / mobile emulated 6 FPS is software-only and does not establish physical device performance.
+
 ## Browser 0.3.0 corrective regression
 First PR run 40773627395: FAIL 1/17 tests due to outdated test assumption of previous east boundary; 16 PASS, browser not run. Source candidate repairs test to assert collision at expanded boundary x=49 and extends tap movement bounds. Exact-head re-test required.
 

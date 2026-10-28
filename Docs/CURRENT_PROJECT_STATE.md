@@ -1,3 +1,6 @@
+## 0.3.0 cinematic visual review
+PR exact-head GitHub Chromium `40773771757` at `932f2a999aae75f0d108fe2d49c3bdb091c8d6f7`: source/node tests and real browser gameplay/dialogue/map/intro both desktop and touch PASS, artifact `12853642534`; screenshots visually inspected. Original intro camera was too close to the low-poly pony and cropped the cart. Camera has been reset to a deliberate medium/wide village side shot from the very first frame, pony head/ears toned down, and cinematic timeline tied to monotonic real elapsed time to avoid stretching at low render FPS. These refinements need fresh exact-HEAD screenshots, with physical Windows FPS still a separate measurement.
+
 ## Exact-head regression finding, root-cause correction
 - First PR CI attempt `40773627395` at `892dbf6aa981396bfe56afc86fc95fbef821532c`: 16 of 17 Node tests PASS; one boundary regression FAIL because its expected collision limit was hardcoded for the old x=33 village edge. Source boundaries were correctly expanded to x=49. Fixed test to derive limit from `MAP_BOUNDS` and test a collision approach at the new east edge. No test assertion was removed or bypassed.
 - Also extended tap-to-walk selection to the same map bounds so the new suburban roads can be reached through mobile pointer input. Corrective candidate requires exact-HEAD CI and visual screenshot recheck.

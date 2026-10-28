@@ -11,7 +11,7 @@ import {portraitSVG} from './portraits.mjs';
 import {SAVE_KEY,NPCS,APPLES,frameDelta,freshState,restoreState,objective,nearestInteractable,talk,act,collect,dialogue,LORE} from './simulation.mjs';
 const $=s=>document.querySelector(s),canvas=$('#game');
 const qaEnabled=new URLSearchParams(location.search).has('qa');
-let uiElapsed=0;const labelBindings=[];let qualityControl=null,arrival=null,cinematic=false,cinematicTime=0,mapOpen=false;
+let uiElapsed=0;const labelBindings=[];let qualityControl=null,arrival=null,cinematic=false,cinematicTime=0,cinematicStart=0,mapOpen=false;
 let engine,scene,world,state,started=false,activeNPC=null,journalOpen=false,yaw=0,pitch=.44,zoom=7.8,keys=new Set(),drag=null,joystick={x:0,y:0},toastTimer,saveTimer=0,time=0,soundEnabled=false,audio=null,audioTimer=null,destination=null,spokenText='';
 const errors=[],telemetry={frames:0,seconds:0,collisions:0,interactions:0,collects:0,saves:0};
 window.addEventListener('unhandledrejection',e=>fatal(e.reason?.message||String(e.reason)));
@@ -44,12 +44,12 @@ function setupInput(){
 }
 function showMap(){if(!started||cinematic||activeNPC||journalOpen)return;keys.clear();destination=null;mapOpen=true;$('#world-map').hidden=false;drawVillageMap($('#village-map'),world.body.position,state.stage,state.apples);$('#map-close').focus();}
 function closeMap(){mapOpen=false;$('#world-map').hidden=true;canvas.focus();}
-function beginOpening(){if(!arrival)return;cinematic=true;cinematicTime=0;destination=null;keys.clear();arrival.begin();$('#hud').hidden=true;$('#arrival-cinematic').hidden=false;$('#arrival-caption').textContent=arrivalBeat(0);}
+function beginOpening(){if(!arrival)return;cinematic=true;cinematicTime=0;cinematicStart=performance.now();destination=null;keys.clear();arrival.begin(scene.activeCamera);$('#hud').hidden=true;$('#arrival-cinematic').hidden=false;$('#arrival-caption').textContent=arrivalBeat(0);}
 function endOpening(){if(cinematic){arrival.end();cinematic=false;}$('#arrival-cinematic').hidden=true;$('#hud').hidden=false;canvas.focus();notify('أهلًا بك في الشاير · قابل بيلبو قرب الباب الأخضر');}
 function applyQuality(){if(!qualityControl)return;const {scale,shadows,mode}=qualityControl.snapshot();if(engine.getHardwareScalingLevel()!==scale)engine.setHardwareScalingLevel(scale);scene.shadowsEnabled=shadows;if(world.shadow)world.shadow.getShadowMap().refreshRate=shadows?1:0;$('#quality').textContent=mode==='auto'?'جودة تلقائية':mode==='quality'?'جودة عالية':'جودة خفيفة';engine.resize();}
 async function toggleSound(){soundEnabled=!soundEnabled;$('#sound').textContent=soundEnabled?'♫ الأجواء مفعّلة':'♫';$('#sound').setAttribute('aria-label',soundEnabled?'إيقاف أصوات الشاير':'تشغيل أصوات الشاير');if(!soundEnabled){await audio?.stop();return;}const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio){soundEnabled=false;notify('الصوت غير مدعوم بهذا المتصفّح');return;}try{if(!audio)audio=createShireAmbience(Audio);for(const channel of ['master','music','effects'])audio.setVolume(channel,Number($('#volume-'+channel).value));await audio.start();notify('أجواء الشاير: عصافير وألحان هادئة أصلية');}catch{soundEnabled=false;$('#sound').textContent='♫';notify('تعذّر تشغيل الصوت على هذا الجهاز');}}
 function animate(dt){time+=dt;const B=window.BABYLON,V=B.Vector3;
- if(cinematic){cinematicTime+=dt;arrival.update(cinematicTime,scene.activeCamera);$('#arrival-caption').textContent=arrivalBeat(cinematicTime);if(cinematicTime>=17)endOpening();return;}
+ if(cinematic){cinematicTime=Math.min(17,(performance.now()-cinematicStart)/1000);arrival.update(cinematicTime,scene.activeCamera);$('#arrival-caption').textContent=arrivalBeat(cinematicTime);if(cinematicTime>=17)endOpening();return;}
  const blocked=!started||!!activeNPC||journalOpen||mapOpen;let moving=false;
  if(!blocked){let forward=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0)+joystick.y;let strafe=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0)+joystick.x;let dx=Math.sin(yaw)*forward+Math.cos(yaw)*strafe,dz=Math.cos(yaw)*forward-Math.sin(yaw)*strafe;
  if(destination){dx=destination.x-world.body.position.x;dz=destination.z-world.body.position.z;if(Math.hypot(dx,dz)<.3){destination=null;dx=dz=0;}}

@@ -18,7 +18,7 @@ test('original pony cart arrival has timed visuals and restores state without co
  const world=createWorld(B,scene,{shadows:false}),colliders=world.colliders.length;
  const body=world.body.position.clone(),gandalf=world.characters.find(x=>x.id==='gandalf'),frodo=world.characters.find(x=>x.id==='frodo');
  const intro=createArrival(B,scene,world);
- intro.begin();assert.equal(gandalf.root.parent,intro.root);assert.equal(world.player.root.isEnabled(),false);
+ intro.begin(camera);assert.ok(camera.position.x>=8,'arrival begins with a wide village camera instead of a cropped horse close-up');assert.equal(gandalf.root.parent,intro.root);assert.equal(world.player.root.isEnabled(),false);
  for(const t of [0,2,7,12,17]){intro.update(t,camera);scene.render();}
  intro.end();assert.equal(intro.active,false);assert.equal(gandalf.root.parent,null);
  assert.equal(gandalf.root.position.z,17);assert.equal(frodo.root.position.z,-4);
