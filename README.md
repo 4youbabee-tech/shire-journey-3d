@@ -1,3 +1,13 @@
+# Shire Journey — active GitHub browser project
+
+Play: https://4youbabee-tech.github.io/shire-journey-3d/ (no ChatGPT account).
+
+Version 0.2.2 candidate: whole-head articulation, rigid character batching, corrected mobile render scale, lighter UI updates, original PCM wind and separate audio gains in the journal. This is batch 1A stabilization, **not** the requested cinematic/art completion. Babylon.js 9.32.1 is unchanged. `npm ci`, `npm run check`, `npm test`; browser QA records real Chromium WebGL screenshots/videos with explicit software-GPU limitations.
+
+GitHub is the sole active source and Pages the sole public deployment. Earlier Sites/UE4 text below is historical. Read the current sections in Docs before relying on old claims.
+
+## Historical project notes
+
 # Shire Journey — A Morning in the Shire
 
 A small, original, stylized 3D browser exploration game built with **Babylon.js 9.32.1**. This is a browser proof of concept authorized separately from the existing UE4 production project. It does not replace its canonical `develop`, open a PES session, or claim compliance with an unavailable ProjectGovernor.
@@ -77,3 +87,4 @@ The four SVG images have an independent source/integrity regression test. Browse
 
 ## Candidate: quiet living Shire ambience
 - Tap the ♫ button once to enable a lightweight, original synthesized bird/leaf/pastoral chime soundscape. The source intentionally contains no film soundtrack or voice recordings. Web Audio requires a user gesture and may be unavailable on some phones. NPCs subtly turn their heads and gesture while speaking; this is visual ambience, not full daily-routine AI. Check candidate's exact GitHub Actions run before announcing production readiness.
+

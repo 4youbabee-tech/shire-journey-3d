@@ -1,3 +1,25 @@
+# Current browser project state — 0.2.2 candidate
+
+## Active authority (2026-10-28)
+GitHub `4youbabee-tech/shire-journey-3d` is the sole active source. Public hosting is https://4youbabee-tech.github.io/shire-journey-3d/ . Babylon.js remains 9.32.1. Historical Sites and UE4 references below are archival and do not govern this browser project.
+
+## Production batch 1A: animation integrity, rendering cost, audio controls
+Base inspected through GitHub connector: `0a52cefd19f69e06e56704c0e9cdf9b2697e1f9f`; its Pages run `40752445899` succeeded.
+
+- Fixed disconnected facial motion: eyes, nose, ears, hair, beard and hat now follow a common neck pivot.
+- Batched rigid character geometry only within the same material and animated parent. 346 -> 200 scene meshes (-42.2%), identical 336,506 triangle count. This is a submission-cost reduction, not a measured 42% FPS gain or new production character art.
+- Disabled automatic pointer-move picking; NPC DOM labels update at 10Hz with cached bindings and one layout read; QA serialization is throttled. Removed persistent framebuffer preservation.
+- Corrected double DPR downscaling. Normal renders at CSS resolution; light at CSS / 1.5 with shadows disabled. Previously a DPR=3 phone rendered at CSS / 3. Explicit user quality control remains available.
+- Increased shadow normal/depth bias to address observed triangular self-shadow artifacts. Requires actual screenshot review before acceptance.
+- Added original generated PCM wind/leaf noise (no recordings), separate music/effects/master gain controls in journal, retained click-to-start sound. No listening-quality acceptance is claimed from automated tests.
+- Clear tap destination on tab visibility changes to prevent unexpected resumed walking.
+
+Validation before push: npm ci PASS; syntax PASS; 12 tests PASS including real NullEngine collision, joint parenting and moved eye vertices, and bounded audio volume. First local Chromium SwiftShader smoke passed desktop, mobile emulation, quest/save and Arabic chat before final audio/shadow changes; exact final candidate must pass again. Final local audio-control/desktop/mobile smoke PASS, no browser exceptions; sampled software medians 6 FPS desktop / 20 FPS touch emulation (not owner device, not a controlled speedup claim). Follow-up shadow-bias raster inspection reduced facade acne but residual roof/edge artifacts remain. Added generated build identity from actual CI checkout, visible in journal and snapshot; final exact-SHA CI remains pending. Cloud interactive browser reports WebGL not supported. Target PC and physical phone remain NOT RUN.
+
+**NOT COMPLETE:** Batch 1A is a stabilization subset of owner batch 1. Production GLB faces/clothing/rigs, original sampled musical score, cinematic pony/cart arrival, daily schedules, environment art overhaul, birthday chapter and 30 FPS device acceptance remain open. No new primitive characters or marketing images count as these deliverables.
+
+## Historical evidence (superseded where stated above)
+
 # Current browser prototype state
 
 Date: 2026-10-28 (Asia/Beirut).
@@ -82,3 +104,4 @@ Next acceptance step: the owner opens the deployed URL in a WebGL-capable browse
 - Static source candidate at authoring; new exact-SHA CI/browser acceptance NOT RUN yet. Actual phone audio, UX and target hardware FPS require device evidence. Old release 0.2.1 remains published until separately merged/deployed.
 
 - Living Shire candidate: 3 non-dialogue background farmers/gardeners now pace fixed safe plots, 11 small upper canopies sway in an original wind loop, no navmesh or quest impact. CI/head validation and on-device performance NOT RUN at authoring. Original five interactive characters unchanged.
+

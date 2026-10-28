@@ -28,3 +28,10 @@
 - Quiet Shire liveliness candidate: varied bird chirps, quiet original three-note pastoral synthetic motif and faint leaves; character head/arm idle gestures, no path-changing AI or new main plot. Chosen Web Audio oscillators to avoid asset downloads and preserve modest GPU load. Requires browser gesture to activate mobile sound.
 
 - Three small named background villagers added as ambient-only walkers in existing open garden plots; no story roles or new canon actions. Upper foliage includes small independent sway nodes without unmerging the static forest. Frame work is limited to 14 transformations; requires device FPS check.
+
+
+## 2026-10-28 batch 1A decisions
+- ORIGINAL-GAME engineering: preserve existing character silhouettes and triangle detail; merge only rigid pieces sharing material and joint. Never merge across limb/head pivots. No GLB/skin/production facial-art acceptance claimed.
+- ORIGINAL-GAME sound: generate a PCM noise bed locally; separate master/music/effects. No film audio, tune or actor imitation imported.
+- SCRIPT-VERIFIED reference inspection: supplied Fellowship screenplay, printed pp. 10–12 (PDF pp. 11–13), `EXT. HOBBITON WOODS` to `EXT. HOBBITON FIELDS`: Frodo reads beneath an old tree; approaching pony/cart and voice draw his attention; he rises and runs; cart travel intercuts with his run; he appears on the bank above the cart; the pair exchange greetings, laugh, and Frodo joins the front seat; then they pass cultivated fields. No screenplay dialogue is copied into game. Source describes end of summer/day; gentle morning is an owner-directed VISUAL-ONLY interpretation, not a script-verified time of day. The screenplay specifies a pony, not a full-size warhorse. Shot implementation is NOT IMPLEMENTED in batch 1A.
+- Public GitHub Pages is the sole active browser deployment. Historical private Sites references are obsolete and must not be redeployed.

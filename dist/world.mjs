@@ -5,8 +5,8 @@ export function createWorld(B,scene,{shadows=true}={}){
  function mat(name,hex,emission=0){const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(hex);m.specularColor=new B.Color3(.03,.03,.03);if(emission)m.emissiveColor=m.diffuseColor.scale(emission);mats[name]=m;return m;}
  const grass=mat('meadow','#7f9f5c'),hill=mat('hill','#6d914d'),hill2=mat('distant hills','#709b70'),cream=mat('lime plaster','#e8d3a0'),wood=mat('oak timber','#715034'),dark=mat('dark timber','#493d2c'),pathmat=mat('warm gravel','#c5ac7a'),bark=mat('bark','#6d5338'),leaf=mat('summer leaves','#729c47'),leaf2=mat('sunlit leaves','#a0b95b'),leaf3=mat('deep leaves','#4d7b40'),door=mat('bag end green','#355f47'),brass=mat('warm brass','#dcac4e'),glass=mat('warm windows','#f4ca75',.3),stone=mat('path stone','#9d9a7b'),white=mat('cream cloth','#eee3c0'),red=mat('rust bunting','#b97151'),blue=mat('sky bunting','#7a9a9b'),yellow=mat('wildflower gold','#e8bc53'),pink=mat('wildflower pink','#d48c8f'),skin=mat('hobbit skin','#e5b18a'),hair=mat('brown curls','#65412b'),bilboHair=mat('Bilbo silver-brown hair','#76634d'),samHair=mat('Sam sandy curls','#8b693e'),frodoHair=mat('Frodo dark curls','#47372c'),bookLeather=mat('Bilbo book leather','#54382d'),trousers=mat('trousers','#685a3b'),feetmat=mat('bare feet','#dca77c'),eye=mat('eyes','#27372b'),shirt=mat('cream shirt','#f5e6bc'),vest=mat('player vest','#99704a'),cloak=mat('green cloak','#506950'),samvest=mat('sam waistcoat','#a78e56'),bilbovest=mat('bilbo waistcoat','#a9664b'),bilboCoat=mat('Bilbo burgundy coat','#663c4e'),frodoVest=mat('Frodo blue waistcoat','#426b70'),grey=mat('grey robes','#969e9a'),hatmat=mat('blue grey hat','#7c8f94'),beard=mat('grey beard','#d8d9cb'),applemat=mat('red apples','#ce6941');
  const sun=new B.DirectionalLight('warm morning sunlight',new V(-.8,-1.6,.65),scene);sun.position=new V(35,55,-30);sun.intensity=1.05;sun.diffuse=new B.Color3(1,.91,.73);const hemi=new B.HemisphericLight('sky fill',new V(0,1,0),scene);hemi.intensity=.6;hemi.groundColor=B.Color3.FromHexString('#66794c');
- scene.clearColor=B.Color4.FromHexString('#bcd9dfff');scene.fogMode=B.Scene.FOGMODE_LINEAR;scene.fogStart=50;scene.fogEnd=150;scene.fogColor=B.Color3.FromHexString('#bcd9df');scene.ambientColor=new B.Color3(.09,.09,.07);scene.collisionsEnabled=true;
- const shadow=shadows?new B.ShadowGenerator(1024,sun):null;if(shadow){shadow.usePercentageCloserFiltering=true;shadow.filteringQuality=B.ShadowGenerator.QUALITY_LOW;shadow.bias=.0015;shadow.normalBias=.035;shadow.darkness=.22;}
+ scene.clearColor=B.Color4.FromHexString('#bcd9dfff');scene.fogMode=B.Scene.FOGMODE_LINEAR;scene.fogStart=50;scene.fogEnd=150;scene.fogColor=B.Color3.FromHexString('#bcd9df');scene.ambientColor=new B.Color3(.09,.09,.07);scene.collisionsEnabled=true;scene.skipPointerMovePicking=true;
+ const shadow=shadows?new B.ShadowGenerator(1024,sun):null;if(shadow){shadow.usePercentageCloserFiltering=true;shadow.filteringQuality=B.ShadowGenerator.QUALITY_LOW;shadow.bias=.005;shadow.normalBias=.3;shadow.darkness=.22;}
  function finish(mesh,material,x,y,z,staticMesh=true,parent=null){mesh.material=material;mesh.position.set(x,y,z);mesh.isPickable=false;if(parent)mesh.parent=parent;else if(staticMesh)statics.push(mesh);mesh.receiveShadows=true;return mesh;}
  function sphere(name,x,y,z,sx,sy,sz,material,staticMesh=true,parent=null,segments=10){const m=M.CreateSphere(name,{diameter:1,segments},scene);m.scaling.set(sx,sy,sz);return finish(m,material,x,y,z,staticMesh,parent);}
  function cyl(name,x,y,z,diameter,height,material,staticMesh=true,parent=null,top=null,tessellation=12){const m=M.CreateCylinder(name,{diameter,height,diameterTop:top??diameter,tessellation},scene);return finish(m,material,x,y,z,staticMesh,parent);}
@@ -63,7 +63,7 @@ export function createWorld(B,scene,{shadows=true}={}){
  function character(id,x,z,{wizard=false,waistcoat=vest,player=false}={}){
   const root=new B.TransformNode(id,scene);root.position.set(x,0,z);const parts=[];const S=(name,px,py,pz,sx,sy,sz,mt,segments=10)=>{const m=sphere(name,px,py,pz,sx,sy,sz,mt,false,root,segments);parts.push(m);return m;};const C=(name,px,py,pz,d,h,mt,top=null)=>{const m=cyl(name,px,py,pz,d,h,mt,false,root,top);parts.push(m);return m;};
   const height=wizard?1.45:1;const torso=S('waistcoat',0,.87*height,0,.68, .8*height,.42,wizard?grey:waistcoat);S('shirt collar',0,1.18*height,-.02,.47,.18,.4,shirt);
-  const head=S('face',0,1.46*height,0,.57,.62,.52,skin,14);S('nose',0,1.43*height,-.28,.13,.16,.16,skin);for(const side of [-1,1]){S('ear',side*.29,1.47*height,0,.15,.23,.15,skin);S('eye',side*.11,1.51*height,-.245,.055,.065,.035,eye,8);}
+  const face=S('face',0,1.46*height,0,.57,.62,.52,skin,14);S('nose',0,1.43*height,-.28,.13,.16,.16,skin);for(const side of [-1,1]){S('ear',side*.29,1.47*height,0,.15,.23,.15,skin);S('eye',side*.11,1.51*height,-.245,.055,.065,.035,eye,8);}
   if(wizard){C('robe skirt',0,.5,0,.92,1,grey,.6);for(let i=0;i<7;i++){const a=i/7*Math.PI*2;S('grey hair',Math.cos(a)*.27,2.05,Math.sin(a)*.2,.23,.48,.19,beard);}S('long beard',0,1.7,-.27,.44,.7,.24,beard);C('hat brim',0,2.46,0,1.15,.065,hatmat);const cap=C('pointed hat',-.06,2.85,0,.75,.82,hatmat,0);cap.rotation.z=.12;C('wizard staff',.64,1.15,-.06,.075,2.3,bark);S('staff top',.64,2.28,-.06,.13,.25,.15,wood);}
   else {for(let i=0;i<12;i++){const a=i/12*Math.PI*2;S('individual hobbit curls',Math.cos(a)*.23,1.66+Math.sin(a)*.08,Math.sin(a)*.19,.24,.23,.23,id==='bilbo'?bilboHair:id==='sam'?samHair:id==='frodo'?frodoHair:hair,8);}S('curly hair crown',0,1.76,.03,.5,.2,.43,id==='bilbo'?bilboHair:id==='sam'?samHair:id==='frodo'?frodoHair:hair);for(let i=0;i<3;i++)S('waistcoat button',0,.75+i*.14,-.22,.045,.045,.035,brass,6);}
   let leftLeg=null,rightLeg=null;
@@ -74,7 +74,24 @@ export function createWorld(B,scene,{shadows=true}={}){
   if(id==='sam'){const handle=cyl('Sam garden trowel handle',0,-.63,-.08,.045,.4,wood,false,right),blade=sphere('Sam garden trowel blade',0,-.89,-.08,.19,.3,.07,stone,false,right);parts.push(handle,blade);}
   if(id==='frodo'){S('Frodo shoulder satchel',.29,.78,.21,.26,.35,.2,bookLeather);}
   if(player){const cape=S('travelling cloak',0,.92,.19,.74,.78,.22,cloak);cape.rotation.x=-.13;S('small pack',0,.9,.34,.38,.45,.2,wood);}
-  root.rotation.y=Math.PI;if(id==='bilbo')root.scaling.setAll(1.04);if(id==='sam')root.scaling.setAll(.98);if(id==='frodo')root.scaling.setAll(.95);if(shadow)for(const part of parts)shadow.addShadowCaster(part);const obj={id,root,left,right,leftLeg,rightLeg,head,parts,wizard};characters.push(obj);return obj;
+  // Facial features and hair must follow the same neck pivot, never the skull alone.
+  const head=new B.TransformNode(id+' neck pivot',scene);head.parent=root;head.position.set(0,1.46*height,0);
+  const headNames=new Set(['face','nose','ear','eye','grey hair','long beard','hat brim','pointed hat','individual hobbit curls','curly hair crown','Bilbo silver side curls']);
+  const headParts=parts.filter(p=>headNames.has(p.name));
+  for(const part of headParts){part.parent=head;part.position.subtractInPlace(head.position);}
+  // Batch rigid pieces only within their existing material AND animated parent.
+  // Merge in parent-local coordinates so joints keep their original pivots.
+  const buckets=new Map();
+  for(const part of parts){const key=part.parent.uniqueId+':'+part.material.uniqueId;if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(part);}
+  const renderParts=[];
+  for(const group of buckets.values()){
+   if(group.length===1){renderParts.push(group[0]);continue;}
+   const parent=group[0].parent,sourceNames=group.map(p=>p.name);
+   for(const part of group){part.parent=null;part.computeWorldMatrix(true);}
+   const merged=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);
+   merged.parent=parent;merged.name=id+' '+merged.material.name;merged.metadata={sourceNames};merged.isPickable=false;merged.receiveShadows=true;renderParts.push(merged);
+  }
+  root.rotation.y=Math.PI;if(id==='bilbo')root.scaling.setAll(1.04);if(id==='sam')root.scaling.setAll(.98);if(id==='frodo')root.scaling.setAll(.95);if(shadow)for(const part of renderParts)shadow.addShadowCaster(part);const obj={id,root,left,right,leftLeg,rightLeg,head,parts:renderParts,wizard};characters.push(obj);return obj;
  }
  const player=character('player',0,-15,{player:true});character('bilbo',8,7,{waistcoat:bilbovest});character('sam',-6,1,{waistcoat:samvest});character('gandalf',-2,17,{wizard:true});character('frodo',3,-4,{waistcoat:frodoVest});
   // Background-only original villagers; they do not alter quests or NPC dialogue owners.
@@ -85,3 +102,4 @@ export function createWorld(B,scene,{shadows=true}={}){
  const body=M.CreateSphere('player collision ellipsoid',{diameter:1,segments:6},scene);body.position.set(0,.72,-15);body.isVisible=false;body.isPickable=false;body.ellipsoid=new V(.32,.7,.32);body.checkCollisions=true;
  return {player,body,characters,workers,leaves,apples,birds,sun,hemi,shadow,colliders,ground,water,stats:{staticBatches:mergedCount,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,animatedCanopies:leaves.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
 }
+
