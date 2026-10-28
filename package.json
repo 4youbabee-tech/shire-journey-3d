@@ -1,11 +1,11 @@
 {
   "name": "shire-journey-browser",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check dist/game.mjs && node --check dist/world.mjs && node --check dist/simulation.mjs && node --check dist/conversation.mjs && node --check dist/portraits.mjs && node --check dist/ambience.mjs && node --check dist/adaptive-quality.mjs && node --check dist/life.mjs",
+    "check": "node --check dist/game.mjs && node --check dist/world.mjs && node --check dist/simulation.mjs && node --check dist/conversation.mjs && node --check dist/portraits.mjs && node --check dist/ambience.mjs && node --check dist/adaptive-quality.mjs && node --check dist/life.mjs && node --check dist/village-layout.mjs && node --check dist/map.mjs && node --check dist/arrival.mjs",
     "postinstall": "node scripts/prepare-engine.mjs && node scripts/stamp-build.mjs",
     "prepare-engine": "node scripts/prepare-engine.mjs"
   },
