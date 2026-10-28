@@ -1,3 +1,6 @@
+## Browser 0.3.0 corrective regression
+First PR run 40773627395: FAIL 1/17 tests due to outdated test assumption of previous east boundary; 16 PASS, browser not run. Source candidate repairs test to assert collision at expanded boundary x=49 and extends tap movement bounds. Exact-head re-test required.
+
 # Browser 0.3.0 production acceptance (candidate before CI)
 
 | Feature | Acceptance gate |

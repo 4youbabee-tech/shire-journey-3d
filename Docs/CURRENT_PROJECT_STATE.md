@@ -1,3 +1,7 @@
+## Exact-head regression finding, root-cause correction
+- First PR CI attempt `40773627395` at `892dbf6aa981396bfe56afc86fc95fbef821532c`: 16 of 17 Node tests PASS; one boundary regression FAIL because its expected collision limit was hardcoded for the old x=33 village edge. Source boundaries were correctly expanded to x=49. Fixed test to derive limit from `MAP_BOUNDS` and test a collision approach at the new east edge. No test assertion was removed or bypassed.
+- Also extended tap-to-walk selection to the same map bounds so the new suburban roads can be reached through mobile pointer input. Corrective candidate requires exact-HEAD CI and visual screenshot recheck.
+
 # Browser release 0.3.0 — Living Hobbiton (2026-10-28)
 
 Preproduction: inspected `03_WORLD_LOCATIONS_AND_MAP_BIBLE` (The Shire / Hobbiton: warm domestic circular-door hill homes, gardens, primary routes, recognizable vistas; on-foot navigation), `06_GAMEPLAY_AND_SIDE_ACTIVITIES_BIBLE` (onboarding, low-threat conversations, safe save transitions), and `10_3D_VISUAL_ASSET_ATLAS_PRODUCTION` (location silhouettes, coherent source-led modeling). All new market and secondary neighborhood pieces are original game detail, not asserted film-specific events.
