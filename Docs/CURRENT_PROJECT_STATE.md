@@ -1,3 +1,11 @@
+# Batch 1B 0.2.3 — proposed candidate (2026-10-28)
+
+Based on inspected main a56d91cbbd9f4b3f41a7c9b30d273ee23af7a509. Browser 0.2.2 had exact-HEAD QA PASS 40768052892 and Pages PASS 40768052890.
+
+This cohort introduces sustained device-measured FPS automatic scaling after 8 s warmup / 6 s sampling. Scaling steps are .25 with 12 s cooldown, capped at 2.25; sustained high FPS restores detail. User can select auto/high/light; 30 FPS target is NOT guaranteed. Existing three gardeners gain original pause-and-tend motions with existing rigs and plot bounds; no extra meshes, NPC authorities, collisions, story or save changes.
+
+New unit tests and browser QA capture are SOURCE CANDIDATE pending exact-HEAD validation. SwiftShader results never establish target Windows/device FPS. Rollback is to revert this one commit; Unreal Governor/PES remains untouched.
+
 # Current browser project state — 0.2.2 candidate
 
 ## Active authority (2026-10-28)

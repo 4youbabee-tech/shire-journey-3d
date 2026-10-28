@@ -1,3 +1,13 @@
+# Batch 1B 0.2.3 — pre-CI acceptance
+
+| Gate | Evidence |
+|---|---|
+| Auto FPS scale, hysteresis, manual override | Source candidate; regression tests PENDING |
+| Garden tending routines and bounds | Source candidate; runtime/QA PENDING |
+| Browser WebGL desktop/mobile, save and chat | Exact-HEAD QA PENDING |
+| GitHub Pages publication | PENDING |
+| Target 30 FPS on physical devices, new rigged characters, cinematic pony/cart | NOT RUN / NOT IMPLEMENTED |
+
 # Current acceptance — 0.2.2 candidate
 
 | Gate | Status | Evidence / limitation |

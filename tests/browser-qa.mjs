@@ -63,7 +63,7 @@ try{
  browser=await chromium.launch({headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
  const desktop=await browser.newContext({viewport:{width:1280,height:720},recordVideo:{dir:out,size:{width:1280,height:720}}});
  const page=await desktop.newPage();page.on('pageerror',e=>report.errors.push('desktop: '+e.message));
- await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();
+ await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();assert.equal((await snap(page)).quality.mode,'auto');
  await page.locator('#sound').click();
  assert.match(await page.locator('#sound').innerText(),/مفعّلة/);
  await page.locator('#journal-open').click();
@@ -87,7 +87,7 @@ try{
  assert.equal((await snap(page)).state.stage,4,'Apple return completes');
  await qaReposition(page,8,1);await qaReposition(page,8,7);await talk(page);await chooseFirst(page);
  assert.equal((await snap(page)).state.stage,5,'Quest completed in actual browser interactions');
- await still(page,'desktop-completed.png');
+ await still(page,'desktop-completed.png');await qaReposition(page,-12,-5);await still(page,'desktop-garden-life.png');
  report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
  await desktop.close();
  const mobile=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,recordVideo:{dir:out,size:{width:390,height:844}}});
@@ -95,7 +95,7 @@ try{
  await ready(touch);await touch.locator('#start').tap();
  const joy=await touch.locator('#joystick').boundingBox();assert.ok(joy,'Touch joystick must be visible');
  const cdp=await mobile.newCDPSession(touch),cx=joy.x+joy.width/2,cy=joy.y+joy.height/2;
- const before=await snap(touch);assert.equal(before.renderSize.scale,1.5);assert.equal(before.renderSize.shadows,false);await mobileHold(cdp,cx,cy,0,-32,2400);const moved=await snap(touch);
+ const before=await snap(touch);assert.equal(before.renderSize.scale,1.5);assert.equal(before.renderSize.shadows,false);assert.equal(before.quality.mode,'auto');await mobileHold(cdp,cx,cy,0,-32,2400);const moved=await snap(touch);
  assert.ok(moved.position.z-before.position.z>.1,'Touch joystick must move character forward');
  await still(touch,'mobile-joystick.png');
  // QA-only move after the independently verified real touch walking smoke.

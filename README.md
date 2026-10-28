@@ -1,3 +1,7 @@
+# 0.2.3 candidate — responsive rendering and living Shire gardens
+
+The quality button cycles auto / high / light; auto adjusts render resolution only after sustained FPS evidence and restores detail when possible. Gardeners now pause to tend crops without new geometry. The cart arrival cinematic and real-device 30 FPS remain unverified.
+
 # Shire Journey — active GitHub browser project
 
 Play: https://4youbabee-tech.github.io/shire-journey-3d/ (no ChatGPT account).
