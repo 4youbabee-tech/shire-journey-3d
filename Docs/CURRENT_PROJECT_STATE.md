@@ -1,3 +1,6 @@
+# 0.6.0 P04 hero-art candidate
+Based on source main dd4eb5bcb5013621e1a9ad1c5c518801af7b6fd5; latest published 0.5.0 WebGL/Pages PASSED. This cohesive candidate adds original Babylon hero facial/costume mesh details via the existing rig hierarchy, slimmer simplified faces and hair, eye irises, brow/lip expression, vest panels, Gandalf beard and subtle scene exposure. It retains rigid batching and quest/collisions/saves. Test exact-head unit and desktop/mobile Chromium visual evidence before acceptance. Full licensed/imported skinned glTF rig with deforming animations is distinct further work and is NOT ACCEPTED by this pass.
+
 ## Exact-SHA visual diagnosis and one cohesive correction
 PR9 source test c35303064004057fd6dd6ea39951b46aadc360c0, Actions 40878519654: all Node + real desktop/touch Chromium PASS; render screenshot desktop-birthday-party.png showed a large green foreground roof mound occluding the celebrations and too few active participants in the shot. Root cause: camera placed at x11,z12 within the Bag End hillside volume. Updated initial party camera to x4,z34 looking toward tree and seven existing NPCs, no additional drawn character geometry, plus screenshot/participant assertion. New candidate requires exact SHA WebGL before merge. Do not confuse QA SwiftShader median 2 FPS with physical phone capability.
 
