@@ -103,6 +103,7 @@ try{
  assert.equal((await snap(page)).party.active,true,'Birthday party and original fireworks begin at the party tree');
  assert.ok((await snap(page)).party.participants>=7,'Seven existing villagers gather to celebrate without adding heavy meshes');
  await still(page,'desktop-birthday-party.png');
+ await page.waitForFunction(()=>window.BABYLON.Engine.LastCreatedScene.animationGroups.filter(g=>g.name.endsWith('Cheer')&&g.isPlaying).length>=7,null,{timeout:10000});
  await page.locator('#party-skip').click();
  assert.equal((await snap(page)).state.partyCompleted,true,'Party skip preserves canonical outcome');
  assert.equal((await snap(page)).state.ringPassed,true,'Bilbo leaves the Ring to Frodo');
@@ -116,7 +117,9 @@ try{
   const skin=s.meshes.filter(m=>m.skeleton&&m.getTotalVertices()>0);
   if(skin.length<8||!s.getMeshByName('gandalf Gandalf tapered silver beard'))throw Error('Missing imported skin or attached Gandalf beard');
   s.getEngine().stopRenderLoop();
-  s.activeCamera.position.set(-2,2.7,11.5);s.activeCamera.setTarget(new B.Vector3(-2,1.7,17));s.render();
+  const actor=s.getTransformNodeByName('gandalf'),head=s.getTransformNodeByName('gandalf head');
+  const facing=B.Vector3.TransformNormal(new B.Vector3(0,0,1),head.getWorldMatrix());facing.y=0;facing.normalize();
+  s.activeCamera.position.copyFrom(actor.position.add(facing.scale(5.5)).add(new B.Vector3(0,2.7,0)));s.activeCamera.setTarget(actor.position.add(new B.Vector3(0,1.7,0)));s.render();
   return {skinnedMeshes:skin.length,skeletons:s.skeletons.length,animationGroups:s.animationGroups.length,inspectionCameraOnly:true};
  });
  await still(page,'desktop-gandalf-character-detail.png');

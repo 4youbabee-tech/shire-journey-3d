@@ -143,6 +143,10 @@ An engine construction or CI pass does not establish browser playability, visual
 
 
 
+# 0.8.0 final review correction
+
+Cinematic/party early-return branches now update imported clip selection. Birthday WebGL QA must observe >=7 playing Cheer groups. Gandalf inspection camera uses current facing direction without moving any world anchor. Exact final SHA validation still required; Bree F1-02/F1-03/F1-04 sequence confirmed from supplied Story Bible, runtime chapters NOT IMPLEMENTED.
+
 # 0.8.0 asset recovery — 2026-10-30
 
 | Deliverable | Evidence / state |

@@ -104,11 +104,12 @@ function finishParty(){
 function applyQuality(){if(!qualityControl)return;const {scale,shadows,mode}=qualityControl.snapshot();if(engine.getHardwareScalingLevel()!==scale)engine.setHardwareScalingLevel(scale);scene.shadowsEnabled=shadows;if(world.shadow)world.shadow.getShadowMap().refreshRate=shadows?1:0;$('#quality').textContent=mode==='auto'?'جودة عالية تلقائيًا':mode==='quality'?'جودة عالية':'جودة خفيفة';engine.resize();}
 async function toggleSound(){soundEnabled=!soundEnabled;$('#sound').textContent=soundEnabled?'♫ الأجواء مفعّلة':'♫';$('#sound').setAttribute('aria-label',soundEnabled?'إيقاف أصوات الشاير':'تشغيل أصوات الشاير');if(!soundEnabled){await audio?.stop();return;}const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio){soundEnabled=false;notify('الصوت غير مدعوم بهذا المتصفّح');return;}try{if(!audio)audio=createShireAmbience(Audio);for(const channel of ['master','music','effects'])audio.setVolume(channel,Number($('#volume-'+channel).value));await audio.start();notify('أجواء الشاير: عصافير وألحان هادئة أصلية');}catch{soundEnabled=false;$('#sound').textContent='♫';notify('تعذّر تشغيل الصوت على هذا الجهاز');}}
 function animate(dt){time+=dt;const B=window.BABYLON,V=B.Vector3;
- if(cinematic){cinematicTime=Math.min(17,(performance.now()-cinematicStart)/1000);arrival.update(cinematicTime,scene.activeCamera);$('#arrival-caption').textContent=arrivalBeat(cinematicTime);if(cinematicTime>=17)endOpening();return;}
+ if(cinematic){cinematicTime=Math.min(17,(performance.now()-cinematicStart)/1000);arrival.update(cinematicTime,scene.activeCamera);importedActors?.update(dt,null,false);$('#arrival-caption').textContent=arrivalBeat(cinematicTime);if(cinematicTime>=17)endOpening();return;}
  if(partyActive){
   const elapsed=Math.max(0,(performance.now()-partyStart)/1000);partyFx.frame(performance.now());
   $('#party-caption').textContent=birthdayBeat(elapsed);
   for(const c of world.characters){if(!partyOriginal.has(c.id))continue;c.left.rotation.x=Math.sin(elapsed*2.5+c.root.uniqueId)*.28;c.right.rotation.x=-c.left.rotation.x;c.head.rotation.y=Math.sin(elapsed*.8+c.root.uniqueId)*.15;}
+  importedActors?.update(dt,null,true);
   if(elapsed>=PARTY_SECONDS)finishParty();
   return;
  }
@@ -147,5 +148,6 @@ async function boot(){try{const B=window.BABYLON;if(!B)throw Error('تعذّر �
  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();notify('توقّف عرض الرسومات مؤقتًا. نحاول استعادته…');});canvas.addEventListener('webglcontextrestored',()=>notify('عاد عرض الرسومات'));engine.runRenderLoop(()=>{if(document.hidden)return;const dt=frameDelta(engine.getDeltaTime());animate(dt);scene.render();if(qualityControl?.sample(engine.getFps(),engine.getDeltaTime()/1000,started&&!document.hidden))applyQuality();});window.__SHIRE__=Object.freeze((new URLSearchParams(location.search).has('qa')&&['localhost','127.0.0.1'].includes(location.hostname))?{snapshot,qaReposition:(x,z)=>{if(!started||![x,z].every(Number.isFinite)||x<MAP_BOUNDS.minX+2||x>MAP_BOUNDS.maxX-2||z<MAP_BOUNDS.minZ+2||z>MAP_BOUNDS.maxZ-2)throw Error('Invalid QA location');world.body.position.set(x,.72,z);destination=null;save();return snapshot();}}:{snapshot});
 }catch(e){fatal(e.message||String(e));}}
 boot();
+
 
 

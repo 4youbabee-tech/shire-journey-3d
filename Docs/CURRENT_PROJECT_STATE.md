@@ -1,3 +1,7 @@
+# 0.8.0 final animation review — 2026-10-30
+
+Review of the first recovery candidate found early returns for cinematic/party state skipped the imported actor state selector. Existing idle animations continued rendering, but Frodo did not select walk and party participants did not select Cheer. Corrected both branches without adding another character/world authority. Added real browser assertion for at least seven playing Cheer groups during birthday. Inspection camera now derives Gandalf's actual head facing direction and leaves actor/story positions untouched. Revalidate this final source cohort before merge; prior 1e546218 evidence does not cover these corrections. Roadmap requirement reconfirmed from supplied Story Bible: F1-02 Shadow of the Past precedes F1-03 Black Riders/Bucklebury, then F1-04 Bree/Weathertop. No Bree runtime delivered in 0.8.0.
+
 # 0.8.0 recovery candidate — 2026-10-30
 
 Canonical main inspected: 35a2780dbe09e9e0e1a215209d6206c9d60e89a1 (0.7.0); Pages 40946139312 and browser 40946139327 PASS. Resume the existing PR #12, not a new project. PR head 38d8172b28ca22c619d4f6539b08c092f07b6630 failed browser run 40960752539 with Invalid typed array length while importing traveller.glb. Both committed GLBs were only 786444 bytes, inconsistent with their declared >2MB lengths. Prior prose claiming local success does not establish remote asset integrity.
