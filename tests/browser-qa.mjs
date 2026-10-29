@@ -70,7 +70,7 @@ try{
  await page.locator('#volume-music').fill('0');await page.locator('#volume-effects').fill('0.5');
  await still(page,'desktop-audio-settings.png');await page.locator('#journal-close').click();
  const walkEvidence=await realWalk(page);await still(page,'desktop-moving.png');await qaReposition(page,-2,17);await talk(page);assert.ok(await page.locator('#choices button').first().isVisible());await chooseFirst(page);assert.equal((await snap(page)).state.gandalfMet,true,'Gandalf greeting unlocks Bilbo');await qaReposition(page,8,7);
- await still(page,'desktop-arrived.png');
+ await still(page,'desktop-arrived.png');await still(page,'desktop-enhanced-hero-0.6.png');
  // Enter the real Babylon room using the gameplay key, inspect the 3D interior and exit.
  await qaReposition(page,11,8.2);
  await page.locator('#interaction:not([hidden])').waitFor({timeout:20000});

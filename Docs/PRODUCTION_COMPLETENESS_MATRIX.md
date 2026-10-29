@@ -1,3 +1,10 @@
+P04 first run 40925340163: FAIL scene mesh budget threshold (21/22 pass). Renderer was not run; no visual acceptance. New source reduces rich geometry to principal four and shares eye/skin materials while retaining named source-level hero detail regression and the same mesh-budget gate. Await exact-head retest.
+
+# 0.6.0 P04 visual candidate
+- SOURCE_AVAILABLE: original hero face eyes, eyebrows, lip shapes, tailoring and wizard silver strands.
+- STATIC + UNIT / CHROMIUM / VISUAL: pending exact-head proof.
+- Full skinning/artist-grade deformation and real-device GPU FPS: not asserted.
+
 ## P03 first visual test findings
 Commit c35303064004057fd6dd6ea39951b46aadc360c0: source/node + Chromium PASS, artifact 12899098251. Birthday camera composition FAIL visual review due large mound blocking characters; corrective camera/crowd source created and needs new exact-head screenshot. Preserve accepted mission/save outcomes and no new runtime meshes.
 

@@ -1,3 +1,7 @@
+# Shire Journey 0.6.0 candidate — storybook hero-art pass
+
+The hero characters now have proportional faces, more discreet layered hair, irises, subtle eyebrows and lip shapes, extra tailoring, and silver wizard details. All art uses original procedural Babylon geometry grouped into the existing animated pivots and material batches. Bilbo's party, Bag End and all prior story/save functionality are preserved. Accept only after exact-head unit/WebGL QA and screenshots; this is not a claim of professional skinned character imports.
+
 # Shire Journey 0.5.0 candidate — Gandalf-first Shire and Bilbo's birthday
 
 On a new playthrough greet Gandalf after the original arrival, then help Bilbo and Sam, collect the optional apples, and gather under the party tree for an original lightweight birthday/firework vignette. The sequence ends with Bilbo departing and the Ring passing to Frodo, in the correct causal order. Story state and parties are saved and replay-safe. Dialogue and sound are original; no film dialogue or music replicated. See Docs/MOBILE_PRODUCTION_ROADMAP.md for the next chapter and character-art work.

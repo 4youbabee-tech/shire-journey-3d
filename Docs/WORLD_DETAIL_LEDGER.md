@@ -57,3 +57,8 @@ The timeline Bible fixes F1-01: Gandalf arrives, Bilbo prepares birthday festivi
 
 ## P03 birthday shot QA
 Rendered screenshot exposed a green foreground hillside occlusion at first party camera coordinate (11,7,12). Avoid camera-only edits that alter story positions or collision. New camera is outside the mound to the north, looks south toward seven existing villagers temporarily assembled under the tree. This reuses accepted meshes and restores all individuals at end/skip, keeping draw cost bounded.
+
+## P04 hero-art pass
+Refine initial toy-like character proportions with narrower faces and hair silhouettes, pupils, eyebrows and modest lip/shading details; differentiate clothing and wizard beard. Keep no copyrighted film actor scan, preserve original NPC identities and current plot; keep material batching and existing neck/arm/leg pivots.
+
+P04 corrective art decision: retain high-resolution facial sculpting only on the four story heroes, not background laborers. Use the existing skin/eye material batches instead of distinct blush/lip materials, avoiding extra grouped draw calls. Preserve strict mesh count regression, original costume silhouette and narrative IDs.

@@ -13,7 +13,7 @@ Authoritative references: supplied 00 Project Rules, 01 Story & Timeline, 02 Cha
 | P01 | Phone UI fits 360–390 px, dialogue fully readable, original music starts on Start tap, high-first adaptive quality | PASS on 0.4.0 main a09e42e; Chromium 40874619398 / 40875240699; 360px layout regression added to next exact-head QA |
 | P02 | Walk through Bag End green door; furnished 3D interior with books, chairs, fireplace, room interactions and safe exit/save | FUNCTIONAL PASS on 0.4.0; cozy art / phone interior screenshot under visual QA this PR |
 | P03 | Film-causal Shire: greet Gandalf, Bilbo and Sam preparation, Birthday party with original fireworks and family reactions | 0.5.0 SOURCE CANDIDATE; exact-head Chromium and screenshots pending |
-| P04 | Art upgrade of Bilbo/Frodo/Sam/Gandalf, full skinning and expressive original rigs, clothing and body/face animations | AFTER P03 |
+| P04 | Art upgrade of Bilbo/Frodo/Sam/Gandalf, full skinning and expressive original rigs, clothing and body/face animations | 0.6.0 original first-art pass CANDIDATE; skinning/import remains later |
 | P05 | Lively villages: Merry, Pippin, Rosie, original villagers, gardening, carts, food, animation scheduling, interior/exterior life | AFTER P04 |
 | P06 | F1-02 Shadow of the Past: Bag End ring story, packing with Sam, Frodo departs; authored cinema and checkpoint | AFTER P05 |
 | P07 | F1-03 Shire road: friends join, Black Riders, forest hiding and ferry escape stealth | AFTER P06 |
