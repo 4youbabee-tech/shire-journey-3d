@@ -100,6 +100,7 @@ try{
  assert.equal((await snap(page)).state.stage,5,'Preparation completed before birthday celebration');
  await qaReposition(page,-2,21);await page.keyboard.press('e');
  assert.equal((await snap(page)).party.active,true,'Birthday party and original fireworks begin at the party tree');
+ assert.ok((await snap(page)).party.participants>=7,'Seven existing villagers gather to celebrate without adding heavy meshes');
  await still(page,'desktop-birthday-party.png');
  await page.locator('#party-skip').click();
  assert.equal((await snap(page)).state.partyCompleted,true,'Party skip preserves canonical outcome');

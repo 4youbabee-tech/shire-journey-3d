@@ -54,3 +54,6 @@ The source World Bible calls Bag End a Hobbit narrative hub with dense lived-in 
 
 ## 0.5.0 original Shire story and birthday art decision
 The timeline Bible fixes F1-01: Gandalf arrives, Bilbo prepares birthday festivities, then Bilbo departs and the Ring passes to Frodo. This candidate makes the first meeting with Gandalf an explicit prerequisite before Bilbo's preparation; retains optional original apple errand, adds inexpensive colored 2D fireworks and original Arabic voice-subtitled birthday, shifts existing NPCs into a temporary scene, restores them on skip, then hides Bilbo after departure. No canonical outcomes change, no film song or dialogue copy. 2D overlay avoids extra shaded 3D meshes.
+
+## P03 birthday shot QA
+Rendered screenshot exposed a green foreground hillside occlusion at first party camera coordinate (11,7,12). Avoid camera-only edits that alter story positions or collision. New camera is outside the mound to the north, looks south toward seven existing villagers temporarily assembled under the tree. This reuses accepted meshes and restores all individuals at end/skip, keeping draw cost bounded.

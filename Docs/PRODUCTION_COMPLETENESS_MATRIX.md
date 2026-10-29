@@ -1,3 +1,6 @@
+## P03 first visual test findings
+Commit c35303064004057fd6dd6ea39951b46aadc360c0: source/node + Chromium PASS, artifact 12899098251. Birthday camera composition FAIL visual review due large mound blocking characters; corrective camera/crowd source created and needs new exact-head screenshot. Preserve accepted mission/save outcomes and no new runtime meshes.
+
 # 0.5.0 P03 candidate acceptance
 
 | Test | Gate |
