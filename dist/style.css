@@ -70,3 +70,7 @@
 #party-caption{position:absolute;bottom:13%;left:8%;right:8%;font:600 clamp(15px,2.3vw,24px)/1.8 Tahoma,sans-serif;text-align:center}
 #party-skip{position:absolute;bottom:4%;left:5%;pointer-events:auto;border:1px solid #f0d49b;background:#223a34d9;border-radius:28px;padding:10px 22px;color:#fff5d5;font:13px Tahoma,sans-serif;cursor:pointer}
 @media(max-width:600px){.party-topline{font-size:11px;top:5%}#party-caption{font-size:17px;bottom:13%}#party-skip{bottom:4%;left:4%}}
+
+/* Visible restart option for legacy-saved game, including narrow mobile screens. */
+#restart-story{display:block;margin:12px 0 8px;padding:11px 15px;max-width:100%;background:rgba(27,48,33,.9);color:#f9e9c7;border:1px solid #dbc17b;border-radius:5px;direction:rtl;line-height:1.5;text-align:center}
+#resume-note{max-width:100%;font-size:13px;line-height:1.65;direction:rtl;text-align:right}

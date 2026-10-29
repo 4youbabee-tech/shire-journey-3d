@@ -62,3 +62,8 @@ Rendered screenshot exposed a green foreground hillside occlusion at first party
 Refine initial toy-like character proportions with narrower faces and hair silhouettes, pupils, eyebrows and modest lip/shading details; differentiate clothing and wizard beard. Keep no copyrighted film actor scan, preserve original NPC identities and current plot; keep material batching and existing neck/arm/leg pivots.
 
 P04 corrective art decision: retain high-resolution facial sculpting only on the four story heroes, not background laborers. Use the existing skin/eye material batches instead of distinct blush/lip materials, avoiding extra grouped draw calls. Preserve strict mesh count regression, original costume silhouette and narrative IDs.
+
+## 2026-10-29 P05 game presentation and story choice
+- Player-supplied real mobile screenshot is direct rejection evidence for the prior flat green toy-like presentation and old-save apple primary objective. New art stays ORIGINAL-GAME; mellow palette, ground vertex colors, naturalized silhouettes and smaller flowers do not claim film character likeness.
+- Acoustic impression of an original pastoral song is synthesized through inexpensive Web Audio triangle/sine notes with bass and 12-second phrase variation; no copyrighted recordings or film music. Wind and birds have independent effects control.
+- Avoid rewriting existing progress. A saved game can restart from Gandalf arrival via an explicit action, or continue the optional apple side activity and reach the party through Sam. All main canon outcomes remain gated by their story actions.

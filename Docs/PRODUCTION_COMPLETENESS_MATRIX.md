@@ -1,3 +1,14 @@
+# P05 browser candidate 0.7.0 — acceptance gates
+
+| Gate | Current evidence |
+|---|---|
+| Original 12-second score / birds / wind | Source authored; Node schedule tests PENDING; audible device review NOT RUN |
+| Natural meadow and character silhouette | Source authored; Babylon NullEngine geometry / visual Chromium PENDING; character production acceptance NOT GIVEN |
+| Existing stage2 saved mission recovery | Root cause diagnosed; new restart and optional errand source + save tests PENDING |
+| Gandalf story dialogue after arrival | Source + desktop/touch Chromium PENDING |
+| Full canon chapters, film-level skinned GLB, 30 FPS physical device | NOT IMPLEMENTED / NOT VERIFIED |
+| GitHub PR exact HEAD / Pages | PENDING at candidate authoring |
+
 P04 first run 40925340163: FAIL scene mesh budget threshold (21/22 pass). Renderer was not run; no visual acceptance. New source reduces rich geometry to principal four and shares eye/skin materials while retaining named source-level hero detail regression and the same mesh-budget gate. Await exact-head retest.
 
 # 0.6.0 P04 visual candidate

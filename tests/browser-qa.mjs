@@ -63,13 +63,13 @@ try{
  browser=await chromium.launch({headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
  const desktop=await browser.newContext({viewport:{width:1280,height:720},recordVideo:{dir:out,size:{width:1280,height:720}}});
  const page=await desktop.newPage();page.on('pageerror',e=>report.errors.push('desktop: '+e.message));
- await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();assert.equal((await snap(page)).quality.mode,'auto');assert.equal((await snap(page)).cinematic.active,true);await still(page,'desktop-arrival-cinematic.png');await page.locator('#arrival-skip').click();assert.equal((await snap(page)).cinematic.active,false);
+ await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();assert.equal((await snap(page)).quality.mode,'auto');assert.equal((await snap(page)).cinematic.active,true);await still(page,'desktop-arrival-cinematic.png');await page.locator('#arrival-skip').click();assert.equal((await snap(page)).cinematic.active,false);assert.equal(await page.locator('#speaker').innerText(),'غاندالف','Opening must speak to Gandalf, not merely show his mesh');await still(page,'desktop-gandalf-opening-dialogue.png');await chooseFirst(page);assert.equal((await snap(page)).state.gandalfMet,true);
  await page.locator('#map-open').click();assert.ok(await page.locator('#world-map').isVisible());await still(page,'desktop-village-map.png');await page.locator('#map-close').click();
  assert.match(await page.locator('#sound').innerText(),/مفعّلة/,'Original music must begin after Start interaction');
  await page.locator('#journal-open').click();
  await page.locator('#volume-music').fill('0');await page.locator('#volume-effects').fill('0.5');
  await still(page,'desktop-audio-settings.png');await page.locator('#journal-close').click();
- const walkEvidence=await realWalk(page);await still(page,'desktop-moving.png');await qaReposition(page,-2,17);await talk(page);assert.ok(await page.locator('#choices button').first().isVisible());await chooseFirst(page);assert.equal((await snap(page)).state.gandalfMet,true,'Gandalf greeting unlocks Bilbo');await qaReposition(page,8,7);
+ const walkEvidence=await realWalk(page);await still(page,'desktop-moving.png');assert.equal((await snap(page)).state.gandalfMet,true);await qaReposition(page,8,7);
  await still(page,'desktop-arrived.png');await still(page,'desktop-enhanced-hero-0.6.png');
  // Enter the real Babylon room using the gameplay key, inspect the 3D interior and exit.
  await qaReposition(page,11,8.2);
@@ -87,7 +87,7 @@ try{
  await still(page,'desktop-arabic-chat.png');await chooseFirst(page);
  assert.equal((await snap(page)).state.stage,1,'Bilbo dialogue advances quest');
  await page.reload({waitUntil:'domcontentloaded'});await page.locator('#welcome:not([hidden])').waitFor({timeout:90000});
- assert.equal((await snap(page)).state.stage,1,'Browser save restores stage after reload');
+ assert.equal((await snap(page)).state.stage,1,'Browser save restores stage after reload');assert.ok(await page.locator('#restart-story').isVisible(),'Saved players must be able to restart the real story');
  await page.locator('#start').click();await qaReposition(page,8,1);await qaReposition(page,-6,1);await talk(page);await chooseFirst(page);
  assert.equal((await snap(page)).state.stage,2,'Sam dialogue advances quest');
  await qaReposition(page,-18,1);await qaReposition(page,-18,12);await page.keyboard.press('e');
@@ -112,12 +112,12 @@ try{
  await desktop.close();
  const mobile=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,recordVideo:{dir:out,size:{width:390,height:844}}});
  const touch=await mobile.newPage();touch.on('pageerror',e=>report.errors.push('mobile: '+e.message));
- await ready(touch);await touch.locator('#start').tap();if((await snap(touch)).cinematic.active)await touch.locator('#arrival-skip').tap();await touch.locator('#map-open').tap();assert.ok(await touch.locator('#world-map').isVisible());await still(touch,'mobile-village-map.png');await touch.locator('#map-close').tap();
+ await ready(touch);await touch.locator('#start').tap();if((await snap(touch)).cinematic.active)await touch.locator('#arrival-skip').tap();assert.equal(await touch.locator('#speaker').innerText(),'غاندالف');await touch.locator('#choices button').first().tap();assert.equal((await snap(touch)).state.gandalfMet,true);await touch.locator('#map-open').tap();assert.ok(await touch.locator('#world-map').isVisible());await still(touch,'mobile-village-map.png');await touch.locator('#map-close').tap();
  const joy=await touch.locator('#joystick').boundingBox();assert.ok(joy,'Touch joystick must be visible');
  const cdp=await mobile.newCDPSession(touch),cx=joy.x+joy.width/2,cy=joy.y+joy.height/2;
  const before=await snap(touch);assert.equal(before.quality.mode,'auto');assert.ok(before.renderSize.scale>=1&&before.renderSize.scale<=2.25,'High-first quality stays within safe adaptive bounds');await mobileHold(cdp,cx,cy,0,-32,2400);const moved=await snap(touch);
  assert.ok(moved.position.z-before.position.z>.1,'Touch joystick must move character forward');
- await still(touch,'mobile-joystick.png');
+ await still(touch,'mobile-joystick.png');await still(touch,'mobile-natural-meadow-0.7.png');
  // QA-only move after the independently verified real touch walking smoke.
  await qaReposition(touch,11,8.2);
  await touch.locator('#interact').waitFor({state:'visible',timeout:20000});

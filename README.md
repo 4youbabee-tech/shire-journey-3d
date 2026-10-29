@@ -1,3 +1,11 @@
+# Shire Journey 0.7.0 — responsive natural world, original score and story recovery
+
+**New in this source candidate:** original melodic accompaniment, ambient birds and wind, muted more organic meadows, softer clothing/arms/legs and a smaller travelling pack. Existing animated workers and birds make the world feel more alive. Entry into Bag End and prior cinematic scenes remain unchanged. This is not a cinematic studio asset import, film score or full character likeness.
+
+**Old phone save showing collect apples?** Start screen offers **ابدأ القصة من وصول غاندالف**; continuing the older save preserves it, and Sam provides an option to advance the main story without collecting apples. A fresh story opens an actual Gandalf conversation following the cart vignette. Apple gathering remains optional, clearly labeled original-game content. Sound uses a live Web Audio original composition triggered from Start; enable phone media volume if inaudible.
+
+Do not call this ready until exact-HEAD Node and actual Chromium WebGL passes and Pages deploy at the same SHA. Hardware FPS/visual acceptance need a real phone test.
+
 # Shire Journey 0.6.0 candidate — storybook hero-art pass
 
 The hero characters now have proportional faces, more discreet layered hair, irises, subtle eyebrows and lip shapes, extra tailoring, and silver wizard details. All art uses original procedural Babylon geometry grouped into the existing animated pivots and material batches. Bilbo's party, Bag End and all prior story/save functionality are preserved. Accept only after exact-head unit/WebGL QA and screenshots; this is not a claim of professional skinned character imports.
