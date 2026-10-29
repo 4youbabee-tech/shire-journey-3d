@@ -1,3 +1,4 @@
+import {loadCharacters} from './characters.mjs';
 import {BUILD} from './build-info.mjs';
 import {createWorld} from './world.mjs';
 import {createBirthdayEffects,birthdayBeat,PARTY_SECONDS} from './party.mjs';
@@ -14,7 +15,7 @@ import {SAVE_KEY,NPCS,APPLES,frameDelta,freshState,restoreState,objective,neares
 const $=s=>document.querySelector(s),canvas=$('#game');
 const qaEnabled=new URLSearchParams(location.search).has('qa');
 let uiElapsed=0;const labelBindings=[];let qualityControl=null,arrival=null,cinematic=false,cinematicTime=0,cinematicStart=0,mapOpen=false,inside=false,interior=null,outdoorMeshes=[],returnPosition={x:11,z:8.2},priorView={yaw:0,zoom:7.8},partyFx=null,partyActive=false,partyStart=0,partyOriginal=new Map();
-let engine,scene,world,state,started=false,activeNPC=null,journalOpen=false,yaw=0,pitch=.44,zoom=7.8,keys=new Set(),drag=null,joystick={x:0,y:0},toastTimer,saveTimer=0,time=0,soundEnabled=false,audio=null,audioTimer=null,destination=null,spokenText='';
+let importedActors,engine,scene,world,state,started=false,activeNPC=null,journalOpen=false,yaw=0,pitch=.44,zoom=7.8,keys=new Set(),drag=null,joystick={x:0,y:0},toastTimer,saveTimer=0,time=0,soundEnabled=false,audio=null,audioTimer=null,destination=null,spokenText='';
 const errors=[],telemetry={frames:0,seconds:0,collisions:0,interactions:0,collects:0,saves:0};
 window.addEventListener('unhandledrejection',e=>fatal(e.reason?.message||String(e.reason)));
 function fatal(message){errors.push(message);$('#loading').hidden=true;$('#fatal-text').textContent=message;$('#fatal').hidden=false;}
@@ -135,10 +136,10 @@ function animate(dt){time+=dt;const B=window.BABYLON,V=B.Vector3;
  }
  if(state.completed){world.sun.diffuse=B.Color3.Lerp(world.sun.diffuse,new B.Color3(1,.82,.55),dt*.1);}
  if(mapOpen&&telemetry.frames%20===0)drawVillageMap($('#village-map'),world.body.position,state.stage,state.apples);
-  telemetry.frames++;telemetry.seconds+=dt;if(qaEnabled&&telemetry.frames%15===0){const diag=$('#qa-diagnostics');if(diag)diag.textContent=JSON.stringify(snapshot());}
+  importedActors?.update(dt,activeNPC,partyActive);telemetry.frames++;telemetry.seconds+=dt;if(qaEnabled&&telemetry.frames%15===0){const diag=$('#qa-diagnostics');if(diag)diag.textContent=JSON.stringify(snapshot());}
 }
 function snapshot(){return {version:BUILD.version,commit:BUILD.commit,storyWindow:STORY_WINDOW.id,state:structuredClone(state),position:{x:world?.body.position.x,y:world?.body.position.y,z:world?.body.position.z},started,activeNPC,journalOpen,camera:{yaw,pitch,zoom},fps:Math.round(engine?.getFps()||0),inside,indoorStats:interior?.stats||null,party:{active:partyActive,started:state?.partyStarted||false,completed:state?.partyCompleted||false,participants:partyActive?partyOriginal.size:0},cinematic:{active:cinematic,time:cinematicTime},mapOpen,quality:qualityControl?.snapshot(),renderSize:engine?{width:engine.getRenderWidth(),height:engine.getRenderHeight(),scale:engine.getHardwareScalingLevel(),shadows:scene.shadowsEnabled}:null,meshes:scene?.meshes.length,triangles:scene?scene.meshes.reduce((n,m)=>n+m.getTotalIndices()/3,0):0,telemetry:{...telemetry},errors:[...errors],world:world?.stats};}
-async function boot(){try{const B=window.BABYLON;if(!B)throw Error('تعذّر تحميل محرك Babylon.js. أعد تحميل الصفحة.');engine=new B.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,powerPreference:'default'});engine.loadingScreen={displayLoadingUI(){},hideLoadingUI(){}};scene=new B.Scene(engine);const camera=new B.UniversalCamera('third-person camera',new B.Vector3(0,5,-23),scene);camera.minZ=.15;camera.maxZ=200;camera.fov=.87;camera.inputs.clear();world=createWorld(B,scene);partyFx=createBirthdayEffects($('#party-fx'));arrival=createArrival(B,scene,world);state=readSave();world.body.position.set(state.position.x,.72,state.position.z);world.body.onCollide=()=>telemetry.collisions++;
+async function boot(){try{const B=window.BABYLON;if(!B)throw Error('تعذّر تحميل محرك Babylon.js. أعد تحميل الصفحة.');engine=new B.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,powerPreference:'default'});engine.loadingScreen={displayLoadingUI(){},hideLoadingUI(){}};scene=new B.Scene(engine);const camera=new B.UniversalCamera('third-person camera',new B.Vector3(0,5,-23),scene);camera.minZ=.15;camera.maxZ=200;camera.fov=.87;camera.inputs.clear();world=createWorld(B,scene);importedActors=await loadCharacters(B,scene,world);partyFx=createBirthdayEffects($('#party-fx'));arrival=createArrival(B,scene,world);state=readSave();world.body.position.set(state.position.x,.72,state.position.z);world.body.onCollide=()=>telemetry.collisions++;
  for(const npc of NPCS){const label=document.createElement('span');label.className='npc-label';label.id='label-'+npc.id;label.textContent=npc.name;label.hidden=true;$('#npc-labels').append(label);labelBindings.push({npc,el:label,character:world.characters.find(c=>c.id===npc.id)});}
  if(new URLSearchParams(location.search).has('qa')){const pre=document.createElement('pre');pre.id='qa-diagnostics';pre.style.cssText='position:fixed;left:5px;bottom:2px;max-width:95%;font:8px monospace;color:white;background:#0008;pointer-events:none;z-index:2;direction:ltr;white-space:pre-wrap;max-height:36px;overflow:hidden';document.body.append(pre);}
  $('#build-version').textContent='الإصدار '+BUILD.version+(BUILD.commit?' · '+BUILD.commit.slice(0,7):' · اختبار محلي');
@@ -146,4 +147,5 @@ async function boot(){try{const B=window.BABYLON;if(!B)throw Error('تعذّر �
  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();notify('توقّف عرض الرسومات مؤقتًا. نحاول استعادته…');});canvas.addEventListener('webglcontextrestored',()=>notify('عاد عرض الرسومات'));engine.runRenderLoop(()=>{if(document.hidden)return;const dt=frameDelta(engine.getDeltaTime());animate(dt);scene.render();if(qualityControl?.sample(engine.getFps(),engine.getDeltaTime()/1000,started&&!document.hidden))applyQuality();});window.__SHIRE__=Object.freeze((new URLSearchParams(location.search).has('qa')&&['localhost','127.0.0.1'].includes(location.hostname))?{snapshot,qaReposition:(x,z)=>{if(!started||![x,z].every(Number.isFinite)||x<MAP_BOUNDS.minX+2||x>MAP_BOUNDS.maxX-2||z<MAP_BOUNDS.minZ+2||z>MAP_BOUNDS.maxZ-2)throw Error('Invalid QA location');world.body.position.set(x,.72,z);destination=null;save();return snapshot();}}:{snapshot});
 }catch(e){fatal(e.message||String(e));}}
 boot();
+
 

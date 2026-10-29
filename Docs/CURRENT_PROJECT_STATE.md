@@ -1,3 +1,7 @@
+# 0.8.0 imported skinned character candidate — 2026-10-29
+
+Base 35a2780dbe09e9e0e1a215209d6206c9d60e89a1. Owner prioritizes a visibly playable stylized game over actor likeness. Two licensed KayKit CC0 assets now load through Babylon GLB containers and instantiate across eight roles. Original procedural render pieces are hidden, gameplay/collision roots retained. Idle/walk/run/interact/cheer clips selected from real skeletal animation. Source tests: 28 PASS locally; first full local Chromium desktop/mobile flow PASS (software WebGL only); final costume atlas orientation corrected after raster inspection and requires exact-SHA CI. No target-device FPS or final art acceptance claimed. Runtime assets and license recorded in Docs/IMPORTED_CHARACTER_ASSETS.md. Rollback: revert this single cohort; old save key preserved.
+
 # P05 0.7.0 — owner-driven playable presentation fix (source candidate 2026-10-29)
 
 Base exact main 5872b9fde795b1bdf961a7ca5b95be96d4602651. Owner's real phone screenshot showed an older stage2 apple mission, a primitive player silhouette and a Gandalf figure without immediate story interaction. The previous 0.6.0 exact-head CI passed but did not simulate this existing saved state. No accepted character art or hardware FPS claim is made.
@@ -161,4 +165,5 @@ Next acceptance step: the owner opens the deployed URL in a WebGL-capable browse
 - Static source candidate at authoring; new exact-SHA CI/browser acceptance NOT RUN yet. Actual phone audio, UX and target hardware FPS require device evidence. Old release 0.2.1 remains published until separately merged/deployed.
 
 - Living Shire candidate: 3 non-dialogue background farmers/gardeners now pace fixed safe plots, 11 small upper canopies sway in an original wind loop, no navmesh or quest impact. CI/head validation and on-device performance NOT RUN at authoring. Original five interactive characters unchanged.
+
 
