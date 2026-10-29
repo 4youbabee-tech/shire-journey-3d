@@ -60,3 +60,13 @@
 
 /* Explicit hidden state outranks responsive dialogue layout. */
 #dialogue[hidden]{display:none!important}
+
+/* Original hand-drawn birthday fireworks: lightweight 2D overlay, no new WebGL meshes. */
+#party-fx{position:fixed;inset:0;width:100vw;height:100dvh;z-index:22;pointer-events:none}
+#party-fx[hidden]{display:none!important}
+#party-cinematic{position:fixed;inset:0;z-index:23;pointer-events:none;background:linear-gradient(to bottom,rgba(6,15,29,.65),transparent 28%,transparent 55%,rgba(6,14,26,.78));color:#fff2d6;text-shadow:0 2px 5px #000a}
+#party-cinematic[hidden]{display:none!important}
+.party-topline{position:absolute;top:6%;right:5%;left:5%;text-align:center;font:600 14px/1.6 Tahoma,sans-serif;letter-spacing:1px}
+#party-caption{position:absolute;bottom:13%;left:8%;right:8%;font:600 clamp(15px,2.3vw,24px)/1.8 Tahoma,sans-serif;text-align:center}
+#party-skip{position:absolute;bottom:4%;left:5%;pointer-events:auto;border:1px solid #f0d49b;background:#223a34d9;border-radius:28px;padding:10px 22px;color:#fff5d5;font:13px Tahoma,sans-serif;cursor:pointer}
+@media(max-width:600px){.party-topline{font-size:11px;top:5%}#party-caption{font-size:17px;bottom:13%}#party-skip{bottom:4%;left:4%}}

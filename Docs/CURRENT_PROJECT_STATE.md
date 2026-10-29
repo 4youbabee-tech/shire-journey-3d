@@ -1,3 +1,12 @@
+## Exact-SHA visual diagnosis and one cohesive correction
+PR9 source test c35303064004057fd6dd6ea39951b46aadc360c0, Actions 40878519654: all Node + real desktop/touch Chromium PASS; render screenshot desktop-birthday-party.png showed a large green foreground roof mound occluding the celebrations and too few active participants in the shot. Root cause: camera placed at x11,z12 within the Bag End hillside volume. Updated initial party camera to x4,z34 looking toward tree and seven existing NPCs, no additional drawn character geometry, plus screenshot/participant assertion. New candidate requires exact SHA WebGL before merge. Do not confuse QA SwiftShader median 2 FPS with physical phone capability.
+
+# 0.5.0 P03 — Shire birthday narrative candidate
+
+Base main a4aceaff770316d56e6cce8fe5f82bff45ce4a28, 0.4.0 live Pages run 40876613784 PASS and Chromium 40876613773 PASS. Player-visible source candidate: mandatory original Gandalf greeting before meeting Bilbo, then retained Sam/apple preparation, a fixed-location birthday party trigger under the celebration tree, 14-second skippable original firework scene, character gestures and Bilbo departure/Ring handoff. Canon source: 01 Story Timeline F1-01 and 07 Mission Matrix. Skip and watch have the same postconditions; a saved in-progress party resumes on next Start. New unit/browser regression and desktop firework screenshot must pass at the exact candidate SHA. No film dialogue, soundtrack or actor likenesses copied.
+
+Next tasks remain character art, richer crowd life and F1-02/F1-03/Bree; no claims of those until production evidence. Existing mission saves load without reset, older stage5 progress can start the party. Rollback revert the single candidate commit; old save key remains unchanged.
+
 ## Visual adjustment following exact-SHA browser review
 Run 40874619398 at 77562d2e30aecac321caeb5cfe8d518fde178e5c: Node and desktop/touch Chromium PASS; actual screenshot of Bag End revealed overlarge empty foreground. Moved furniture closer, added warm household props and candles, updated diary/hearth focus distances and added actual mobile interior screenshot test. Requires exact-HEAD rerun for this corrective commit.
 
