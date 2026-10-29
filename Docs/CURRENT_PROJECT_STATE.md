@@ -1,3 +1,6 @@
+## Visual adjustment following exact-SHA browser review
+Run 40874619398 at 77562d2e30aecac321caeb5cfe8d518fde178e5c: Node and desktop/touch Chromium PASS; actual screenshot of Bag End revealed overlarge empty foreground. Moved furniture closer, added warm household props and candles, updated diary/hearth focus distances and added actual mobile interior screenshot test. Requires exact-HEAD rerun for this corrective commit.
+
 # 0.4.0 Mobile phone presentation and Bag End entrance (source candidate)
 
 Source base exact main bf57bb315d0bc5679cb7503309d87990b057c554, with prior Pages run 40774862501 PASS and Chromium 40774865147 PASS. Candidate integrates high-first adaptive render, music started from the actual Start tap (WebAudio gesture policy), safer mobile HUD and fully column-stacked dialogue/chat, plus an actual on-demand furnished Babylon 3D interior at Bag End with safe door entry/exit, room object interactions and persisted visitation. Outdoor meshes are temporarily disabled when indoors; only the player remains in scene, collisions switch to room bounds. The auto-save persists the outdoor return point to avoid out-of-bounds resumption. No new paid/licensed film resources. New tests must prove rendered room and mobile controls before merge.

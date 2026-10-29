@@ -10,9 +10,9 @@ Authoritative references: supplied 00 Project Rules, 01 Story & Timeline, 02 Cha
 | ID | Deliverable a player can experience | Status |
 |---|---|---|
 | P00 | Published 0.3.0: expanded Hobbiton, map, original Gandalf-cart cinematic | ACCEPTED, commit bf57bb3, Pages 40774862501 and Chromium 40774865147 PASS |
-| P01 | Phone UI fits 360–390 px, dialogue fully readable, original music starts on Start tap, high-first adaptive quality | NEXT |
-| P02 | Walk through Bag End green door; furnished 3D interior with books, chairs, fireplace, room interactions and safe exit/save | AFTER P01 |
-| P03 | Film-causal Shire: greet Gandalf, Bilbo and Sam preparation, Birthday party with original fireworks and family reactions | AFTER P02 |
+| P01 | Phone UI fits 360–390 px, dialogue fully readable, original music starts on Start tap, high-first adaptive quality | PASS on 0.4.0 main a09e42e; Chromium 40874619398 / 40875240699; 360px layout regression added to next exact-head QA |
+| P02 | Walk through Bag End green door; furnished 3D interior with books, chairs, fireplace, room interactions and safe exit/save | FUNCTIONAL PASS on 0.4.0; cozy art / phone interior screenshot under visual QA this PR |
+| P03 | Film-causal Shire: greet Gandalf, Bilbo and Sam preparation, Birthday party with original fireworks and family reactions | NEXT after P02 visual QA |
 | P04 | Art upgrade of Bilbo/Frodo/Sam/Gandalf, full skinning and expressive original rigs, clothing and body/face animations | AFTER P03 |
 | P05 | Lively villages: Merry, Pippin, Rosie, original villagers, gardening, carts, food, animation scheduling, interior/exterior life | AFTER P04 |
 | P06 | F1-02 Shadow of the Past: Bag End ring story, packing with Sam, Frodo departs; authored cinema and checkpoint | AFTER P05 |

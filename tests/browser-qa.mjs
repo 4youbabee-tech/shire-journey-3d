@@ -110,6 +110,15 @@ try{
  assert.ok(moved.position.z-before.position.z>.1,'Touch joystick must move character forward');
  await still(touch,'mobile-joystick.png');
  // QA-only move after the independently verified real touch walking smoke.
+ await qaReposition(touch,11,8.2);
+ await touch.locator('#interact').waitFor({state:'visible',timeout:20000});
+ await touch.locator('#interact').tap();
+ await touch.waitForFunction(()=>window.__SHIRE__.snapshot().inside,{timeout:20000});
+ await still(touch,'mobile-bag-end-interior.png');
+ assert.ok((await snap(touch)).indoorStats.decor>=30);
+ await touch.locator('#interact').waitFor({state:'visible',timeout:20000});
+ await touch.locator('#interact').tap();
+ await touch.waitForFunction(()=>!window.__SHIRE__.snapshot().inside,{timeout:20000});
  await qaReposition(touch,-6,1);
  await touch.locator('#interact').waitFor({state:'visible',timeout:20000});
  assert.ok(await touch.locator('#interact').isVisible(),'Mobile interaction button should appear near Sam');
@@ -118,6 +127,10 @@ try{
  const boxes=await touch.evaluate(()=>({w:window.innerWidth,dialogue:document.querySelector('#dialogue').getBoundingClientRect().toJSON(),chat:document.querySelector('#npc-chat-input').getBoundingClientRect().toJSON(),send:document.querySelector('#npc-chat-send').getBoundingClientRect().toJSON()}));
  for(const key of ['dialogue','chat','send']){const r=boxes[key];assert.ok(r.left>=-2&&r.right<=boxes.w+2&&r.width>25,'Mobile '+key+' stays inside viewport');}
  assert.ok(boxes.dialogue.width>boxes.w*.75,'Mobile dialogue is legible');
+ await touch.setViewportSize({width:360,height:780});await touch.waitForTimeout(350);
+ const compact=await touch.evaluate(()=>({w:window.innerWidth,dialogue:document.querySelector('#dialogue').getBoundingClientRect().toJSON(),chat:document.querySelector('#npc-chat-input').getBoundingClientRect().toJSON(),send:document.querySelector('#npc-chat-send').getBoundingClientRect().toJSON()}));
+ for(const key of ['dialogue','chat','send']){const r=compact[key];assert.ok(r.left>=-2&&r.right<=compact.w+2&&r.width>25,'360px mobile '+key+' stays visible');}
+ await still(touch,'mobile-360-dialogue.png');await touch.setViewportSize({width:390,height:844});
  await touch.locator('#npc-chat-input').fill('أين الحديقة؟');await touch.locator('#npc-chat-send').tap();
  assert.ok((await touch.locator('#chat-log').innerText()).length>15);await still(touch,'mobile-arabic-chat.png');
  await touch.locator('#dialogue-close').tap();

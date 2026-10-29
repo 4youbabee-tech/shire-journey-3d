@@ -1,6 +1,6 @@
 # SHIRE JOURNEY — Active Production Queue
 
-**Resume in order:** [Mobile & cinematic roadmap](Docs/MOBILE_PRODUCTION_ROADMAP.md) · [Character/story asset roster](Docs/SHIRE_TO_BREE_CHARACTER_ROSTER.md). Every next engineering pass uses the earliest unaccepted task, checks GitHub HEAD and CI, and should result in a player-visible tested build rather than administration.
+**Resume in order:** [Mobile & cinematic roadmap](Docs/MOBILE_PRODUCTION_ROADMAP.md) · [Character/story asset roster](Docs/SHIRE_TO_BREE_CHARACTER_ROSTER.md). 0.4.0 now includes working Bag End entry/exit, responsive mobile dialogues and start-triggered original music. P02 indoor art refinement is in review; next major gameplay step P03 is Gandalf-first story sequence and Bilbo birthday party. Every pass uses latest GitHub HEAD/CI and delivers player-visible changes.
 
 # Shire Journey 0.3.0 — Living Hobbiton
 
