@@ -1,5 +1,6 @@
 // All art here is original procedural stylized geometry, not imported film assets.
 import {HOMES,ROADS,MAP_BOUNDS} from './village-layout.mjs';
+import {attachFacialRig} from './facial-performance.mjs';
 export function createWorld(B,scene,{shadows=true}={}){
  const V=B.Vector3, M=B.MeshBuilder;let seed=7349;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
  const mats={},statics=[],colliders=[],characters=[],apples=[],birds=[],leaves=[],workers=[];
@@ -123,7 +124,8 @@ export function createWorld(B,scene,{shadows=true}={}){
    const merged=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);
    merged.parent=parent;merged.name=id+' '+merged.material.name;merged.metadata={sourceNames};merged.isPickable=false;merged.receiveShadows=true;renderParts.push(merged);
   }
-  root.rotation.y=Math.PI;if(id==='bilbo')root.scaling.setAll(1.04);if(id==='sam')root.scaling.setAll(.98);if(id==='frodo')root.scaling.setAll(.95);if(shadow)for(const part of renderParts)shadow.addShadowCaster(part);const obj={id,root,left,right,leftLeg,rightLeg,head,parts:renderParts,wizard};characters.push(obj);return obj;
+  const faceRig=attachFacialRig(B,scene,{id,head,height,skin,brow:id==='bilbo'?bilboHair:id==='sam'?samHair:id==='frodo'?frodoHair:beard,ink:eye});
+   root.rotation.y=Math.PI;if(id==='bilbo')root.scaling.setAll(1.04);if(id==='sam')root.scaling.setAll(.98);if(id==='frodo')root.scaling.setAll(.95);if(shadow)for(const part of renderParts)shadow.addShadowCaster(part);const obj={id,root,left,right,leftLeg,rightLeg,head,parts:renderParts,wizard,faceRig};characters.push(obj);return obj;
  }
  const player=character('player',0,-15,{player:true});character('bilbo',8,7,{waistcoat:bilbovest});character('sam',-6,1,{waistcoat:samvest});character('gandalf',-2,17,{wizard:true});character('frodo',3,-4,{waistcoat:frodoVest});
   // Background-only original villagers; they do not alter quests or NPC dialogue owners.
@@ -132,6 +134,6 @@ export function createWorld(B,scene,{shadows=true}={}){
  // Merge static geometry by material: a few dozen draws, rather than hundreds.
  const groups=new Map();for(const mesh of statics){const key=mesh.material.uniqueId;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(mesh);}let mergedCount=0;for(const group of groups.values()){const m=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);if(m){m.name='batched '+m.material.name;m.receiveShadows=true;m.freezeWorldMatrix();if(shadow&& !['warm gravel','clouds','pond water'].includes(m.material.name))shadow.addShadowCaster(m);mergedCount++;}}
  const body=M.CreateSphere('player collision ellipsoid',{diameter:1,segments:6},scene);body.position.set(0,.72,-15);body.isVisible=false;body.isPickable=false;body.ellipsoid=new V(.32,.7,.32);body.checkCollisions=true;
- return {player,body,characters,workers,leaves,apples,birds,sun,hemi,shadow,colliders,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,roads:ROADS.length,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,animatedCanopies:leaves.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
+ return {player,body,characters,workers,leaves,apples,birds,sun,hemi,shadow,colliders,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,roads:ROADS.length,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,expressiveFaces:characters.filter(c=>c.faceRig).length,animatedCanopies:leaves.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
 }
 

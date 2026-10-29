@@ -1,3 +1,9 @@
+## 2026-10-29 P04 facial performance candidate — gate not yet accepted
+- Existing published 0.5.0 main dd4eb5b: Actions 40880096214 Chromium exact-head PASS, 22/22 Node tests; Pages 40880096111 deployment PASS. Software medians ~2 FPS desktop / 5 FPS emulated mobile; target hardware unknown.
+- Proposed 0.5.1: create four original procedural facial articulation rigs anchored to existing head joints. Eyelid blinking, brows, simple contextual mouth movement and celebratory expressions; no new collision meshes, external licensed assets or voice imitation.
+- P04 is only partially addressed. Fully skinned glTF/skeleton rigs, production costume detail, lifelike motion and subjective visual review remain OPEN.
+- Acceptance: PR exact-head build, 4/4 face rig & bounded expression Node tests, desktop/mobile WebGL screenshots; no Pages publication before acceptance.
+
 ## P03 first visual test findings
 Commit c35303064004057fd6dd6ea39951b46aadc360c0: source/node + Chromium PASS, artifact 12899098251. Birthday camera composition FAIL visual review due large mound blocking characters; corrective camera/crowd source created and needs new exact-head screenshot. Preserve accepted mission/save outcomes and no new runtime meshes.
 

@@ -1,3 +1,20 @@
+# Shire Journey 0.5.1 — Production and acceptance status (2026-10-29)
+
+This repository is the *existing* Babylon.js/WebGL game; playable public build: https://4youbabee-tech.github.io/shire-journey-3d/ . Do not confuse an unmerged branch candidate with the public release.
+
+| Queue | Player-visible status |
+| --- | --- |
+| P00 | **ACCEPTED** — Hobbiton roads, map and original cart arrival (0.3). |
+| P01 | **FUNCTIONAL PASS** — small-phone HUD/dialogue, Start-triggered original sound and adaptive quality (0.4); real-phone FPS remains unmeasured. |
+| P02 | **FUNCTIONAL PASS** — Bag End green-door entry, furnished room, interactions, safe exit and saves (0.4); aesthetic sign-off pending. |
+| P03 | **SOURCE + EXACT-HEAD CHROMIUM PASS** — Gandalf greeting, preparations, birthday party/firework vignette and Bilbo departure/Ring handoff on main `dd4eb5b`; 22 Node tests + Chromium PASS run 40880096214; Pages deployment run 40880096111 PASS. This is a short authored vignette, not a complete film recreation. |
+| P04 | **PARTIAL 0.5.1 PR CANDIDATE** — individual blinking, eyebrows and conversational/celebratory mouth expressions on Bilbo, Frodo, Sam and Gandalf. Four original face rigs reuse existing materials, no actors/film assets. Full skinned character replacement, costumes and cinematic animation **NOT IMPLEMENTED**. Exact candidate-head QA and visual approval required. |
+| P05 | **NOT COMPLETE** — existing three gardeners, but no full village daily schedules / Merry-Pippin-Rosie cast integration. |
+| P06–P09 | **NOT IMPLEMENTED** — Ring investigation after party, departure, Black Riders, Bree and later story chapters. |
+| P10 | **NOT ACCEPTED** — physical device 30 FPS, full audio/art polish and hardware QA still unmeasured. |
+
+Evidence caveat: GitHub Chromium uses *software SwiftShader*, median ~2 FPS desktop and 5 FPS mobile-emulated on main `dd4eb5b`. The face-art branch must pass exact-HEAD tests and screenshot inspection before merge/deploy. No spending, film soundtrack, actor voices or copied screenplay lines.
+
 # Shire Journey 0.5.0 candidate — Gandalf-first Shire and Bilbo's birthday
 
 On a new playthrough greet Gandalf after the original arrival, then help Bilbo and Sam, collect the optional apples, and gather under the party tree for an original lightweight birthday/firework vignette. The sequence ends with Bilbo departing and the Ring passing to Frodo, in the correct causal order. Story state and parties are saved and replay-safe. Dialogue and sound are original; no film dialogue or music replicated. See Docs/MOBILE_PRODUCTION_ROADMAP.md for the next chapter and character-art work.
