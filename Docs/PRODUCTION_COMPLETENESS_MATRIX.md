@@ -1,3 +1,14 @@
+# 0.4.0 candidate gates
+
+| Gate | Status before exact-HEAD test |
+|---|---|
+| Mobile 390 px dialogue/chat full horizontal coverage | SOURCE_CANDIDATE + Chromium screenshot / bounds test pending |
+| Music starts from Start tap | SOURCE_CANDIDATE + Chromium label check pending |
+| High-first quality starts at 1x and self-adapts | SOURCE_CANDIDATE + browser smoke pending |
+| Bag End room, interior/exit, sofa/books/lighting | SOURCE_CANDIDATE; Babylon NullEngine + Chromium gameplay screenshot pending |
+| Save/return, legacy save recovery | SOURCE_CANDIDATE; unit + browser pending |
+| Physical phone GPU / Windows 30 FPS | NOT DEVICE TESTED |
+
 ## 0.3.0 visual evidence before framing refinement
 Exact-head Chromium at `932f2a999aae75f0d108fe2d49c3bdb091c8d6f7`: PASS all browser/map/story tests and 17/17 Node tests; screenshots artifact 12853642534. Visual review found cinematic too close to pony; a wider camera and real-time timeline are corrective candidates requiring new screenshot QA. SwiftShader median desktop 2 FPS / mobile emulated 6 FPS is software-only and does not establish physical device performance.
 

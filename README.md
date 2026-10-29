@@ -1,3 +1,7 @@
+# SHIRE JOURNEY — Active Production Queue
+
+**Resume in order:** [Mobile & cinematic roadmap](Docs/MOBILE_PRODUCTION_ROADMAP.md) · [Character/story asset roster](Docs/SHIRE_TO_BREE_CHARACTER_ROSTER.md). Every next engineering pass uses the earliest unaccepted task, checks GitHub HEAD and CI, and should result in a player-visible tested build rather than administration.
+
 # Shire Journey 0.3.0 — Living Hobbiton
 
 Explore seventeen hillside homes along twelve pastoral road routes, a produce market, lanterns, wells, gardens and woodland. Press **M** / tap **الخريطة** to open an original in-game village map with roads, landmarks, friends, the player and active apple markers. Begin a new game with a skippable original 17-second Gandalf pony-cart / Frodo arrival vignette; replay from the journal. The quest, Arabic conversations, auto-save, collision and WebGL quality controls remain available. No external runtime art/music source or actor recording is imported.

@@ -28,3 +28,35 @@
  #village-map{max-height:61vh}#map-open{font-size:10px!important;padding:8px 6px!important}
  #arrival-skip{bottom:3%;left:3%}
 }
+
+
+/* Owner mobile screenshots: repair overflow/clipped dialogue, large HUD and touch targets. */
+#dialogue .dialogue-copy{min-width:0;max-width:100%}#dialogue #npc-chat-form{min-width:0;max-width:100%}#dialogue #npc-chat-input{min-width:0}#choices button{overflow-wrap:anywhere}
+@media(max-width:650px){
+ header{left:11px!important;right:11px!important;top:calc(9px + env(safe-area-inset-top))!important;align-items:center!important;gap:6px!important}
+ .brand{font-size:11px!important;letter-spacing:0!important;line-height:1.1;white-space:nowrap}.brand small{font-size:6px!important;letter-spacing:0!important}
+ nav{flex:1;min-width:0;justify-content:flex-end;gap:3px!important}
+ nav button{font-size:10px!important;padding:7px 5px!important;min-width:0;line-height:1.3;min-height:39px}
+ #sound{width:48px;overflow:hidden}#quality{width:63px;white-space:normal}
+ #quest{top:calc(61px + env(safe-area-inset-top))!important;right:11px!important;left:auto!important;max-width:220px!important;min-width:0!important;padding:9px 12px!important}
+ #quest small{margin-bottom:3px}#quest-progress{margin-top:5px}#quest-progress i{width:20px}
+ #interaction{right:12px!important;left:auto!important;bottom:clamp(112px,16vh,155px)!important;transform:none!important}
+ #interact{min-width:115px;max-width:177px;padding:10px 12px}
+ #location{right:13px!important;bottom:26px!important;opacity:.75}
+ #dialogue{display:flex!important;flex-direction:column!important;left:10px!important;right:10px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;transform:none!important;width:auto!important;max-width:none!important;max-height:min(73dvh,620px)!important;overflow-x:hidden!important;overflow-y:auto!important;gap:6px!important;padding:12px 15px 18px!important;border-radius:15px!important}
+ #dialogue .portrait{height:63px!important;width:64px!important;min-width:64px!important;align-self:flex-start;margin:0!important}
+ #dialogue .dialogue-copy{min-width:0!important;width:100%!important}
+ #dialogue .speaker-line{gap:7px;flex-wrap:wrap}
+ #dialogue .speaker-line h2{font-size:19px!important;margin:2px 0!important}
+ #dialogue .dialogue-copy p{font-size:13px!important;line-height:1.7;margin:5px 0 8px!important;overflow-wrap:anywhere}
+ #dialogue #choices{gap:5px}#dialogue #choices button{font-size:12px!important;min-height:38px;padding:7px 9px!important}
+ #dialogue .chat-interface{margin-top:8px;padding-top:7px}#dialogue #npc-chat-form{display:flex;flex-wrap:wrap;gap:5px}
+ #dialogue #npc-chat-input{flex:1 1 160px;min-width:0;width:0;font-size:12px!important;min-height:42px;padding:8px!important}
+ #dialogue #npc-chat-send{flex:0 0 auto;min-width:62px;max-width:74px;padding:7px!important}
+ #dialogue .chat-disclaimer{font-size:9px;line-height:1.45}#dialogue-close{min-width:36px;min-height:36px}
+}
+@media(max-width:370px){nav button{font-size:9px!important;padding:6px 4px!important}.brand{font-size:10px!important}#quest{max-width:200px!important}}
+
+
+/* Explicit hidden state outranks responsive dialogue layout. */
+#dialogue[hidden]{display:none!important}

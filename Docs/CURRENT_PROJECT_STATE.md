@@ -1,3 +1,7 @@
+# 0.4.0 Mobile phone presentation and Bag End entrance (source candidate)
+
+Source base exact main bf57bb315d0bc5679cb7503309d87990b057c554, with prior Pages run 40774862501 PASS and Chromium 40774865147 PASS. Candidate integrates high-first adaptive render, music started from the actual Start tap (WebAudio gesture policy), safer mobile HUD and fully column-stacked dialogue/chat, plus an actual on-demand furnished Babylon 3D interior at Bag End with safe door entry/exit, room object interactions and persisted visitation. Outdoor meshes are temporarily disabled when indoors; only the player remains in scene, collisions switch to room bounds. The auto-save persists the outdoor return point to avoid out-of-bounds resumption. No new paid/licensed film resources. New tests must prove rendered room and mobile controls before merge.
+
 ## 0.3.0 cinematic visual review
 PR exact-head GitHub Chromium `40773771757` at `932f2a999aae75f0d108fe2d49c3bdb091c8d6f7`: source/node tests and real browser gameplay/dialogue/map/intro both desktop and touch PASS, artifact `12853642534`; screenshots visually inspected. Original intro camera was too close to the low-poly pony and cropped the cart. Camera has been reset to a deliberate medium/wide village side shot from the very first frame, pony head/ears toned down, and cinematic timeline tied to monotonic real elapsed time to avoid stretching at low render FPS. These refinements need fresh exact-HEAD screenshots, with physical Windows FPS still a separate measurement.
 
