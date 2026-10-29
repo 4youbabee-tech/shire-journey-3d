@@ -13,7 +13,7 @@ test('Bag End room is real, furnished, gated and safe for mobile world collision
  assert.equal(nearBagDoor(BAG_DOOR),true);assert.equal(nearBagDoor({x:0,z:0}),false);
  room.setActive(true);assert.equal(room.meshes.every(m=>m.isEnabled()),true);
  assert.equal(room.nearby({x:160,z:136}).id,'exit-house');
- assert.equal(room.nearby({x:154,z:151}).id,'diary');
+ assert.equal(room.nearby({x:154,z:147.4}).id,'diary');
  room.setActive(false);assert.equal(room.meshes.some(m=>m.isEnabled()),false);
  engine.dispose();
 });

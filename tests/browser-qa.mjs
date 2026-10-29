@@ -110,6 +110,15 @@ try{
  assert.ok(moved.position.z-before.position.z>.1,'Touch joystick must move character forward');
  await still(touch,'mobile-joystick.png');
  // QA-only move after the independently verified real touch walking smoke.
+ await qaReposition(touch,11,8.2);
+ await touch.locator('#interact').waitFor({state:'visible',timeout:20000});
+ await touch.locator('#interact').tap();
+ await touch.waitForFunction(()=>window.__SHIRE__.snapshot().inside,{timeout:20000});
+ await still(touch,'mobile-bag-end-interior.png');
+ assert.ok((await snap(touch)).indoorStats.decor>=30);
+ await touch.locator('#interact').waitFor({state:'visible',timeout:20000});
+ await touch.locator('#interact').tap();
+ await touch.waitForFunction(()=>!window.__SHIRE__.snapshot().inside,{timeout:20000});
  await qaReposition(touch,-6,1);
  await touch.locator('#interact').waitFor({state:'visible',timeout:20000});
  assert.ok(await touch.locator('#interact').isVisible(),'Mobile interaction button should appear near Sam');

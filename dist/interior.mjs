@@ -34,11 +34,19 @@ export function createBagEndInterior(B,scene){
  const door=cy('green round inner door',160,2.8,131.4,4.75,.12,green);door.rotation.x=Math.PI/2;
  const rim=use(M.CreateTorus('round oak doorframe',{diameter:4.95,thickness:.23,tessellation:28},scene),oak,160,2.8,131.25);rim.rotation.x=Math.PI/2;
  sp('door brass handle',161,2.58,131.14,.19,.19,.14,brass);
- const lights=[new B.PointLight('Bag End hearth light',new V(156,2,157),scene),new B.PointLight('Bag End ceiling light',new V(160,4.5,145),scene)];
+ // Pull the sitting and work areas closer to the entrance; this is a cozy Hobbit home, not an empty hall.
+ const nearFurniture=new Set(['woven patterned carpet','dining table','dining table legs','oak chair','chair back','glazed plate','bright fruit','old writing desk','Bilbo journal','bookcase upright','bookcase shelf','bound book']);
+ const hearthFurniture=new Set(['hearth surround','fireplace recess','firelit ember','carved mantel']);
+ for(const m of meshes){if(nearFurniture.has(m.name))m.position.z-=3.6;else if(hearthFurniture.has(m.name))m.position.z-=5.0;}
+ // Warm foreground details and softened domestic silhouettes.
+ for(const [x,z] of [[153,139],[168,138]]){cy('glazed flower pot',x,.45,z,.8,.75,rug);sp('potted kitchen herb',x,.95,z,.75,.9,.75,green);}
+ for(const [x,z] of [[151,143],[170,143]]){cy('small candle stand',x,1.2,z,.3,2.4,oak);sp('candle flame',x,2.48,z,.3,.45,.3,fire);}
+ for(const [x,z] of [[163,139],[165,140]]){bx('leather luggage',x,.4,z,1.1,.8,.64,book);bx('rolled blanket',x,.86,z,.85,.13,.58,linen);}
+ const lights=[new B.PointLight('Bag End hearth light',new V(156,2,153),scene),new B.PointLight('Bag End ceiling light',new V(160,4.5,145),scene)];
  lights[0].diffuse=B.Color3.FromHexString('#ffc186');lights[0].intensity=.6;lights[0].range=12;
  lights[1].diffuse=B.Color3.FromHexString('#ffe8bc');lights[1].intensity=.5;lights[1].range=22;
  const setActive=on=>{for(const m of meshes)m.setEnabled(on);for(const l of lights)l.setEnabled(on);};
- const nearby=p=>Math.hypot(p.x-160,p.z-135.5)<3?{id:'exit-house',name:'اخرج إلى الشاير'}:Math.hypot(p.x-154,p.z-151)<2.3?{id:'diary',name:'اقرأ دفتر بيلبو'}:Math.hypot(p.x-156,p.z-156)<2.5?{id:'fire',name:'تأمّل المدفأة'}:null;
+ const nearby=p=>Math.hypot(p.x-160,p.z-135.5)<3?{id:'exit-house',name:'اخرج إلى الشاير'}:Math.hypot(p.x-154,p.z-147.4)<2.3?{id:'diary',name:'اقرأ دفتر بيلبو'}:Math.hypot(p.x-156,p.z-151.1)<2.5?{id:'fire',name:'تأمّل المدفأة'}:null;
  setActive(false);
  return {meshes,colliders,nearby,setActive,spawn:{x:160,y:.72,z:137.9},stats:{decor:meshes.length,lights:lights.length}};
 }

@@ -49,3 +49,5 @@
 
 ## Mobile milestone P01–P02, Bag End playable interior
 The source World Bible calls Bag End a Hobbit narrative hub with dense lived-in props, circular geometry and interior state transitions. This release adds an ORIGINAL-GAME furnished room with timber ceiling, books, table, firelight, readable diary, and safe door-based entry/exit. No film set replica or soundtrack copied. Switching exterior meshes off indoors reduces competing draw calls. The home remains a contained location rather than a separate second-world authority. Mobile HUD priorities: conversation controls and thumb access over decorative panels; music begins only after voluntary Start tap. High-first adaptive resolution is a preference, not a physical 30 FPS guarantee.
+
+- 0.4.0 visual intervention: first interior screenshot looked spacious/empty versus Hobbit lived-in reference. Shift furniture forward and add warm domestic foreground details (herbs, candle stands, luggage and blanket) without new collisions. Mobile interior screenshot acceptance added to QA.
