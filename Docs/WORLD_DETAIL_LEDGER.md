@@ -46,3 +46,6 @@
 - TECHNICAL: no texture network requests; retain merged static materials and low-triangle details, expanded village boundaries with save validation, test scene/character restoration and screen-rendered evidence. Performance on owner device remains a separate metric.
 
 - CINEMATIC VISUAL REVIEW: initial shot showed an unflattering cropped close-up of primitive cart and pony; reframe the original-game arrival as a medium/wide Shire road shot with scenery and Gandalf visible. Preserve skip and full automatic return; time is monotonic real elapsed instead of frame-rate-dependent simulation stepping.
+
+## Mobile milestone P01–P02, Bag End playable interior
+The source World Bible calls Bag End a Hobbit narrative hub with dense lived-in props, circular geometry and interior state transitions. This release adds an ORIGINAL-GAME furnished room with timber ceiling, books, table, firelight, readable diary, and safe door-based entry/exit. No film set replica or soundtrack copied. Switching exterior meshes off indoors reduces competing draw calls. The home remains a contained location rather than a separate second-world authority. Mobile HUD priorities: conversation controls and thumb access over decorative panels; music begins only after voluntary Start tap. High-first adaptive resolution is a preference, not a physical 30 FPS guarantee.
