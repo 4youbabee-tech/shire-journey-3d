@@ -19,7 +19,7 @@ export async function loadCharacters(B,scene,world){
   const scale=height/(max-min);holder.scaling.setAll(scale);holder.position.y=-min*scale;holder.rotation.y=Math.PI;
   for(const m of c.parts){world.shadow?.removeShadowCaster(m);m.dispose(false,false);}
   const palette=c.id==='gandalf'?'gandalf':['player','bilbo','sam','frodo'].includes(c.id)?c.id:null;
-  if(palette)for(const material of new Set(meshes.map(m=>m.material).filter(Boolean))){
+  if(palette)for(const material of new Set(meshes.map(m=>m.material).filter(m=>m?.albedoTexture))){
    const copy=material.clone(c.id+' costume');copy.albedoTexture=new B.Texture('./assets/characters/'+palette+'.png',scene,false,false);
    for(const m of meshes)if(m.material===material)m.material=copy;
   }
@@ -40,3 +40,4 @@ export async function loadCharacters(B,scene,world){
  world.stats.importedCharacters=actors.length;world.stats.characterAssets='KayKit Adventurers CC0';
  return {actors,update(dt,activeNPC,party){for(const c of actors)c.imported.update(dt,{speaking:c.id===activeNPC,celebrating:party});}};
 }
+

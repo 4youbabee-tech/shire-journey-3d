@@ -110,6 +110,16 @@ try{
  await still(page,'desktop-after-birthday.png');
  await still(page,'desktop-completed.png');await qaReposition(page,-12,-5);await still(page,'desktop-garden-life.png');
  report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
+ // Inspect the real asset at its existing world position; no character teleport.
+ report.desktop.characterRig=await page.evaluate(()=>{
+  const B=window.BABYLON,s=B.Engine.LastCreatedScene;
+  const skin=s.meshes.filter(m=>m.skeleton&&m.getTotalVertices()>0);
+  if(skin.length<8||!s.getMeshByName('gandalf Gandalf tapered silver beard'))throw Error('Missing imported skin or attached Gandalf beard');
+  s.getEngine().stopRenderLoop();
+  s.activeCamera.position.set(-2,2.7,11.5);s.activeCamera.setTarget(new B.Vector3(-2,1.7,17));s.render();
+  return {skinnedMeshes:skin.length,skeletons:s.skeletons.length,animationGroups:s.animationGroups.length,inspectionCameraOnly:true};
+ });
+ await still(page,'desktop-gandalf-character-detail.png');
  await desktop.close();
  const mobile=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,recordVideo:{dir:out,size:{width:390,height:844}}});
  const touch=await mobile.newPage();touch.on('pageerror',e=>report.errors.push('mobile: '+e.message));
@@ -152,4 +162,5 @@ try{
  assert.deepEqual(report.errors,[],'No uncaught browser exceptions');report.status='PASS';
 }catch(e){report.status='FAIL';report.errors.push(e.stack||String(e));console.error(e);process.exitCode=1;
 }finally{await writeFile(resolve(out,'report.json'),JSON.stringify(report,null,2));console.log('BROWSER_QA_REPORT '+JSON.stringify({commit:report.commit,status:report.status,desktop:report.desktop.performance,mobile:report.mobile.performance,errors:report.errors.slice(0,3)}));await browser?.close();await new Promise(ok=>server.close(ok));}
+
 

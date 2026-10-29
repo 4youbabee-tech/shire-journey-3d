@@ -1,3 +1,15 @@
+# 0.8.0 recovery candidate — 2026-10-30
+
+Canonical main inspected: 35a2780dbe09e9e0e1a215209d6206c9d60e89a1 (0.7.0); Pages 40946139312 and browser 40946139327 PASS. Resume the existing PR #12, not a new project. PR head 38d8172b28ca22c619d4f6539b08c092f07b6630 failed browser run 40960752539 with Invalid typed array length while importing traveller.glb. Both committed GLBs were only 786444 bytes, inconsistent with their declared >2MB lengths. Prior prose claiming local success does not establish remote asset integrity.
+
+M0/M1 diagnosis and repair: downloaded official CC0 KayKit source at tree 672074b73ba276876a19e8816ecdc5241817ab47. Raw Rogue/Mage Git blob hashes independently match upstream c8827661105eef7b2bfbef3bc676d41a47625733 / c89f19f6e707f6e07e4632a08876bd6d0172b082. Removed weapons and retained nine animation clips. Authored continuous beard and folded robe meshes attached to Gandalf's existing head/hips joints; neutralized stray pink/cyan atlas colors. This is an approximate cartoon game cast, not film likeness or accepted final character art. Hobbit roles still share a face/body base; authored blinking, distinct expressive faces and nuanced seated conversation remain open.
+
+M2/M3 source validation: self-contained character payloads are losslessly gzip/base64 chunked in scripts/character-data, assembled by npm ci / prepare-engine. No external runtime downloads. Every reconstructed asset must pass exact bytes, SHA256, GLB header/chunk and buffer-view bounds, skin-weight presence and required locomotion clips. Corruption/truncation regression tests added. Generated GLBs no longer pass through the connector's size-limited binary request. Rollback is revert PR #12; original version-1 save key remains compatible.
+
+Local evidence after final robe/texture changes: npm syntax and 30 Node tests PASS; Chromium SwiftShader desktop 1280x720 and emulated touch 390x844 full existing QA PASS, no page exceptions. Tests cover actual keyboard/joystick smoke, touch camera, dialogue, Bag End, party and saved progress; quest progression uses explicit localhost QA relocation between encounters, not full-route navigation acceptance. Recorded actual WebM videos and screenshots. Software medians desktop 3 FPS / mobile emulation 8 FPS are NOT physical-device results. Local fixed-camera before/after uses main 0.7.0 game/index/build modules and identical world geometry. Added fixed-camera Gandalf inspection at his existing position without moving scene/story objects.
+
+M4-M7 exact candidate GitHub CI, visual review and Pages verification: PENDING at commit authoring. Do not merge before exact-head browser QA PASS and screenshot review. Hardware i7/8GB/2GB/720p 30FPS, physical phone/audio and owner visual acceptance NOT RUN. This is owner batch 1 recovery, not completion of all five batches. Arrival pony/cart/environment remain the earlier procedural vignette; requested Frodo-under-tree film-sequence reconstruction has NOT been implemented in this batch.
+
 # 0.8.0 imported skinned character candidate — 2026-10-29
 
 Base 35a2780dbe09e9e0e1a215209d6206c9d60e89a1. Owner prioritizes a visibly playable stylized game over actor likeness. Two licensed KayKit CC0 assets now load through Babylon GLB containers and instantiate across eight roles. Original procedural render pieces are hidden, gameplay/collision roots retained. Idle/walk/run/interact/cheer clips selected from real skeletal animation. Source tests: 28 PASS locally; first full local Chromium desktop/mobile flow PASS (software WebGL only); final costume atlas orientation corrected after raster inspection and requires exact-SHA CI. No target-device FPS or final art acceptance claimed. Runtime assets and license recorded in Docs/IMPORTED_CHARACTER_ASSETS.md. Rollback: revert this single cohort; old save key preserved.
@@ -165,5 +177,6 @@ Next acceptance step: the owner opens the deployed URL in a WebGL-capable browse
 - Static source candidate at authoring; new exact-SHA CI/browser acceptance NOT RUN yet. Actual phone audio, UX and target hardware FPS require device evidence. Old release 0.2.1 remains published until separately merged/deployed.
 
 - Living Shire candidate: 3 non-dialogue background farmers/gardeners now pace fixed safe plots, 11 small upper canopies sway in an original wind loop, no navmesh or quest impact. CI/head validation and on-device performance NOT RUN at authoring. Original five interactive characters unchanged.
+
 
 

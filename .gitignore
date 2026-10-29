@@ -3,3 +3,6 @@ node_modules/
 *.tgz
 tmp/
 dist/vendor/babylon.js
+
+dist/assets/characters/*.glb
+node_modules/
