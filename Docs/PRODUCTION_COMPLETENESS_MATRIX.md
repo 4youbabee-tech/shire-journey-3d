@@ -1,3 +1,8 @@
+## 0.4.0 source receipts and P02 refinement
+- Main a09e42e: Pages 40875240720 PASS, Chromium 40875240699 PASS; PR7 40874619398 Node/browser tests PASS for indoor gameplay, audio and mobile dialogue.
+- Follow-up visual: moved distant furniture into a closer Hobbit-room composition, added small homely props; photo of new browser result + 360px UI/touch room proof required before P02 artistic acceptance.
+- Hardware mobile GPU performance NOT DEVICE TESTED (CI uses SwiftShader).
+
 # 0.4.0 candidate gates
 
 | Gate | Status before exact-HEAD test |
