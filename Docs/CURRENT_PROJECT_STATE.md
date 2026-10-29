@@ -1,3 +1,13 @@
+# P05 0.7.0 — owner-driven playable presentation fix (source candidate 2026-10-29)
+
+Base exact main 5872b9fde795b1bdf961a7ca5b95be96d4602651. Owner's real phone screenshot showed an older stage2 apple mission, a primitive player silhouette and a Gandalf figure without immediate story interaction. The previous 0.6.0 exact-head CI passed but did not simulate this existing saved state. No accepted character art or hardware FPS claim is made.
+
+Single cohesive candidate: original 12-second melody with bass/harmony (pastoral score, Web Audio only, no movie audio/copyrighted tune) plus varied birds, filtered leaf-wind bed and active sound settings. Meadow receives low-cost deterministic vertex-color mottling on one ground mesh, more natural foliage color balance and smaller flowers. Player cloak/pack and softened character sleeves/trousers reduce toy-like silhouette without purchasing or importing models; three existing workers remain animated; flying birds visibly flutter. Strict runtime mesh budget retained and source test added.
+
+Narrative: opening cart leads into a genuine Gandalf dialogue after the cinematic. Previously saved apple-stage progress remains available, but welcome page now offers explicit fresh story restart. Sam offers a no-apples route to the Bilbo party; apple gathering is an optional original side errand. Persist `applesSkipped` in version-1 save schema, validate against corrupted saves, no forced save resets. Broader trilogy and film-level art are not claimed.
+
+Acceptance: SOURCE CANDIDATE until latest exact-SHA Node/Chromium screenshots/audio API evidence, then review and merge. Real user-device audio listening, visual acceptance and GPU FPS NOT RUN. Single-commit rollback is safe, with existing save key preserved.
+
 ## Source gate finding — P04 art draw-call budget
 Exact-candidate Action 40925340163 at 20e895c7704e7fe26271cb9d7c2954d8f65b128a: 21/22 Node tests PASSED, the scene-mesh budget regression rejected the candidate before browser render. Root cause was adding original extra face material groups for every ambient character, increasing rigid-merged draw calls despite batching. Corrected the source: hero-only rich facial details, shared existing face/eye materials for cheek and lip, keep worker base rigs light. The strict mesh-budget test remains unchanged. Re-run exact-HEAD Node and browser before merge.
 
