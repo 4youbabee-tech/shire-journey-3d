@@ -1,3 +1,6 @@
+## Source gate finding — P04 art draw-call budget
+Exact-candidate Action 40925340163 at 20e895c7704e7fe26271cb9d7c2954d8f65b128a: 21/22 Node tests PASSED, the scene-mesh budget regression rejected the candidate before browser render. Root cause was adding original extra face material groups for every ambient character, increasing rigid-merged draw calls despite batching. Corrected the source: hero-only rich facial details, shared existing face/eye materials for cheek and lip, keep worker base rigs light. The strict mesh-budget test remains unchanged. Re-run exact-HEAD Node and browser before merge.
+
 # 0.6.0 P04 hero-art candidate
 Based on source main dd4eb5bcb5013621e1a9ad1c5c518801af7b6fd5; latest published 0.5.0 WebGL/Pages PASSED. This cohesive candidate adds original Babylon hero facial/costume mesh details via the existing rig hierarchy, slimmer simplified faces and hair, eye irises, brow/lip expression, vest panels, Gandalf beard and subtle scene exposure. It retains rigid batching and quest/collisions/saves. Test exact-head unit and desktop/mobile Chromium visual evidence before acceptance. Full licensed/imported skinned glTF rig with deforming animations is distinct further work and is NOT ACCEPTED by this pass.
 

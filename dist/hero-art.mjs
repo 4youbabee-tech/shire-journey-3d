@@ -1,9 +1,10 @@
 // Original storybook-face and costume details using the existing articulated pivots.
 // Geometry is grouped by existing material/parent by world.mjs, not individual draw calls.
 export function enhanceHero({id,height,root,head,parts,sphere,materials}){
- const {skin,shirt,eye,brass,rosy,lip,wood,trousers,waistcoat,grey,hatmat,
+ const {skin,shirt,eye,brass,wood,trousers,waistcoat,grey,hatmat,
   hair,bilboHair,frodoHair,samHair,beard}=materials;
  const hairMat=id==='bilbo'?bilboHair:id==='sam'?samHair:id==='frodo'?frodoHair:hair;
+ if(!['bilbo','frodo','sam','gandalf'].includes(id))return {detailTag:'ambient-base',faceDetails:0,clothing:false};
  const headPart=(name,x,y,z,sx,sy,sz,mt,segments=10)=>{
   const m=sphere(name,x,y,z,sx,sy,sz,mt,false,head,segments);parts.push(m);return m;
  };
@@ -18,10 +19,10 @@ export function enhanceHero({id,height,root,head,parts,sphere,materials}){
   headPart('tiny eye reflection',side*.114-.012,eyeY+.011,-.291,.014,.014,.009,shirt,8);
   const brow=headPart('expressive wool-soft eyebrow',side*.119,.142,-.228,.118,.025,.036,hairMat,12);
   brow.rotation.z=side*.12;
-  headPart('subtle warm cheek',side*.176,-.093,-.186,.11,.052,.022,rosy,10);
-  headPart('defined small ear fold',side*.26,.007,-.07,.055,.11,.033,rosy,12);
+  headPart('subtle cheek plane',side*.176,-.093,-.186,.11,.052,.022,skin,10);
+  headPart('defined small ear fold',side*.26,.007,-.07,.055,.11,.033,skin,12);
  }
- headPart('short natural mouth',0,-.156,-.244,.115,.022,.022,lip,12);
+ headPart('short natural mouth',0,-.156,-.244,.115,.022,.022,eye,12);
  headPart('rounded nose bridge',0,-.031,-.251,.076,.14,.08,skin,12);
  // Flexible robe and vest silhouettes. All are ambient original designs.
  if(id!=='gandalf'){
