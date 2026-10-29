@@ -1,3 +1,7 @@
+# Shire Journey 0.5.0 candidate — Gandalf-first Shire and Bilbo's birthday
+
+On a new playthrough greet Gandalf after the original arrival, then help Bilbo and Sam, collect the optional apples, and gather under the party tree for an original lightweight birthday/firework vignette. The sequence ends with Bilbo departing and the Ring passing to Frodo, in the correct causal order. Story state and parties are saved and replay-safe. Dialogue and sound are original; no film dialogue or music replicated. See Docs/MOBILE_PRODUCTION_ROADMAP.md for the next chapter and character-art work.
+
 # SHIRE JOURNEY — Active Production Queue
 
 **Resume in order:** [Mobile & cinematic roadmap](Docs/MOBILE_PRODUCTION_ROADMAP.md) · [Character/story asset roster](Docs/SHIRE_TO_BREE_CHARACTER_ROSTER.md). 0.4.0 now includes working Bag End entry/exit, responsive mobile dialogues and start-triggered original music. P02 indoor art refinement is in review; next major gameplay step P03 is Gandalf-first story sequence and Bilbo birthday party. Every pass uses latest GitHub HEAD/CI and delivers player-visible changes.

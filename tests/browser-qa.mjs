@@ -69,7 +69,7 @@ try{
  await page.locator('#journal-open').click();
  await page.locator('#volume-music').fill('0');await page.locator('#volume-effects').fill('0.5');
  await still(page,'desktop-audio-settings.png');await page.locator('#journal-close').click();
- const walkEvidence=await realWalk(page);await still(page,'desktop-moving.png');await qaReposition(page,8,7);
+ const walkEvidence=await realWalk(page);await still(page,'desktop-moving.png');await qaReposition(page,-2,17);await talk(page);assert.ok(await page.locator('#choices button').first().isVisible());await chooseFirst(page);assert.equal((await snap(page)).state.gandalfMet,true,'Gandalf greeting unlocks Bilbo');await qaReposition(page,8,7);
  await still(page,'desktop-arrived.png');
  // Enter the real Babylon room using the gameplay key, inspect the 3D interior and exit.
  await qaReposition(page,11,8.2);
@@ -97,7 +97,15 @@ try{
  await qaReposition(page,-21,1);await qaReposition(page,-6,1);await talk(page);await chooseFirst(page);
  assert.equal((await snap(page)).state.stage,4,'Apple return completes');
  await qaReposition(page,8,1);await qaReposition(page,8,7);await talk(page);await chooseFirst(page);
- assert.equal((await snap(page)).state.stage,5,'Quest completed in actual browser interactions');
+ assert.equal((await snap(page)).state.stage,5,'Preparation completed before birthday celebration');
+ await qaReposition(page,-2,21);await page.keyboard.press('e');
+ assert.equal((await snap(page)).party.active,true,'Birthday party and original fireworks begin at the party tree');
+ await still(page,'desktop-birthday-party.png');
+ await page.locator('#party-skip').click();
+ assert.equal((await snap(page)).state.partyCompleted,true,'Party skip preserves canonical outcome');
+ assert.equal((await snap(page)).state.ringPassed,true,'Bilbo leaves the Ring to Frodo');
+ assert.equal((await snap(page)).state.bilboGone,true,'Bilbo departs after the celebration');
+ await still(page,'desktop-after-birthday.png');
  await still(page,'desktop-completed.png');await qaReposition(page,-12,-5);await still(page,'desktop-garden-life.png');
  report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
  await desktop.close();

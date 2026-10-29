@@ -1,3 +1,14 @@
+# 0.5.0 P03 candidate acceptance
+
+| Test | Gate |
+|---|---|
+| Gandalf-first progression and refusal to skip narrative gate | Unit + Chromium exact-head PENDING |
+| Bilbo + Sam + apples legacy state compatibility | Unit and in-browser saved reload PENDING |
+| Original birthday scene/2D fireworks and party skip | Desktop/WebGL screenshot PENDING |
+| Canon Bilbo departs and Ring passes to Frodo | Deterministic unit + in-browser QA PENDING |
+| Phone 360px dialogue and original start-triggered ambience | Preserve existing QA PENDING |
+| Next source-licensed/skinned characters and Shire-Bree gameplay | Separate following P04+ milestones |
+
 ## 0.4.0 source receipts and P02 refinement
 - Main a09e42e: Pages 40875240720 PASS, Chromium 40875240699 PASS; PR7 40874619398 Node/browser tests PASS for indoor gameplay, audio and mobile dialogue.
 - Follow-up visual: moved distant furniture into a closer Hobbit-room composition, added small homely props; photo of new browser result + 360px UI/touch room proof required before P02 artistic acceptance.
