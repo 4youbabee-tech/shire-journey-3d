@@ -1,3 +1,7 @@
+# 0.8.0 imported skinned character candidate — 2026-10-29
+
+Base 35a2780dbe09e9e0e1a215209d6206c9d60e89a1. Owner prioritizes a visibly playable stylized game over actor likeness. Two licensed KayKit CC0 assets now load through Babylon GLB containers and instantiate across eight roles. Original procedural render pieces are hidden, gameplay/collision roots retained. Idle/walk/run/interact/cheer clips selected from real skeletal animation. Source tests: 28 PASS locally; final Chromium visual/gameplay validation PENDING. No target-device FPS or final art acceptance claimed. Runtime assets and license recorded in Docs/IMPORTED_CHARACTER_ASSETS.md. Rollback: revert this single cohort; old save key preserved.
+
 # P05 browser candidate 0.7.0 — acceptance gates
 
 | Gate | Current evidence |
@@ -136,4 +140,25 @@ An engine construction or CI pass does not establish browser playability, visual
 - Soundscape + NPC gestures candidate: SOURCE_AVAILABLE after push, JavaScript/unit/Chromium checks pending; original Web Audio synthesis, opt-in button, pause on background tab, no film recording. Actual phone audio and visual acceptance NOT TESTED.
 
 - Background farmers (3) / light swaying canopies (11): source candidate; PASS only after exact-head tests, still NOT PHYSICAL-DEVICE TESTED. No pathfinding/day schedule.
+
+
+
+# 0.8.0 final review correction
+
+Cinematic/party early-return branches now update imported clip selection. Birthday WebGL QA must observe >=7 playing Cheer groups. Gandalf inspection camera uses current facing direction without moving any world anchor. Exact final SHA validation still required; Bree F1-02/F1-03/F1-04 sequence confirmed from supplied Story Bible, runtime chapters NOT IMPLEMENTED.
+
+# 0.8.0 asset recovery — 2026-10-30
+
+| Deliverable | Evidence / state |
+|---|---|
+| Complete licensed character source | KayKit CC0 raw Git blob hashes verified against official upstream; no actor likeness |
+| Reproducible safe asset transfer | Chunked lossless gzip/base64 in repository; npm ci reconstructs locally and validates sizes/SHA256/GLB bounds |
+| Visible skinned actors | Eight existing roles rendered locally, nine authored clips retained, camera/quest roots preserved |
+| Gandalf identity | Head-attached continuous beard, hips-attached folded long robe, hat and neutral atlas; real close-up reviewed |
+| Source tests | 30 PASS locally including deliberate truncated/corrupt GLBs rejected |
+| Browser interactions | Local desktop/touch QA PASS; actual movement smoke plus QA relocation for quest steps; PNG/WebM generated |
+| Performance | Local SwiftShader medians 3/8 FPS; target PC and physical phone NOT RUN |
+| Exact-head CI / publish | Required next, PENDING at authoring; existing main remains 0.7.0 until successful merge/deploy |
+| Final art | NOT ACCEPTED: shared hobbit faces/body, no blink/facial morph clips, model proportions still toy-like |
+| Requested opening/tree/horse overhaul | NOT IMPLEMENTED by this repair; previous procedural arrival is preserved |
 

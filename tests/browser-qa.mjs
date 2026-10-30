@@ -32,6 +32,7 @@ async function ready(page){
  await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.querySelector('#welcome').hidden||!document.querySelector('#fatal').hidden,null,{timeout:90000});
  if(await page.locator('#fatal').isVisible())throw Error('WebGL/scene failed: '+await page.locator('#fatal-text').innerText());
+ assert.equal((await snap(page)).world.importedCharacters,8,'All eight visible roles use imported GLB rigs');
  if(process.env.GITHUB_ACTIONS)assert.equal((await snap(page)).commit,checkoutSha,'Published build identity matches tested checkout');
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
 }
@@ -102,6 +103,7 @@ try{
  assert.equal((await snap(page)).party.active,true,'Birthday party and original fireworks begin at the party tree');
  assert.ok((await snap(page)).party.participants>=7,'Seven existing villagers gather to celebrate without adding heavy meshes');
  await still(page,'desktop-birthday-party.png');
+ await page.waitForFunction(()=>window.BABYLON.Engine.LastCreatedScene.animationGroups.filter(g=>g.name.endsWith('Cheer')&&g.isPlaying).length>=7,null,{timeout:10000});
  await page.locator('#party-skip').click();
  assert.equal((await snap(page)).state.partyCompleted,true,'Party skip preserves canonical outcome');
  assert.equal((await snap(page)).state.ringPassed,true,'Bilbo leaves the Ring to Frodo');
@@ -109,6 +111,18 @@ try{
  await still(page,'desktop-after-birthday.png');
  await still(page,'desktop-completed.png');await qaReposition(page,-12,-5);await still(page,'desktop-garden-life.png');
  report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
+ // Inspect the real asset at its existing world position; no character teleport.
+ report.desktop.characterRig=await page.evaluate(()=>{
+  const B=window.BABYLON,s=B.Engine.LastCreatedScene;
+  const skin=s.meshes.filter(m=>m.skeleton&&m.getTotalVertices()>0);
+  if(skin.length<8||!s.getMeshByName('gandalf Gandalf tapered silver beard'))throw Error('Missing imported skin or attached Gandalf beard');
+  s.getEngine().stopRenderLoop();
+  const actor=s.getTransformNodeByName('gandalf'),head=s.getTransformNodeByName('gandalf head');
+  const facing=B.Vector3.TransformNormal(new B.Vector3(0,0,1),head.getWorldMatrix());facing.y=0;facing.normalize();
+  s.activeCamera.position.copyFrom(actor.position.add(facing.scale(5.5)).add(new B.Vector3(0,2.7,0)));s.activeCamera.setTarget(actor.position.add(new B.Vector3(0,1.7,0)));s.render();
+  return {skinnedMeshes:skin.length,skeletons:s.skeletons.length,animationGroups:s.animationGroups.length,inspectionCameraOnly:true};
+ });
+ await still(page,'desktop-gandalf-character-detail.png');
  await desktop.close();
  const mobile=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,recordVideo:{dir:out,size:{width:390,height:844}}});
  const touch=await mobile.newPage();touch.on('pageerror',e=>report.errors.push('mobile: '+e.message));
@@ -151,3 +165,5 @@ try{
  assert.deepEqual(report.errors,[],'No uncaught browser exceptions');report.status='PASS';
 }catch(e){report.status='FAIL';report.errors.push(e.stack||String(e));console.error(e);process.exitCode=1;
 }finally{await writeFile(resolve(out,'report.json'),JSON.stringify(report,null,2));console.log('BROWSER_QA_REPORT '+JSON.stringify({commit:report.commit,status:report.status,desktop:report.desktop.performance,mobile:report.mobile.performance,errors:report.errors.slice(0,3)}));await browser?.close();await new Promise(ok=>server.close(ok));}
+
+

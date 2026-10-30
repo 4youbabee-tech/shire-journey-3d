@@ -1,0 +1,20 @@
+{
+  "traveller.glb": {
+    "bytes": 2356472,
+    "sha256": "a29ce12fa455595f2f5f7c7822e5ff22ba453246649c5ddbf0f80dba4ee1dfeb",
+    "parts": [
+      "traveller.0.b64",
+      "traveller.1.b64",
+      "traveller.2.b64"
+    ]
+  },
+  "wizard.glb": {
+    "bytes": 2372816,
+    "sha256": "c89764992fb6332cb5b2ca50e776d3aba1c1f5f7fd7b597e56ae86354ba49b90",
+    "parts": [
+      "wizard.0.b64",
+      "wizard.1.b64",
+      "wizard.2.b64"
+    ]
+  }
+}

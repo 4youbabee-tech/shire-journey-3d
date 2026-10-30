@@ -1,3 +1,9 @@
+# Shire Journey 0.8.0 — imported animated character recovery candidate
+
+Eight existing roles now use licensed KayKit CC0 GLB actors, shared source geometry with separate costumes and cloned skeletal animation. Gandalf has an authored head-attached beard and long folded robe. These are approximate stylized roles; shared hobbit faces and toy-like proportions still need art work. Existing dialogue, save, touch controls, Bag End and birthday flow retained. No claim of target-device 30 FPS.
+
+PR #12 originally failed because binary GLBs were truncated during transfer. Lossless compressed source chunks now reconstruct during `npm ci`, with exact SHA256/byte/header/buffer bounds checks and regression tests. No external asset network calls during play. See Docs/IMPORTED_CHARACTER_ASSETS.md for provenance and limitations. Validate exact-head CI and inspect evidence before merge; Pages remains the one public URL below.
+
 # Shire Journey 0.7.0 — responsive natural world, original score and story recovery
 
 **New in this source candidate:** original melodic accompaniment, ambient birds and wind, muted more organic meadows, softer clothing/arms/legs and a smaller travelling pack. Existing animated workers and birds make the world feel more alive. Entry into Bag End and prior cinematic scenes remain unchanged. This is not a cinematic studio asset import, film score or full character likeness.
@@ -115,4 +121,5 @@ The four SVG images have an independent source/integrity regression test. Browse
 
 ## Candidate: quiet living Shire ambience
 - Tap the ♫ button once to enable a lightweight, original synthesized bird/leaf/pastoral chime soundscape. The source intentionally contains no film soundtrack or voice recordings. Web Audio requires a user gesture and may be unavailable on some phones. NPCs subtly turn their heads and gesture while speaking; this is visual ambience, not full daily-routine AI. Check candidate's exact GitHub Actions run before announcing production readiness.
+
 

@@ -67,3 +67,11 @@ P04 corrective art decision: retain high-resolution facial sculpting only on the
 - Player-supplied real mobile screenshot is direct rejection evidence for the prior flat green toy-like presentation and old-save apple primary objective. New art stays ORIGINAL-GAME; mellow palette, ground vertex colors, naturalized silhouettes and smaller flowers do not claim film character likeness.
 - Acoustic impression of an original pastoral song is synthesized through inexpensive Web Audio triangle/sine notes with bass and 12-second phrase variation; no copyrighted recordings or film music. Wind and birds have independent effects control.
 - Avoid rewriting existing progress. A saved game can restart from Gandalf arrival via an explicit action, or continue the optional apple side activity and reach the party through Sam. All main canon outcomes remain gated by their story actions.
+
+
+- 0.8.0 ORIGINAL-GAME art: owner accepts approximate identities and imported licensed stylized people. KayKit Rogue/Mage CC0 adopted as role representations, not actor likeness. Story remains the existing F1-01 opening and birthday sequence. Imported animation validation must precede merge.
+
+# 2026-10-30 — recover imported actor assets without moving world anchors
+
+Continue PR #12 against canonical main 35a2780. Incomplete binary transfer was the root cause of run 40960752539; never rerun that same broken payload. Repository now contains lossless compressed asset chunks plus a manifest and fail-closed build integrity gate. Runtime GLBs generated before both QA and Pages packaging. Official source Git blob hashes verified; CC0 license retained. Gandalf receives continuous beard/robe surfaces attached to the imported head/hips, not a replacement collision or character authority. No mission locations, house colliders or scene positions changed for photography. Fixed-camera close-up is an inspection view only. Babylon documentation https://doc.babylonjs.com/features/featuresDeepDive/importers/assetContainers/ informed reusable containers with independent cloned skeletons and animation groups; actual compatibility uses pinned 9.32.1 runtime and browser QA. Existing world/pony/cart art remains outside this recovery batch.
+
