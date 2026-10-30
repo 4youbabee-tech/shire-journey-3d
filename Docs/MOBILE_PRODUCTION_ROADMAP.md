@@ -1,3 +1,18 @@
+# Current execution map — 2026-10-30
+
+| Work | Verified state | Next gate |
+|---|---|---|
+| Existing repository / build recovery | Exact source restored; clean npm ci; main d2c5d759 remains canonical | Preserve all work in cohesive GitHub commits |
+| Natural Frodo / Gandalf / Bilbo / Sam | Four licensed authored GLBs, one 65-bone rig each; loaded on eight roles; independent face controls | Correct wool color/lighting and inspect actual faces/cloth in motion |
+| Interaction / movement / collision / save | 412bce3 desktop/touch WebGL and 49 source tests PASS | Repeat with integrated art/audio cohort |
+| In-world pony/cart opening | Full continuous playback PASS; sit/rise/run/talk/board/ride clips present | Inspect actual chronological recording and handoff |
+| Roadside life and footsteps | Existing scheduled gardeners / wind / birds; new bounded instancing and four CC0 recordings prepared | Exact-head source, browser, audio decode and raster check |
+| First-film birthday causal outcomes | Existing tested party, Bilbo departs, Ring passes; skip/save outcomes consistent | Integrated chapter playthrough and visual review |
+| Published acceptance | Permanent Pages still d2c5d759; physical target PC/phone performance not measured here | Accepted candidate → merge → Pages/exact SHA verification |
+| Later film windows | F1-02 onward planned below; do not replace first-region quality gate with premature expansion | Complete the first-region production gates first |
+
+50 source tests PASS for the current polish cohort. Software SwiftShader is a functional/render test, not physical-device acceptance.
+
 # Shire Journey — Mobile cinematic production roadmap
 
 ## Owner contract and sources

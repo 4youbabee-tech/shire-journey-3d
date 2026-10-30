@@ -34,7 +34,7 @@ async function assertFaceVisible(page,id){
   const h={gandalf:3.12,bilbo:1.36,sam:1.48,frodo:1.42}[id];head.computeWorldMatrix(true);const face=head.getAbsolutePosition().add(new B.Vector3(0,h*.06,0));
   const p=B.Vector3.Project(face,B.Matrix.Identity(),s.getTransformMatrix(),s.activeCamera.viewport.toGlobal(s.getEngine().getRenderWidth(),s.getEngine().getRenderHeight()));
   const canvas=document.querySelector('#game').getBoundingClientRect(),dialog=document.querySelector('#dialogue').getBoundingClientRect(),x=p.x/s.getEngine().getRenderWidth()*canvas.width,y=p.y/s.getEngine().getRenderHeight()*canvas.height;
-  return p.z>0&&p.z<1&&x>20&&x<canvas.width-20&&y>20&&y<dialog.top-22&&B.Vector3.Distance(face,s.activeCamera.position)>1.1;
+  return p.z>0&&p.z<1&&x>20&&x<canvas.width-20&&y>20&&y<dialog.top-(id==='gandalf'?90:45)&&B.Vector3.Distance(face,s.activeCamera.position)>1.1;
  },id,{timeout:20000});}catch(error){await still(page,'face-visibility-failure-'+id+'.png');throw error;}
 }
 async function ready(page){
@@ -78,6 +78,7 @@ try{
  await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();assert.equal((await snap(page)).quality.mode,'auto');assert.equal((await snap(page)).cinematic.active,true);await still(page,'desktop-arrival-cinematic.png');await page.locator('#arrival-skip').click();assert.equal((await snap(page)).cinematic.active,false);assert.equal(await page.locator('#speaker').innerText(),'غاندالف','Opening must speak to Gandalf, not merely show his mesh');await assertFaceVisible(page,'gandalf');await still(page,'desktop-gandalf-opening-dialogue.png');await chooseFirst(page);assert.equal((await snap(page)).state.gandalfMet,true);
  await page.locator('#map-open').click();assert.ok(await page.locator('#world-map').isVisible());await still(page,'desktop-village-map.png');await page.locator('#map-close').click();
  await page.waitForFunction(()=>window.__SHIRE__.snapshot().audio?.score.status==='decoded',null,{timeout:30000});
+ assert.equal((await snap(page)).audio.foley.decoded,4,'Four packaged CC0 footstep variants must decode');
  assert.match(await page.locator('#sound').innerText(),/مفعّلة/,'Original music must begin after Start interaction');
  await page.locator('#journal-open').click();
  await page.locator('#volume-music').fill('0');await page.locator('#volume-effects').fill('0.5');
@@ -168,7 +169,7 @@ try{
  await touch.locator('#interact').waitFor({state:'visible',timeout:20000});
  assert.ok(await touch.locator('#interact').isVisible(),'Mobile interaction button should appear near Sam');
  await touch.locator('#interact').tap();await touch.locator('#dialogue:not([hidden])').waitFor({timeout:5000});assert.equal(await touch.locator('#portrait svg').count(),1,'Sam SVG portrait visible on emulated mobile');
- await assertFaceVisible(touch,'sam');await still(touch,'mobile-dialogue.png');
+ assert.equal(await touch.locator('#toast').isVisible(),false,'Transient notices must not cover the face during dialogue');await assertFaceVisible(touch,'sam');await still(touch,'mobile-dialogue.png');
  const boxes=await touch.evaluate(()=>({w:window.innerWidth,dialogue:document.querySelector('#dialogue').getBoundingClientRect().toJSON(),chat:document.querySelector('#npc-chat-input').getBoundingClientRect().toJSON(),send:document.querySelector('#npc-chat-send').getBoundingClientRect().toJSON()}));
  for(const key of ['dialogue','chat','send']){const r=boxes[key];assert.ok(r.left>=-2&&r.right<=boxes.w+2&&r.width>25,'Mobile '+key+' stays inside viewport');}
  assert.ok(boxes.dialogue.width>boxes.w*.75,'Mobile dialogue is legible');

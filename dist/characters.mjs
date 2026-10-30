@@ -25,7 +25,7 @@ export function createClipMixer({fadeSeconds=.24}={}){
 }
 export async function loadCharacters(B,scene,world){
  const assets={};
- for(const role of ['frodo','sam','bilbo','gandalf']){const a=await B.SceneLoader.LoadAssetContainerAsync('./assets/characters/',role+'-natural.glb',scene);for(const g of a.animationGroups)g.stop();assets[role]=a;}
+ for(const role of ['frodo','sam','bilbo','gandalf']){const a=await B.SceneLoader.LoadAssetContainerAsync('./assets/characters/',role+'-natural.glb',scene);for(const g of a.animationGroups)g.stop();for(const m of a.materials)if(/woven waistcoat|wool cloak|woven wool/.test(m.name)&&m.albedoTexture)m.albedoTexture.gammaSpace=false;assets[role]=a;}
  const actors=[];
  for(const c of world.characters){
   const role=roleFor(c.id),instance=assets[role].instantiateModelsToScene(n=>c.id+' '+n,false,{doNotInstantiate:true});

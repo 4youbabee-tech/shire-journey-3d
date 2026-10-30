@@ -6,5 +6,33 @@
       "hearth-and-hills.0.b64",
       "hearth-and-hills.1.b64"
     ]
+  },
+  "footstep-00.mp3": {
+    "bytes": 2760,
+    "sha256": "dc8c52d6a56a2fd1945a265907163d7c5573019de340fcd1a20451cff958531c",
+    "parts": [
+      "footstep-00.b64"
+    ]
+  },
+  "footstep-02.mp3": {
+    "bytes": 2760,
+    "sha256": "0ee5bc1b1d32171fd32a262007371795aa307a429cb5b31f83a156088b1d2b25",
+    "parts": [
+      "footstep-02.b64"
+    ]
+  },
+  "footstep-06.mp3": {
+    "bytes": 2760,
+    "sha256": "6ab88a7d5af7ba8ed45c3f60ec29931ab4d5f567e05ad86218535a6d81ce626b",
+    "parts": [
+      "footstep-06.b64"
+    ]
+  },
+  "footstep-09.mp3": {
+    "bytes": 2551,
+    "sha256": "be122b3e4bfcb8c5951e66a0f11f89deb23e9c886ef5927adcef25f83c702b34",
+    "parts": [
+      "footstep-09.b64"
+    ]
   }
 }
