@@ -1,3 +1,73 @@
+# Active production map — 0.9 opening region
+
+Application cohort `dda4170` passed exact-head Actions 41110116242 (53 source tests; desktop/touch gameplay; continuous opening; natural party). Full evidence and limitations are in [CURRENT_PROJECT_STATE.md](CURRENT_PROJECT_STATE.md). This table supersedes the historical checkpoints below.
+
+| Owner priority | Implemented and verified in this cohort | Next acceptance / scope boundary |
+|---|---|---|
+| Frodo, Gandalf, Bilbo, Sam | Four distinct licensed natural-proportion GLBs; 65-bone rigs, 12 clips, textured facial anatomy, blink/gaze/expression, authored costume and bare feet | Physical-device appearance and performance review; background actors reuse Sam's base |
+| Opening under tree and arriving pony/cart | Real 27-second world scene, reading/rise/run/greeting/board/ride, harness/reins, distance-driven wheels, restored story positions and control | Continuous WebM reviewed; source-inspired original staging, not a shot-identical film reproduction |
+| Life in the existing Shire | Three staggered gardeners, five activity states, four hand-following tools, 16 moving imported trees, bounded shared foliage instances, birds/clouds | Richer social encounters, additional residents and schedules are subsequent content |
+| Sound and atmosphere | Original sampled 51-second score, four recorded footsteps, varied recorded forest excerpts, wind/cart fallback, gesture start and separate gains | Physical speaker/headphone review; recorded horse/cart/door/tool library not represented as complete |
+| Image and environment | Sage terrain bitmap, textured summer nature and roadside planting; face-visible desktop/phone conversation cameras | Existing houses/roads retain their procedural construction; architectural/detail expansion remains queued |
+| Story and play | Gandalf-first gate, optional original apple activity, Bag End interior, Arabic rule-based dialogue/memory, saved birthday and departure/Ring outcomes | Birthday remains a compact original vignette; F1-02 investigation onward is not implemented |
+| Functional / publication | Source, real WebGL desktop/touch, save/collision/quest, full opening, both birthday paths PASS | Merge and Pages SHA checked by main's public smoke; no physical target-PC/phone FPS claim |
+
+## Historical acceptance checkpoints
+
+The records below are chronological evidence, not a second current queue. Earlier HOLD labels, pending tests and rejected assets retain their original meaning and are superseded by the active table where explicitly resolved.
+
+# 0.9.0 production candidate — authored cast and opening-region polish
+
+Prior integrated 4f46eee6bd41f81248114e0927db685a37c79d03 Actions 41099937846 PASS: source, desktop/touch gameplay and continuous opening; four packaged footstep buffers decoded. Artifact 12997642846 digest b8803c949096f1fe3beb92218aa06c57c77f3f1133c947e06965b1ee13d61d76. Reviewed its real JPEGs and chronological contact sheet. No physical-device performance claim: SwiftShader medians were 1 FPS desktop / 3 FPS touch emulation at adaptive resolution.
+
+This cohort repairs the actual GLB wool albedos to standard sRGB. The attempted runtime gamma flag did not visibly fix the result; it is removed. scripts/repair-linear-wool.py admits only the four reviewed legacy payload hashes and preserves every non-wool buffer view byte-for-byte. Corrected asset receipts retain original input hashes and image means; the Blender authoring script now encodes future wool tiles correctly. Gandalf's woven wool mean changes from about 45/51/51 to 116/123/123 bytes, while skin/eyes/geometry/rig/animation data stay unchanged.
+
+Other integrated work: original 512px sage meadow texture, continuous Frodo heading while approaching/boarding, leather harness/reins and cart footboard, a close conversation inspection of Frodo, and four original concave gardening tools following actual imported palm joints. Tool alignment is verified under parent/hand rotation; the LH look-direction convention required a corrected forward axis, caught by the native test. NPC tools are stowed during conversation/celebration. A licensed TinyWorlds forest clip now supplies varied excerpts with gentle pan/fades over the procedural wind; the old chirps remain only a decode fallback. See audio credits and sealed receipts for the explicit mirror chain.
+
+Shipped GLB-only boot now creates actor roots/joints directly instead of allocating and discarding the legacy procedural body meshes. Native validation with deferred nature: 210 to 84 initial meshes and 600560 to 349780 initial triangles; all actor positions, scales, joint locations, worker schedules and static collider counts match. These are startup allocation counts in NullEngine, not GPU/FPS measurements.
+
+Local source and asset validation: 53 tests PASS, with syntax checks. Exact-head CI/raster/recording verification remains the release gate for this source cohort. Save schema, canonical NPC locations and F1-01 outcomes remain unchanged. Later film windows and physical device acceptance remain separately tracked in the roadmap; do not interpret a version tag or technical test as a finished-game declaration.
+
+# Active production polish — following 412bce3 verification
+
+412bce35618266e46b4b95c9666aa57f476c0d16 exact-head Actions 41041444175 PASS: 49 source tests, native actor collision, desktop/touch gameplay, projected face visibility and continuous opening. Downloaded artifact 12970532462 (35,429,370 bytes); locally verified SHA256 c0979223983069d29ffcef74ed8a42c4ae22d7011f49411b2f4ffa9d328a862a. Reviewed real desktop/phone JPEGs and full WebM contact sheet. Software-only medians 2 FPS desktop / 5 FPS touch emulation; render resolution and adaptive state differ, so no hardware FPS or comparative speedup claim.
+
+Raster findings: a transient notice covers Sam's eyes, Gandalf's mouth/beard approaches the dialogue panel, custom woven textures appear too dark, and opening still extraction incorrectly assumes browser wall-clock time equals encoded WebM time. Fixes now hide notices during dialogue, frame Gandalf higher with a larger visibility margin, interpret only the authored linear wool albedos as linear, and produce an explicitly chronological 16-frame contact sheet from the actual video rather than falsely naming frames by wall-clock stage. Preserve two seconds of actual handoff in the recording.
+
+Add up to 220 shared grass/flower instances along existing road shoulders, with precomputed static blocker bounds and actor clearance; canonical actors, roads, colliders and story anchors stay authoritative. Add four Kenney CC0 footstep samples, converted to mono MP3 (10,831 bytes total), embedded in the same verified offline build pipeline. See FOOTSTEP_ASSET_PROVENANCE.md for explicit mirror acquisition, original/derivative hashes and licence. Source/runtime syntax and 50 Node tests PASS locally, including gesture-gated decode, decoded-buffer reuse and different adjacent recordings. New exact-head WebGL and visual review are required before release.
+
+# Active work — natural cast integration, 2026-10-30
+
+The 605c86a exact-head technical run passed, but the chibi art was rejected. Four licensed natural-proportion actors now replace it, with authored weighted costume, facial controls and floor/boarding clips. See IMPORTED_CHARACTER_ASSETS.md and the sealed manifest for exact source/license/asset provenance. Runtime integration includes semantic gaze/blink, stable shader capacity, continuous seated boarding, physical-distance wheel rotation, slower analog walking and close conversation framing. 48 source/NullEngine tests PASS. These do not constitute raster art approval or physical-device performance. Current branch remains a production draft while actual WebGL results are inspected. Canonical main/Pages remains d2c5d759 until the integrated candidate passes its gates.
+
+Production map: cast source build and local integrity complete → exact-head WebGL body/face/clip/costume inspection → fix visible faults → village/audio/story-window integration → target-device acceptance → merge and Pages identity verification. F1-01 causal gates remain enforced; later chapters are not substituted for the agreed first-region quality. Source canon: supplied Story and Timeline Bible pp1–10 and Tolkien Concerning Hobbits pp25–27; film opening order remains the supplied screenplay sequence documented below. No copied protected dialogue/music.
+
+# Resumed 0.9 corrective cohort — 2026-10-30
+
+| Item | Evidence / state |
+|---|---|
+| Recovery of existing unpublished work | PR #13 parent 6638beb; npm ci PASS; prior exact-head run 40982495511 / artifact 12945097923 hash verified |
+| Interrupted crossfades / one-shot distance resume | Real Babylon 9.32.1 AnimationGroup regression tests PASS; new browser evidence pending |
+| Distinct traveller head/hair silhouettes | Four source-authored morphs, real GLB vertex/eye bounds test PASS; final art NOT ACCEPTED |
+| Hair palettes / blinking compatibility | Four existing atlases recolored, original blink deltas rescaled to avoid crossing eyelids; real GLB open/half/closed tests added; requires actual WebGL review |
+| Background Socialize / gaze easing | Existing Interact clip selected; elapsed-time smoothing; not a new AI authority |
+| Source verification | npm run check and 42/42 Node tests required after the eyelid deformation correction |
+| New exact-head recording | Required before merge; PENDING at commit authoring |
+| Performance / release | No physical-device results or new public release claimed; permanent Pages remains 0.8.0 |
+
+# 0.9.0-dev release gate — HOLD / UNPUBLISHED
+
+| Area | Implemented in candidate | Unmet acceptance |
+|---|---|---|
+| Characters | Eight skinned roles, blink morph, weighted transitions, gaze, distinct heights | Shared faces/hair; costumes/skin/cloth not accepted |
+| Opening | 27s real scene, reading/rise/run/greeting/ride, real rigged horse | Seat/robe intersection and boarding polish; not cinematic acceptance |
+| Sound | Original 51s sampled harp/flute, PCM foley, controls | Audible device review and varied environmental recordings absent |
+| Life/nature | Five staggered plot-bound work states, CC0 textured instanced trees/understory | No rich social AI, hand/tool contacts or full schedules |
+| Homes | Imported player now visible indoors; furnished Bag End, restored lighting | Other interiors and final architectural quality absent |
+| Story | Existing F1-01 party/aftermath gates, original Arabic rules-based conversations | F1-02 investigation, F1-03 escape, F1-04 Bree NOT IMPLEMENTED |
+| Verification | Source tests, real WebGL desktop/touch, continuous opening capture | Full-route physical-device navigation, 30 FPS hardware and listening review NOT RUN |
+| Publication | Draft source checkpoint only | MUST NOT MERGE/PUBLISH as complete game |
+
 # 0.8.0 imported skinned character candidate — 2026-10-29
 
 Base 35a2780dbe09e9e0e1a215209d6206c9d60e89a1. Owner prioritizes a visibly playable stylized game over actor likeness. Two licensed KayKit CC0 assets now load through Babylon GLB containers and instantiate across eight roles. Original procedural render pieces are hidden, gameplay/collision roots retained. Idle/walk/run/interact/cheer clips selected from real skeletal animation. Source tests: 28 PASS locally; final Chromium visual/gameplay validation PENDING. No target-device FPS or final art acceptance claimed. Runtime assets and license recorded in Docs/IMPORTED_CHARACTER_ASSETS.md. Rollback: revert this single cohort; old save key preserved.

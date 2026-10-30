@@ -19,20 +19,31 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - run: npm run check && node --check tests/browser-qa.mjs && npm test
+      - run: npm run check && node --check tests/browser-qa.mjs && node --check tests/published-smoke.mjs && node --check tests/party-playback.mjs && npm test
       - name: Install pinned QA browser automation
         run: |
           npm install --no-save --no-package-lock --ignore-scripts playwright@1.56.1
           npx playwright install --with-deps chromium
+          sudo apt-get install -y --no-install-recommends ffmpeg
       - name: Exercise a real WebGL canvas and record playback
         env:
           EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: node tests/browser-qa.mjs
+        run: |
+          node tests/browser-qa.mjs
+          QA_OUT=qa-evidence/full-opening node tests/opening-playback.mjs
+          QA_OUT=qa-evidence/full-party node tests/party-playback.mjs
+      - name: Verify the permanent public game after main deployment
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.sha }}
+          QA_OUT: qa-evidence/published
+        run: node tests/published-smoke.mjs
       - name: Preserve screenshots, video and performance report even on failure
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: shire-browser-evidence
           path: qa-evidence/
-          retention-days: 14
+          retention-days: 90
           if-no-files-found: warn
+

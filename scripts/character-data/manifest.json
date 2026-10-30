@@ -1,20 +1,107 @@
 {
-  "traveller.glb": {
-    "bytes": 2356472,
-    "sha256": "a29ce12fa455595f2f5f7c7822e5ff22ba453246649c5ddbf0f80dba4ee1dfeb",
+  "horse.glb": {
+    "bytes": 1412960,
+    "sha256": "f328abdc6a7772f15c1b601c48151313a8fa20f4a475353c93819419c9a989a1",
     "parts": [
-      "traveller.0.b64",
-      "traveller.1.b64",
-      "traveller.2.b64"
+      "horse.0.b64",
+      "horse.1.b64"
+    ],
+    "requiredAnimations": [
+      "Idle",
+      "Walk",
+      "Eating"
     ]
   },
-  "wizard.glb": {
-    "bytes": 2372816,
-    "sha256": "c89764992fb6332cb5b2ca50e776d3aba1c1f5f7fd7b597e56ae86354ba49b90",
+  "frodo-natural.glb": {
+    "bytes": 1971984,
+    "sha256": "e2b3183744c0f8a26b285f76fe5141be6ca4cca510721e008558a19686a151b9",
     "parts": [
-      "wizard.0.b64",
-      "wizard.1.b64",
-      "wizard.2.b64"
+      "frodo-natural.0.b64",
+      "frodo-natural.1.b64",
+      "frodo-natural.2.b64"
+    ],
+    "requiredAnimations": [
+      "Idle",
+      "Walking_A",
+      "Running_A",
+      "Interact",
+      "Cheer",
+      "PickUp",
+      "Sit_Chair_Idle",
+      "Sit_Chair_Talk",
+      "Sit_Floor_Idle",
+      "Sit_Floor_Down",
+      "Sit_Floor_StandUp",
+      "Board"
+    ]
+  },
+  "sam-natural.glb": {
+    "bytes": 1860136,
+    "sha256": "9bae13962be0be2b2cb8d5499dedecdc57edee39c3dbaa888a542bc5b55110fe",
+    "parts": [
+      "sam-natural.0.b64",
+      "sam-natural.1.b64",
+      "sam-natural.2.b64"
+    ],
+    "requiredAnimations": [
+      "Idle",
+      "Walking_A",
+      "Running_A",
+      "Interact",
+      "Cheer",
+      "PickUp",
+      "Sit_Chair_Idle",
+      "Sit_Chair_Talk",
+      "Sit_Floor_Idle",
+      "Sit_Floor_Down",
+      "Sit_Floor_StandUp",
+      "Board"
+    ]
+  },
+  "bilbo-natural.glb": {
+    "bytes": 1970644,
+    "sha256": "47c99f96937bbe17a0b8facd1de6e8d3423097550285e6d2defe6f019dd9e0a7",
+    "parts": [
+      "bilbo-natural.0.b64",
+      "bilbo-natural.1.b64",
+      "bilbo-natural.2.b64"
+    ],
+    "requiredAnimations": [
+      "Idle",
+      "Walking_A",
+      "Running_A",
+      "Interact",
+      "Cheer",
+      "PickUp",
+      "Sit_Chair_Idle",
+      "Sit_Chair_Talk",
+      "Sit_Floor_Idle",
+      "Sit_Floor_Down",
+      "Sit_Floor_StandUp",
+      "Board"
+    ]
+  },
+  "gandalf-natural.glb": {
+    "bytes": 1952352,
+    "sha256": "6cacd3dd437ccd7e0f9fd72f94d85a132d8b85826a11901fee953431c9c8341c",
+    "parts": [
+      "gandalf-natural.0.b64",
+      "gandalf-natural.1.b64",
+      "gandalf-natural.2.b64"
+    ],
+    "requiredAnimations": [
+      "Idle",
+      "Walking_A",
+      "Running_A",
+      "Interact",
+      "Cheer",
+      "PickUp",
+      "Sit_Chair_Idle",
+      "Sit_Chair_Talk",
+      "Board",
+      "Sit_Floor_Idle",
+      "Sit_Floor_StandUp",
+      "Sit_Floor_Down"
     ]
   }
 }

@@ -1,3 +1,13 @@
+# Shire Journey — 0.9 opening-region production update
+
+Existing Babylon.js 9.32.1 project. The 0.9 cohort replaces the chibi cast with four authored CC0 humanoids, improves the in-world horse/cart opening, physical actor interaction, Arabic dialogue framing, terrain and village detail, and packaged audio. The permanent game URL remains https://4youbabee-tech.github.io/shire-journey-3d/ .
+
+Verification and source/asset provenance: Docs/CURRENT_PROJECT_STATE.md, Docs/IMPORTED_CHARACTER_ASSETS.md, Docs/GROUND_TEXTURE_PROVENANCE.md and the audio credit files. Check the latest exact-head Actions and Pages run for the deployed build identity. This is the opening-region production line; the full-film expansion is tracked in Docs/MOBILE_PRODUCTION_ROADMAP.md.
+
+## Historical development notes — superseded by the current 0.9 section
+
+The chronological records below describe earlier versions and their acceptance state at that time. Use Docs/CURRENT_PROJECT_STATE.md and Docs/PRODUCTION_COMPLETENESS_MATRIX.md for the active build and production queue.
+
 # Shire Journey 0.8.0 — imported animated character recovery candidate
 
 Eight existing roles now use licensed KayKit CC0 GLB actors, shared source geometry with separate costumes and cloned skeletal animation. Gandalf has an authored head-attached beard and long folded robe. These are approximate stylized roles; shared hobbit faces and toy-like proportions still need art work. Existing dialogue, save, touch controls, Bag End and birthday flow retained. No claim of target-device 30 FPS.

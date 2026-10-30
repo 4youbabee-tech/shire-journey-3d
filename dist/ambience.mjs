@@ -1,4 +1,4 @@
-// Self-contained original music and pastoral soundscape. Mobile-safe Web Audio.
+// Original sampled music, procedural nature and licensed CC0 footstep recordings.
 import {pastoralPhrase} from './score.mjs';
 export function createShireAmbience(AudioContextConstructor){
  const context=new AudioContextConstructor(),master=context.createGain();master.gain.value=.22;master.connect(context.destination);
@@ -10,7 +10,30 @@ export function createShireAmbience(AudioContextConstructor){
  const buffer=context.createBuffer(1,context.sampleRate*4,context.sampleRate),samples=buffer.getChannelData(0);let last=0;
  for(let i=0;i<samples.length;i++){last=(last+.025*(Math.random()*2-1))/1.025;samples[i]=last*2.25;}
  const wind=context.createBufferSource(),windGain=context.createGain();wind.buffer=buffer;wind.loop=true;windGain.gain.value=.08;wind.connect(windGain);windGain.connect(effects);let windStarted=false;
- let timer=null,phrase=0,birdTick=0;
+ let timer=null,phrase=0,birdTick=0,scoreBuffer=null,scoreSource=null,scorePromise=null,scoreStatus='unloaded',scoreError=null,footClock=0,cartClock=0,foleyBuffers=[],foleyStatus='unloaded',lastFoot=-1,foleyPromise=null,forestBuffer=null;
+ async function loadScore(){
+  if(!context.decodeAudioData||typeof fetch!=='function')return;
+  if(!scorePromise)scorePromise=(async()=>{try{scoreStatus='loading';const response=await fetch(new URL('./assets/audio/hearth-and-hills.mp3',import.meta.url));if(!response.ok)throw Error('Score HTTP '+response.status);scoreBuffer=await context.decodeAudioData(await response.arrayBuffer());scoreStatus='decoded';}catch(error){scoreStatus='fallback';scoreError=error.message;}})();
+  await scorePromise;
+ }
+ async function loadFoley(){
+  if(!context.decodeAudioData||typeof fetch!=='function'){foleyStatus='fallback';return;}
+  if(!foleyPromise)foleyPromise=(async()=>{foleyStatus='loading';const results=await Promise.allSettled(['footstep-00','footstep-02','footstep-06','footstep-09','forest-birds'].map(async name=>{const response=await fetch(new URL('./assets/audio/'+name+'.mp3',import.meta.url));if(!response.ok)throw Error('Foley HTTP '+response.status);return context.decodeAudioData(await response.arrayBuffer());}));foleyBuffers=results.slice(0,4).filter(r=>r.status==='fulfilled').map(r=>r.value);forestBuffer=results[4]?.status==='fulfilled'?results[4].value:null;foleyStatus=foleyBuffers.length===4?'decoded':foleyBuffers.length?'partial':'fallback';})();
+  await foleyPromise;
+ }
+ function beginScore(){if(!scoreBuffer||scoreSource)return;scoreSource=context.createBufferSource();scoreSource.buffer=scoreBuffer;scoreSource.loop=true;scoreSource.connect(music);scoreSource.start();}
+ const impact=context.createBuffer(1,Math.floor(context.sampleRate*.22),context.sampleRate);
+ const impactData=impact.getChannelData(0);let rseed=4831;
+ for(let i=0;i<impactData.length;i++){rseed=(Math.imul(rseed,1664525)+1013904223)>>>0;const t=i/context.sampleRate;impactData[i]=((rseed/4294967296*2-1)*.35+Math.sin(t*410)*.5)*Math.exp(-t*33)*Math.min(1,t*1400);}
+ function step(volume,rate=1,foot=false,wood=false){
+  if(context.state!=='running')return;const source=context.createBufferSource(),gain=context.createGain();
+  if(foot&&foleyBuffers.length){const next=(lastFoot+1+Math.floor(Math.random()*Math.max(1,foleyBuffers.length-1)))%foleyBuffers.length;lastFoot=next;source.buffer=foleyBuffers[next];}else source.buffer=impact;
+  if(source.playbackRate)source.playbackRate.value=rate;gain.gain.value=volume;
+  const filter=foot&&foleyBuffers.length&&context.createBiquadFilter?context.createBiquadFilter():null;
+  if(filter){filter.type='lowpass';filter.frequency.value=wood?4400:1000;source.connect(filter);filter.connect(gain);}else source.connect(gain);
+  gain.connect(effects);source.onended=()=>{source.disconnect?.();filter?.disconnect();gain.disconnect?.();};source.start();
+ }
+
  const osc=(freq,when,duration,volume,type='sine',end=freq,bus=effects)=>{
   const o=context.createOscillator(),g=context.createGain();o.type=type;
   o.frequency.setValueAtTime(Math.max(1,freq),when);o.frequency.exponentialRampToValueAtTime(Math.max(1,end),when+duration);
@@ -19,6 +42,13 @@ export function createShireAmbience(AudioContextConstructor){
  };
  function birds(now){
   const i=birdTick++;
+  if(forestBuffer&&forestBuffer.duration>.6){
+   const source=context.createBufferSource(),gain=context.createGain(),duration=Math.min(3.4,forestBuffer.duration-.1),offset=(i*1.713)%Math.max(.1,forestBuffer.duration-duration-.05);source.buffer=forestBuffer;source.playbackRate.value=.97+(i%4)*.02;
+   gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.08,now+.18);gain.gain.setValueAtTime(.08,now+duration-.3);gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+   const pan=context.createStereoPanner?.();source.connect(gain);if(pan){pan.pan.setValueAtTime(Math.sin(i*2.399)*.5,now);gain.connect(pan);pan.connect(effects);}else gain.connect(effects);
+   source.onended=()=>{source.disconnect?.();gain.disconnect?.();pan?.disconnect();};source.start(now,offset,duration);source.stop?.(now+duration+.05);windGain.gain.setValueAtTime(.07,now);return;
+  }
+
   // Two separated whistles with pitch curves feel less electronic than fixed beeps.
   const base=1050+(i%5)*90;
   osc(base,now,.19,.028,'sine',base*1.36);
@@ -26,12 +56,20 @@ export function createShireAmbience(AudioContextConstructor){
   windGain.gain.setValueAtTime(.06+.035*Math.sin(i*.41),now);
  }
  function song(now){for(const n of pastoralPhrase(phrase++))osc(n.frequency,now+n.at,n.duration,n.volume,n.wave,n.frequency*.997,music);}
- function cycle(){if(context.state!=='running')return;const now=context.currentTime+.07;birds(now);if((birdTick-1)%2===0)song(now+.12);}
+ function cycle(){if(context.state!=='running')return;const now=context.currentTime+.07;birds(now);if(!scoreBuffer&&(birdTick-1)%2===0)song(now+.12);}
  return {
+  get foley(){return {status:foleyStatus,decoded:foleyBuffers.length,forestDecoded:!!forestBuffer};},
+  get score(){return {status:scoreStatus,duration:scoreBuffer?.duration||0,error:scoreError};},
+  update(dt,{moving=false,wood=false,cart=false,cartDistance=30}={}){
+   if(context.state!=='running')return;
+   footClock+=moving?dt:0;if(moving&&footClock>.47){footClock%=.47;step(wood?.12:.085,wood?1.03:.94,true,wood);}
+   cartClock+=cart?dt:0;if(cart&&cartClock>.28){cartClock%=.28;step(.22/(1+cartDistance*.15),.62+(Math.floor(context.currentTime*4)%2)*.15);}
+  },
   setVolume,get levels(){return {...levels};},get state(){return context.state;},
-  start:async()=>{await context.resume();if(!windStarted){wind.start();windStarted=true;}cycle();if(!timer)timer=setInterval(cycle,6000);},
+  start:async()=>{await context.resume();if(!windStarted){wind.start();windStarted=true;}await Promise.all([loadScore(),loadFoley()]);beginScore();cycle();if(!timer)timer=setInterval(cycle,6000);},
   suspend:()=>context.suspend(),resume:()=>context.resume(),
   stop:()=>{if(timer){clearInterval(timer);timer=null;}return context.suspend();},
   close:()=>{if(timer)clearInterval(timer);return context.close();}
  };
 }
+

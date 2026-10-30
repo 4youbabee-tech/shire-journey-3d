@@ -74,3 +74,8 @@
 /* Visible restart option for legacy-saved game, including narrow mobile screens. */
 #restart-story{display:block;margin:12px 0 8px;padding:11px 15px;max-width:100%;background:rgba(27,48,33,.9);color:#f9e9c7;border:1px solid #dbc17b;border-radius:5px;direction:rtl;line-height:1.5;text-align:center}
 #resume-note{max-width:100%;font-size:13px;line-height:1.65;direction:rtl;text-align:right}
+
+/* Frame the real actor above the parchment dialogue on narrow screens. */
+:root{--shire-dialogue-height:55vh}
+#dialogue{max-height:var(--shire-dialogue-height)}
+@media(max-width:600px){:root{--shire-dialogue-height:58dvh}#dialogue{max-height:var(--shire-dialogue-height)!important}#dialogue .portrait{width:48px!important;height:52px!important;min-width:48px!important}}

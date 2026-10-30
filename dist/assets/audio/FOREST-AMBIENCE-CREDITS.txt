@@ -1,0 +1,16 @@
+Forest Ambience — TinyWorlds (embedded artist tag: Rick Hoppmann).
+Source listing: https://opengameart.org/content/forest-ambience
+Licence: CC0 1.0, https://creativecommons.org/publicdomain/zero/1.0/
+
+Acquired as a 7.176-second derivative clip from the public Godot microgame mirror:
+https://github.com/moraguma/GamutoWare/tree/HEAD/microjogos/2023S1/projeto-pochete/recursos/Forest_Ambience.mp3
+That microgame's creditos.gd explicitly attributes this file to the source listing.
+Exact downloaded Git blob: a7b5c0dba3eaba0de8a8bc63950713ef900e273d.
+The original listing's CC0 declaration was retrieved during asset research;
+TinyWorlds attribution is also corroborated by Ciallo-Reader ambient/CREDITS.md.
+This is an explicit mirror acquisition, not a download of the original full archive.
+
+Converted to mono 32 kHz / 48 kb/s MP3; source and output SHA256 are recorded in
+scripts/audio-data/forest-receipt.json. Runtime varies excerpt offset, gentle pan
+and rate with envelope fades over the continuous procedural wind bed.
+No film music, film dialogue or actor recording is included.

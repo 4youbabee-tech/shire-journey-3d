@@ -2,12 +2,37 @@
 import {NodeIO} from '@gltf-transform/core';
 import {prune,dedup,resample} from '@gltf-transform/functions';
 const io=new NodeIO();
-const keep=new Set(['Idle','Walking_A','Running_A','Interact','Cheer','Sit_Floor_Idle','Sit_Floor_Down','Sit_Floor_StandUp','PickUp']);
+const keep=new Set(['Idle','Walking_A','Running_A','Interact','Cheer','Sit_Floor_Idle','Sit_Floor_Down','Sit_Floor_StandUp','Sit_Chair_Idle','PickUp']);
 for(const [source,target] of [['Rogue','traveller'],['Mage','wizard']]){
  const doc=await io.read('/tmp/shire-'+source+'.glb');
  for(const a of doc.getRoot().listAnimations())if(!keep.has(a.getName()))a.dispose();
- for(const n of doc.getRoot().listNodes())if(/Knife|Crossbow|Throwable|Spellbook|Wand|2H_Staff/.test(n.getName()))n.dispose();
+ for(const n of doc.getRoot().listNodes())if(/Knife|Crossbow|Throwable|Spellbook|Wand/.test(n.getName()))n.dispose();
+ const head=doc.getRoot().listNodes().find(n=>n.getName()==='head');
+ const headScale=source==='Mage'?.82:.83;head.setScale([headScale,headScale,headScale]);
+ for(const animation of doc.getRoot().listAnimations())for(const channel of animation.listChannels())if(channel.getTargetNode()===head&&channel.getTargetPath()==='scale'){
+  const sampler=channel.getSampler(),output=sampler.getOutput(),copy=sampler.clone().setOutput(output.clone().setArray(Float32Array.from(output.getArray(),v=>v*headScale)));animation.addSampler(copy);channel.setSampler(copy);
+ }
+ const headMesh=doc.getRoot().listNodes().find(n=>n.getName().endsWith('_Head'))?.getMesh();
+ if(headMesh){
+  for(const primitive of headMesh.listPrimitives()){
+   const p=primitive.getAttribute('POSITION'),uv=primitive.getAttribute('TEXCOORD_0');if(!uv)continue;
+   const a=p.getArray(),t=uv.getArray(),delta=new Float32Array(a.length),eyes=[];
+   for(let i=0;i<p.getCount();i++)if(Math.floor(t[i*2]*8)===2&&Math.floor(t[i*2+1]*4)===0)eyes.push(i);
+   for(const side of [-1,1]){const ids=eyes.filter(i=>a[i*3]*side>=0),center=ids.reduce((sum,i)=>sum+a[i*3+1],0)/Math.max(1,ids.length);for(const i of ids)delta[i*3+1]=(center-a[i*3+1])*.94;}
+   const target=doc.createPrimitiveTarget('blink').setAttribute('POSITION',doc.createAccessor('eyelid closure').setType('VEC3').setArray(delta).setBuffer(doc.getRoot().listBuffers()[0]));
+   primitive.addTarget(target);
+  }
+  headMesh.setWeights([0]);headMesh.setExtras({targetNames:['blink']});
+ }
  if(source==='Mage'){
+  const staffNode=doc.getRoot().listNodes().find(n=>n.getName()==='2H_Staff');
+  if(staffNode){
+   const positions=[],normals=[],indices=[],sides=8,segments=20;
+   for(let i=0;i<=segments;i++){const t=i/segments,y=-.9+t*2.15,r=.04-.018*t,cx=.025*Math.sin(t*8)+(t>.83?(t-.83)*.45:0),cz=.025*Math.sin(t*5);for(let j=0;j<=sides;j++){const angle=j/sides*Math.PI*2;positions.push(cx+Math.cos(angle)*r,y,cz+Math.sin(angle)*r);normals.push(Math.cos(angle),0,Math.sin(angle));if(i<segments&&j<sides){const a=i*(sides+1)+j,b=a+sides+1;indices.push(a,b,a+1,a+1,b,b+1);}}}
+   const buffer=doc.getRoot().listBuffers()[0],access=(type,array)=>doc.createAccessor().setType(type).setArray(array).setBuffer(buffer);
+   const primitive=doc.createPrimitive().setAttribute('POSITION',access('VEC3',new Float32Array(positions))).setAttribute('NORMAL',access('VEC3',new Float32Array(normals))).setIndices(access('SCALAR',new Uint16Array(indices))).setMaterial(doc.createMaterial('natural crooked wooden staff').setBaseColorFactor([.24,.15,.075,1]).setRoughnessFactor(.98).setMetallicFactor(0));
+   staffNode.setMesh(doc.createMesh('crooked wooden staff').addPrimitive(primitive));
+  }
   // A continuous tapered beard surface attached to the authored head joint.
   // Follows all imported skeletal clips, never a detached runtime primitive.
   const positions=[],normals=[],indices=[],cols=12,rows=9;

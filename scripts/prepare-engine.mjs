@@ -2,6 +2,8 @@ import {readFileSync,copyFileSync,mkdirSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import './prepare-characters.mjs';
+import './prepare-audio.mjs';
+import './prepare-environment.mjs';
 const require=createRequire(import.meta.url);
 const source=require.resolve('babylonjs');
 const data=readFileSync(source);

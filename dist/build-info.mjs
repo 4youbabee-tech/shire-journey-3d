@@ -1,1 +1,1 @@
-export const BUILD = {"version":"0.2.2","commit":null};
+export const BUILD = {"version":"0.9.0-dev","commit":null};

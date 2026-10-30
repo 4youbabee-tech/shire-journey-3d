@@ -27,11 +27,23 @@ if(process.env.EXPECTED_COMMIT_SHA&&checkoutSha!==process.env.EXPECTED_COMMIT_SH
 const report={commit:checkoutSha,environment:'Chromium SwiftShader (software WebGL; NOT target hardware)',host:process.env.GITHUB_ACTIONS?'GitHub Actions':'local Linux container',desktop:{},mobile:{},errors:[],status:'NOT RUN'};
 let browser;
 const snap=page=>page.evaluate(()=>window.__SHIRE__?.snapshot());
-const still=async(page,name)=>page.screenshot({path:resolve(out,name),animations:'disabled'});
+const still=async(page,name)=>{const result=await page.screenshot({path:resolve(out,name),animations:'disabled'});if(['desktop-gandalf-opening-dialogue.png','desktop-gandalf-character-detail.png','desktop-frodo-face-detail.png','desktop-dialogue.png','mobile-dialogue.png'].includes(name)||name.startsWith('face-visibility-failure'))console.log('SHIRE_CAPTURE:'+name+':'+(await page.screenshot({type:'jpeg',quality:40,animations:'disabled'})).toString('base64'));return result;};
+async function assertFaceVisible(page,id){
+ try{await page.waitForFunction(id=>{
+  const B=window.BABYLON,s=B.Engine.LastCreatedScene,head=s.getTransformNodeByName(id+' Head');if(!head)return false;
+  const h={gandalf:3.12,bilbo:1.36,sam:1.48,frodo:1.42}[id];head.computeWorldMatrix(true);const face=head.getAbsolutePosition().add(new B.Vector3(0,h*.06,0));
+  const p=B.Vector3.Project(face,B.Matrix.Identity(),s.getTransformMatrix(),s.activeCamera.viewport.toGlobal(s.getEngine().getRenderWidth(),s.getEngine().getRenderHeight()));
+  const canvas=document.querySelector('#game').getBoundingClientRect(),dialog=document.querySelector('#dialogue').getBoundingClientRect(),x=p.x/s.getEngine().getRenderWidth()*canvas.width,y=p.y/s.getEngine().getRenderHeight()*canvas.height;
+  return p.z>0&&p.z<1&&x>20&&x<canvas.width-20&&y>20&&y<dialog.top-(id==='gandalf'?90:45)&&B.Vector3.Distance(face,s.activeCamera.position)>1.1;
+ },id,{timeout:20000});}catch(error){await still(page,'face-visibility-failure-'+id+'.png');throw error;}
+}
 async function ready(page){
  await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.querySelector('#welcome').hidden||!document.querySelector('#fatal').hidden,null,{timeout:90000});
  if(await page.locator('#fatal').isVisible())throw Error('WebGL/scene failed: '+await page.locator('#fatal-text').innerText());
+ assert.equal((await snap(page)).world.eyelidRigs,8,'Every role has real eyelid morph deformation');
+ assert.equal((await snap(page)).world.naturalCastRoles,4,'Four independently authored natural humanoid roles');
+ assert.equal((await snap(page)).world.gardenToolRigs,4,'Gardening tools must follow four real imported hand rigs');
  assert.equal((await snap(page)).world.importedCharacters,8,'All eight visible roles use imported GLB rigs');
  if(process.env.GITHUB_ACTIONS)assert.equal((await snap(page)).commit,checkoutSha,'Published build identity matches tested checkout');
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
@@ -64,45 +76,50 @@ try{
  browser=await chromium.launch({headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
  const desktop=await browser.newContext({viewport:{width:1280,height:720},recordVideo:{dir:out,size:{width:1280,height:720}}});
  const page=await desktop.newPage();page.on('pageerror',e=>report.errors.push('desktop: '+e.message));
- await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();assert.equal((await snap(page)).quality.mode,'auto');assert.equal((await snap(page)).cinematic.active,true);await still(page,'desktop-arrival-cinematic.png');await page.locator('#arrival-skip').click();assert.equal((await snap(page)).cinematic.active,false);assert.equal(await page.locator('#speaker').innerText(),'غاندالف','Opening must speak to Gandalf, not merely show his mesh');await still(page,'desktop-gandalf-opening-dialogue.png');await chooseFirst(page);assert.equal((await snap(page)).state.gandalfMet,true);
+ await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();assert.equal((await snap(page)).quality.mode,'auto');assert.equal((await snap(page)).cinematic.active,true);await still(page,'desktop-arrival-cinematic.png');await page.locator('#arrival-skip').click();assert.equal((await snap(page)).cinematic.active,false);assert.equal(await page.locator('#speaker').innerText(),'غاندالف','Opening must speak to Gandalf, not merely show his mesh');await assertFaceVisible(page,'gandalf');await still(page,'desktop-gandalf-opening-dialogue.png');await chooseFirst(page);assert.equal((await snap(page)).state.gandalfMet,true);
+ await qaReposition(page,3,-5.6);await talk(page);assert.equal(await page.locator('#speaker').innerText(),'فرودو');await assertFaceVisible(page,'frodo');await still(page,'desktop-frodo-face-detail.png');await page.locator('#dialogue-close').click();await qaReposition(page,-2,14.8);
  await page.locator('#map-open').click();assert.ok(await page.locator('#world-map').isVisible());await still(page,'desktop-village-map.png');await page.locator('#map-close').click();
+ await page.waitForFunction(()=>window.__SHIRE__.snapshot().audio?.score.status==='decoded',null,{timeout:30000});
+ assert.equal((await snap(page)).audio.foley.decoded,4,'Four packaged CC0 footstep variants must decode');assert.equal((await snap(page)).audio.foley.forestDecoded,true,'Licensed forest ambience must decode');
  assert.match(await page.locator('#sound').innerText(),/مفعّلة/,'Original music must begin after Start interaction');
  await page.locator('#journal-open').click();
  await page.locator('#volume-music').fill('0');await page.locator('#volume-effects').fill('0.5');
  await still(page,'desktop-audio-settings.png');await page.locator('#journal-close').click();
- const walkEvidence=await realWalk(page);await still(page,'desktop-moving.png');assert.equal((await snap(page)).state.gandalfMet,true);await qaReposition(page,8,7);
+ const walkEvidence=await realWalk(page);await still(page,'desktop-moving.png');assert.equal((await snap(page)).state.gandalfMet,true);await qaReposition(page,8,5.5);
  await still(page,'desktop-arrived.png');await still(page,'desktop-enhanced-hero-0.6.png');
  // Enter the real Babylon room using the gameplay key, inspect the 3D interior and exit.
  await qaReposition(page,11,8.2);
  await page.locator('#interaction:not([hidden])').waitFor({timeout:20000});
  await page.keyboard.press('e');
  await page.waitForFunction(()=>window.__SHIRE__.snapshot().inside,{timeout:25000});
+ assert.ok(await page.evaluate(()=>BABYLON.Engine.LastCreatedScene.meshes.some(m=>m.name.startsWith('player ')&&m.skeleton&&m.isEnabled())),'Imported player remains visible inside Bag End');
  await still(page,'desktop-bag-end-interior.png');
  assert.ok((await snap(page)).indoorStats.decor>=30,'A genuinely furnished 3D interior is rendered');
  await page.keyboard.press('e');
  await page.waitForFunction(()=>!window.__SHIRE__.snapshot().inside,{timeout:25000});
- await qaReposition(page,8,7);
- await talk(page);assert.equal(await page.locator('#portrait svg').count(),1,'Bilbo SVG portrait visible');assert.ok(await page.locator('#npc-voice').isVisible(),'Browser narration button present');await still(page,'desktop-dialogue.png');
+ await qaReposition(page,8,5.5);
+ await talk(page);assert.equal(await page.locator('#portrait svg').count(),1,'Bilbo SVG portrait visible');assert.ok(await page.locator('#npc-voice').isVisible(),'Browser narration button present');await assertFaceVisible(page,'bilbo');await still(page,'desktop-dialogue.png');
  await page.locator('#npc-chat-input').fill('من أنت؟');await page.locator('#npc-chat-send').click();
  assert.match(await page.locator('#chat-log').innerText(),/بيلبو/,'Free-text Arabic contextual dialogue must respond');
  await still(page,'desktop-arabic-chat.png');await chooseFirst(page);
  assert.equal((await snap(page)).state.stage,1,'Bilbo dialogue advances quest');
  await page.reload({waitUntil:'domcontentloaded'});await page.locator('#welcome:not([hidden])').waitFor({timeout:90000});
  assert.equal((await snap(page)).state.stage,1,'Browser save restores stage after reload');assert.ok(await page.locator('#restart-story').isVisible(),'Saved players must be able to restart the real story');
- await page.locator('#start').click();await qaReposition(page,8,1);await qaReposition(page,-6,1);await talk(page);await chooseFirst(page);
+ await page.locator('#start').click();await qaReposition(page,8,1);await qaReposition(page,-6,-.5);await talk(page);await chooseFirst(page);
  assert.equal((await snap(page)).state.stage,2,'Sam dialogue advances quest');
  await qaReposition(page,-18,1);await qaReposition(page,-18,12);await page.keyboard.press('e');
  assert.equal((await snap(page)).state.apples.length,1);
  await qaReposition(page,-17,17);await page.keyboard.press('e');assert.equal((await snap(page)).state.apples.length,2);
  await qaReposition(page,-21,15);await page.keyboard.press('e');assert.equal((await snap(page)).state.stage,3,'All three apples collected');
- await qaReposition(page,-21,1);await qaReposition(page,-6,1);await talk(page);await chooseFirst(page);
+ await qaReposition(page,-21,1);await qaReposition(page,-6,-.5);await talk(page);await chooseFirst(page);
  assert.equal((await snap(page)).state.stage,4,'Apple return completes');
- await qaReposition(page,8,1);await qaReposition(page,8,7);await talk(page);await chooseFirst(page);
+ await qaReposition(page,8,1);await qaReposition(page,8,5.5);await talk(page);await chooseFirst(page);
  assert.equal((await snap(page)).state.stage,5,'Preparation completed before birthday celebration');
  await qaReposition(page,-2,21);await page.keyboard.press('e');
  assert.equal((await snap(page)).party.active,true,'Birthday party and original fireworks begin at the party tree');
  assert.ok((await snap(page)).party.participants>=7,'Seven existing villagers gather to celebrate without adding heavy meshes');
- await still(page,'desktop-birthday-party.png');
+ // Do not block the 14-second live scene on a software-GPU screenshot before testing Skip.
+ // The independent resumed-party playback below records the natural ending and celebration.
  await page.waitForFunction(()=>window.BABYLON.Engine.LastCreatedScene.animationGroups.filter(g=>g.name.endsWith('Cheer')&&g.isPlaying).length>=7,null,{timeout:10000});
  await page.locator('#party-skip').click();
  assert.equal((await snap(page)).state.partyCompleted,true,'Party skip preserves canonical outcome');
@@ -115,11 +132,20 @@ try{
  report.desktop.characterRig=await page.evaluate(()=>{
   const B=window.BABYLON,s=B.Engine.LastCreatedScene;
   const skin=s.meshes.filter(m=>m.skeleton&&m.getTotalVertices()>0);
-  if(skin.length<8||!s.getMeshByName('gandalf Gandalf tapered silver beard'))throw Error('Missing imported skin or attached Gandalf beard');
+  if(skin.length<8||!s.getTransformNodeByName('gandalf Head'))throw Error('Missing imported skin or attached Gandalf beard');
   s.getEngine().stopRenderLoop();
-  const actor=s.getTransformNodeByName('gandalf'),head=s.getTransformNodeByName('gandalf head');
+  const actor=s.getTransformNodeByName('gandalf'),head=s.getTransformNodeByName('gandalf Head');
   const facing=B.Vector3.TransformNormal(new B.Vector3(0,0,1),head.getWorldMatrix());facing.y=0;facing.normalize();
-  s.activeCamera.position.copyFrom(actor.position.add(facing.scale(5.5)).add(new B.Vector3(0,2.7,0)));s.activeCamera.setTarget(actor.position.add(new B.Vector3(0,1.7,0)));s.render();
+  const target=actor.position.add(new B.Vector3(0,2,0));let cameraPosition=null;
+  for(const radius of [3.5,4.5,5.5,2.5])for(const offset of [0,.45,-.45,.8,-.8]){
+   if(cameraPosition)continue;
+   const direction=new B.Vector3(facing.x*Math.cos(offset)+facing.z*Math.sin(offset),0,facing.z*Math.cos(offset)-facing.x*Math.sin(offset));
+   const candidate=actor.position.add(direction.scale(radius)).add(new B.Vector3(0,2.8,0)),delta=target.subtract(candidate),distance=delta.length();
+   const hit=s.pickWithRay(new B.Ray(candidate,delta.normalize(),distance),m=>m.isEnabled()&&m.isVisible&&m.getTotalVertices()>0&&!m.isDescendantOf(actor));
+   if(!hit?.hit||hit.distance>distance-.2)cameraPosition=candidate;
+  }
+  if(!cameraPosition)throw Error('No unobstructed Gandalf inspection camera; reject hidden character evidence');
+  s.activeCamera.position.copyFrom(cameraPosition);s.activeCamera.setTarget(target);s.render();
   return {skinnedMeshes:skin.length,skeletons:s.skeletons.length,animationGroups:s.animationGroups.length,inspectionCameraOnly:true};
  });
  await still(page,'desktop-gandalf-character-detail.png');
@@ -142,11 +168,11 @@ try{
  await touch.locator('#interact').waitFor({state:'visible',timeout:20000});
  await touch.locator('#interact').tap();
  await touch.waitForFunction(()=>!window.__SHIRE__.snapshot().inside,{timeout:20000});
- await qaReposition(touch,-6,1);
+ await qaReposition(touch,-6,-.5);
  await touch.locator('#interact').waitFor({state:'visible',timeout:20000});
  assert.ok(await touch.locator('#interact').isVisible(),'Mobile interaction button should appear near Sam');
  await touch.locator('#interact').tap();await touch.locator('#dialogue:not([hidden])').waitFor({timeout:5000});assert.equal(await touch.locator('#portrait svg').count(),1,'Sam SVG portrait visible on emulated mobile');
- await still(touch,'mobile-dialogue.png');
+ assert.equal(await touch.locator('#toast').isVisible(),false,'Transient notices must not cover the face during dialogue');await assertFaceVisible(touch,'sam');await still(touch,'mobile-dialogue.png');
  const boxes=await touch.evaluate(()=>({w:window.innerWidth,dialogue:document.querySelector('#dialogue').getBoundingClientRect().toJSON(),chat:document.querySelector('#npc-chat-input').getBoundingClientRect().toJSON(),send:document.querySelector('#npc-chat-send').getBoundingClientRect().toJSON()}));
  for(const key of ['dialogue','chat','send']){const r=boxes[key];assert.ok(r.left>=-2&&r.right<=boxes.w+2&&r.width>25,'Mobile '+key+' stays inside viewport');}
  assert.ok(boxes.dialogue.width>boxes.w*.75,'Mobile dialogue is legible');
@@ -164,6 +190,7 @@ try{
  await mobile.close();
  assert.deepEqual(report.errors,[],'No uncaught browser exceptions');report.status='PASS';
 }catch(e){report.status='FAIL';report.errors.push(e.stack||String(e));console.error(e);process.exitCode=1;
-}finally{await writeFile(resolve(out,'report.json'),JSON.stringify(report,null,2));console.log('BROWSER_QA_REPORT '+JSON.stringify({commit:report.commit,status:report.status,desktop:report.desktop.performance,mobile:report.mobile.performance,errors:report.errors.slice(0,3)}));await browser?.close();await new Promise(ok=>server.close(ok));}
+}finally{await writeFile(resolve(out,'report.json'),JSON.stringify(report,null,2));console.log('BROWSER_QA_REPORT '+JSON.stringify({commit:report.commit,status:report.status,desktop:report.desktop.performance,mobile:report.mobile.performance,scene:{desktop:report.desktop.snapshot,mobile:report.mobile.snapshot},errors:report.errors.slice(0,3)}));await browser?.close();await new Promise(ok=>server.close(ok));}
+
 
 

@@ -1,0 +1,34 @@
+{
+  "flowers.glb": {
+    "bytes": 46580,
+    "sha256": "42968584a8083b0b7ce3b8d2cf3cec85b2a1196bb6b631880460ebb15c9ce84f",
+    "parts": [
+      "flowers.0.b64"
+    ],
+    "kind": "static"
+  },
+  "grass.glb": {
+    "bytes": 33640,
+    "sha256": "f9aeff9720491b0a7fab25948ac949126839b72d2b484276c6684c76ba765a5e",
+    "parts": [
+      "grass.0.b64"
+    ],
+    "kind": "static"
+  },
+  "maple-a.glb": {
+    "bytes": 242252,
+    "sha256": "261b09cfc6f83d1973fa616c2293a58aa6a3ca540c1a0311588798e91242fa9b",
+    "parts": [
+      "maple-a.0.b64"
+    ],
+    "kind": "static"
+  },
+  "maple-b.glb": {
+    "bytes": 352796,
+    "sha256": "199cfb52b1fd945c59a32a7af4b3acb33512598240399d8640d378fa8d7fc583",
+    "parts": [
+      "maple-b.0.b64"
+    ],
+    "kind": "static"
+  }
+}

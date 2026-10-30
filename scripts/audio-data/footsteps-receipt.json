@@ -1,0 +1,22 @@
+{
+  "00": {
+    "sourceSha256": "6fe61ef1fc3bcf0e253bf2eb64759db6cb69e2fe452f4d88cc597ecf78a3d601",
+    "outputSha256": "dc8c52d6a56a2fd1945a265907163d7c5573019de340fcd1a20451cff958531c",
+    "bytes": 2760
+  },
+  "02": {
+    "sourceSha256": "2d9575b7dead6e1217ca113991fc5229e9b6d998ea0726ebbb277e7398ab888f",
+    "outputSha256": "0ee5bc1b1d32171fd32a262007371795aa307a429cb5b31f83a156088b1d2b25",
+    "bytes": 2760
+  },
+  "06": {
+    "sourceSha256": "6cabfe7ae95d227a84066c6e17014ac31cc7c89b14ef51d7877e98352d4a64fb",
+    "outputSha256": "6ab88a7d5af7ba8ed45c3f60ec29931ab4d5f567e05ad86218535a6d81ce626b",
+    "bytes": 2760
+  },
+  "09": {
+    "sourceSha256": "9324ebb9b2c5bcd078dcb523c6518d38a9f34081069d511602c2efb14ce06ce2",
+    "outputSha256": "be122b3e4bfcb8c5951e66a0f11f89deb23e9c886ef5927adcef25f83c702b34",
+    "bytes": 2551
+  }
+}
