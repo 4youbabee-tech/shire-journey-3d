@@ -1,6 +1,28 @@
 // Reviewed CC0 assets; gameplay roots are the only authority for motion/collision.
+import {applyTravellerSculpt} from './character-art.mjs';
 export const CHARACTER_HEIGHTS=Object.freeze({player:1.72,bilbo:1.64,sam:1.79,frodo:1.71,gandalf:3.12});
 export function blinkAmount(seconds,seed=0){const period=3.7+(seed%5)*.21,t=((seconds+seed*.137)%period+period)%period;return t<.17?Math.sin(t/.17*Math.PI)**2:0;}
+// Keep each outgoing pose until its weight reaches zero, including interrupted fades.
+// Resume only groups that were playing: a completed Rise must never restart/loop.
+export function createClipMixer({fadeSeconds=.24}={}){
+ const live=new Map();let selected=null,paused=false;
+ function select(group,{loop=true}={}){
+  if(group===selected)return;selected=group;
+  if(!group)return;
+  if(!live.has(group)){group.start(loop);group.setWeightForAllAnimatables(live.size?0:1);live.set(group,{weight:live.size?0:1,from:live.size?0:1,target:1,elapsed:0,resume:false});}
+  for(const [clip,s]of live){s.from=s.weight;s.target=clip===group?1:0;s.elapsed=0;}
+  if(paused){group.pause();live.get(group).resume=true;}
+ }
+ function update(dt){
+  if(paused)return;
+  for(const [group,s]of live){s.elapsed+=Math.max(0,dt);const t=Math.min(1,s.elapsed/fadeSeconds);s.weight=s.from+(s.target-s.from)*t;group.setWeightForAllAnimatables(s.weight);if(t===1&&s.target===0){group.stop();live.delete(group);}}
+ }
+ function setPaused(value){
+  if(value===paused)return;paused=value;
+  for(const [group,s]of live){if(value){s.resume=group.isPlaying;if(s.resume)group.pause();}else if(s.resume){group.play();s.resume=false;}}
+ }
+ return {select,update,setPaused,get activeCount(){return live.size;}};
+}
 export async function loadCharacters(B,scene,world){
  const assets={};
  for(const kind of ['traveller','wizard']){const a=await B.SceneLoader.LoadAssetContainerAsync('./assets/characters/',kind+'.glb',scene);for(const g of a.animationGroups)g.stop();assets[kind]=a;}
@@ -18,21 +40,20 @@ export async function loadCharacters(B,scene,world){
   const find=n=>instance.animationGroups.find(g=>g.name.endsWith(n));
   const clips={Idle:find('Idle'),Walk:find('Walking_A'),Run:find('Running_A'),Talk:find('Interact'),Cheer:find('Cheer'),Work:find('PickUp'),Sit:find('Sit_Floor_Idle'),Rise:find('Sit_Floor_StandUp'),Ride:find('Sit_Chair_Idle')};
   if(!clips.Idle||!clips.Walk||!clips.Run)throw Error('Missing locomotion clips for '+c.id);
-  let active=null,previous=null,fade=1,last=c.root.position.clone(),clock=0,paused=false;
+  const mixer=createClipMixer();let last=c.root.position.clone(),clock=0;
   const head=holder.getChildTransformNodes().find(n=>n.name===c.id+' head');
   const staff=meshes.find(m=>m.name.endsWith('2H_Staff')),hand=holder.getChildTransformNodes().find(n=>n.name===c.id+' handslot.l');
   if(staff&&hand){staff.parent=c.root;staff.rotationQuaternion=B.Quaternion.Identity();staff.scaling.setAll(1.25);}
   const blinkMeshes=meshes.filter(m=>m.morphTargetManager?.numTargets);
-  const imported={holder,meshes,clips:instance.animationGroups,head,staff,hand,blinkMeshes,mode:'Idle',blink:0,lookYaw:0};
+  applyTravellerSculpt(B,scene,meshes,c.id);
+  const imported={holder,meshes,clips:instance.animationGroups,head,staff,hand,blinkMeshes,mode:'Idle',blink:0,lookYaw:0,dt:0};
   function update(dt,{speaking=false,celebrating=false,pose=null}={}){
-   clock+=dt;const distance=B.Vector3.Distance(last,c.root.position);last.copyFrom(c.root.position);
-   const far=B.Vector3.Distance(c.root.getAbsolutePosition(),scene.activeCamera.position)>42;
-   if(!c.root.isEnabled()||far){active?.pause();previous?.pause();paused=true;imported.paused=true;return;}
-   if(paused){active?.play(true);previous?.play(true);paused=false;}imported.paused=false;
-   const speed=distance/Math.max(.001,dt),mode=pose||(celebrating?'Cheer':speaking?'Talk':c.activity==='Work'?'Work':c.activity==='Rest'?'Sit':speed>3.6?'Run':speed>.25?'Walk':'Idle');
+   clock+=dt;imported.dt=dt;const distance=B.Vector3.Distance(last,c.root.position);last.copyFrom(c.root.position);
+   const far=B.Vector3.DistanceSquared(c.root.getAbsolutePosition(),scene.activeCamera.position)>42*42;
+   imported.paused=!c.root.isEnabled()||far;mixer.setPaused(imported.paused);if(imported.paused)return;
+   const speed=distance/Math.max(.001,dt),mode=pose||(celebrating?'Cheer':speaking?'Talk':c.activity==='Work'?'Work':c.activity==='Rest'?'Sit':c.activity==='Socialize'?'Talk':speed>3.6?'Run':speed>.25?'Walk':'Idle');
    const next=clips[mode==='Socialize'?'Talk':mode]||clips.Idle;imported.mode=mode;imported.reading=pose==='Sit';
-   if(next!==active){previous?.stop();previous=active;active=next;fade=previous?0:1;next.start(mode!=='Rise');next.setWeightForAllAnimatables(fade);}
-   if(previous){fade=Math.min(1,fade+dt/.24);previous.setWeightForAllAnimatables(1-fade);active.setWeightForAllAnimatables(fade);if(fade>=1){previous.stop();previous=null;}}
+   mixer.select(next,{loop:mode!=='Rise'});mixer.update(dt);
    imported.blink=blinkAmount(clock,c.root.uniqueId);
   }
   imported.update=update;c.imported=imported;actors.push(c);
@@ -44,7 +65,8 @@ export async function loadCharacters(B,scene,world){
    if(a.staff&&a.hand){a.hand.computeWorldMatrix(true);c.root.computeWorldMatrix(true);a.staff.position.copyFrom(B.Vector3.TransformCoordinates(a.hand.getAbsolutePosition(),c.root.getWorldMatrix().clone().invert()));}
    if(!a.head)continue;
    const near=B.Vector3.Distance(c.root.getAbsolutePosition(),world.body.position)<8;
-   if(c.id!=='player'&&near){const local=B.Vector3.TransformCoordinates(world.body.position,a.head.getWorldMatrix().clone().invert());const yaw=Math.max(-.28,Math.min(.28,Math.atan2(local.x,local.z)));a.lookYaw+=(yaw-a.lookYaw)*.12;}else a.lookYaw*=.9;
+   const response=1-Math.exp(-7.5*a.dt);
+   if(c.id!=='player'&&near){const local=B.Vector3.TransformCoordinates(world.body.position,a.head.getWorldMatrix().clone().invert());const yaw=Math.max(-.28,Math.min(.28,Math.atan2(local.x,local.z)));a.lookYaw+=(yaw-a.lookYaw)*response;}else a.lookYaw*=1-response;
    if(a.head.rotationQuaternion){a.head.rotationQuaternion.multiplyInPlace(B.Quaternion.RotationYawPitchRoll(a.lookYaw,a.reading?.22:0,0));}
   }
  });
@@ -52,3 +74,4 @@ export async function loadCharacters(B,scene,world){
  world.stats.eyelidRigs=actors.filter(c=>c.imported.blinkMeshes.length).length;
  return {actors,update(dt,activeNPC,party,cinema=null){for(const c of actors)c.imported.update(dt,{speaking:c.id===activeNPC,celebrating:party,pose:cinema?(c.id==='frodo'?cinema.frodoMode:c.id==='gandalf'?'Ride':null):null});},dispose(){scene.onAfterAnimationsObservable.remove(observer);}};
 }
+

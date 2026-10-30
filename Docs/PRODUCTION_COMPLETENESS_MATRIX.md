@@ -1,3 +1,16 @@
+# Resumed 0.9 corrective cohort — 2026-10-30
+
+| Item | Evidence / state |
+|---|---|
+| Recovery of existing unpublished work | PR #13 parent 6638beb; npm ci PASS; prior exact-head run 40982495511 / artifact 12945097923 hash verified |
+| Interrupted crossfades / one-shot distance resume | Real Babylon 9.32.1 AnimationGroup regression tests PASS; new browser evidence pending |
+| Distinct traveller head/hair silhouettes | Four source-authored morphs, real GLB vertex/eye bounds test PASS; final art NOT ACCEPTED |
+| Hair palettes / blinking compatibility | Four existing atlases recolored, original blink retained; requires actual WebGL review |
+| Background Socialize / gaze easing | Existing Interact clip selected; elapsed-time smoothing; not a new AI authority |
+| Source verification | npm run check and 41/41 Node tests PASS locally |
+| New exact-head recording | Required before merge; PENDING at commit authoring |
+| Performance / release | No physical-device results or new public release claimed; permanent Pages remains 0.8.0 |
+
 # 0.9.0-dev release gate — HOLD / UNPUBLISHED
 
 | Area | Implemented in candidate | Unmet acceptance |

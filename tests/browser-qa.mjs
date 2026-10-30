@@ -33,6 +33,7 @@ async function ready(page){
  await page.waitForFunction(()=>!document.querySelector('#welcome').hidden||!document.querySelector('#fatal').hidden,null,{timeout:90000});
  if(await page.locator('#fatal').isVisible())throw Error('WebGL/scene failed: '+await page.locator('#fatal-text').innerText());
  assert.equal((await snap(page)).world.eyelidRigs,8,'Every role has real eyelid morph deformation');
+ assert.equal(await page.evaluate(()=>BABYLON.Engine.LastCreatedScene.meshes.filter(m=>m.morphTargetManager&&Array.from({length:m.morphTargetManager.numTargets},(_,i)=>m.morphTargetManager.getTarget(i)).some(t=>t.name.endsWith('authored silhouette')&&t.influence===1)).length),4,'Four story/player roles have distinct authored head silhouettes');
  assert.equal((await snap(page)).world.importedCharacters,8,'All eight visible roles use imported GLB rigs');
  if(process.env.GITHUB_ACTIONS)assert.equal((await snap(page)).commit,checkoutSha,'Published build identity matches tested checkout');
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
@@ -122,7 +123,16 @@ try{
   s.getEngine().stopRenderLoop();
   const actor=s.getTransformNodeByName('gandalf'),head=s.getTransformNodeByName('gandalf head');
   const facing=B.Vector3.TransformNormal(new B.Vector3(0,0,1),head.getWorldMatrix());facing.y=0;facing.normalize();
-  s.activeCamera.position.copyFrom(actor.position.add(facing.scale(5.5)).add(new B.Vector3(0,2.7,0)));s.activeCamera.setTarget(actor.position.add(new B.Vector3(0,1.7,0)));s.render();
+  const target=actor.position.add(new B.Vector3(0,2,0));let cameraPosition=null;
+  for(const radius of [3.5,4.5,5.5,2.5])for(const offset of [0,.45,-.45,.8,-.8]){
+   if(cameraPosition)continue;
+   const direction=new B.Vector3(facing.x*Math.cos(offset)+facing.z*Math.sin(offset),0,facing.z*Math.cos(offset)-facing.x*Math.sin(offset));
+   const candidate=actor.position.add(direction.scale(radius)).add(new B.Vector3(0,2.8,0)),delta=target.subtract(candidate),distance=delta.length();
+   const hit=s.pickWithRay(new B.Ray(candidate,delta.normalize(),distance),m=>m.isEnabled()&&m.isVisible&&m.getTotalVertices()>0&&!m.isDescendantOf(actor));
+   if(!hit?.hit||hit.distance>distance-.2)cameraPosition=candidate;
+  }
+  if(!cameraPosition)throw Error('No unobstructed Gandalf inspection camera; reject hidden character evidence');
+  s.activeCamera.position.copyFrom(cameraPosition);s.activeCamera.setTarget(target);s.render();
   return {skinnedMeshes:skin.length,skeletons:s.skeletons.length,animationGroups:s.animationGroups.length,inspectionCameraOnly:true};
  });
  await still(page,'desktop-gandalf-character-detail.png');
@@ -168,5 +178,6 @@ try{
  assert.deepEqual(report.errors,[],'No uncaught browser exceptions');report.status='PASS';
 }catch(e){report.status='FAIL';report.errors.push(e.stack||String(e));console.error(e);process.exitCode=1;
 }finally{await writeFile(resolve(out,'report.json'),JSON.stringify(report,null,2));console.log('BROWSER_QA_REPORT '+JSON.stringify({commit:report.commit,status:report.status,desktop:report.desktop.performance,mobile:report.mobile.performance,errors:report.errors.slice(0,3)}));await browser?.close();await new Promise(ok=>server.close(ok));}
+
 
 
