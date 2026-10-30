@@ -244,3 +244,8 @@ Cinematic/party early-return branches now update imported clip selection. Birthd
 | Final art | NOT ACCEPTED: shared hobbit faces/body, no blink/facial morph clips, model proportions still toy-like |
 | Requested opening/tree/horse overhaul | NOT IMPLEMENTED by this repair; previous procedural arrival is preserved |
 
+
+
+## Exact-head validation correction — e709002
+
+The first candidate Actions run completed `npm ci` and all syntax checks. 55/56 source tests passed, including the new One Ring rig/ownership test and the new mound side/rear collision + Bag End door-access test. The sole failure was an older natural-world assertion counting all Babylon scene meshes as draw submissions; invisible collision hulls were included in that count. The correction keeps the original strict <240 visible render-mesh limit and adds a separate <100 total collision-volume bound. This is a measurement correction, not removal or relaxation of the collision requirement. Exact-head Actions must rerun before acceptance.
