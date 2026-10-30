@@ -1,3 +1,13 @@
+# 0.9.2 production candidate — visible Ring and Hobbit-hole collision
+
+Base main/Pages: `3f54c8d4b889ce8537de0595d5f628f7a2db9bfd` (0.9.1). Draft candidate; not merged or published.
+
+- A real Babylon gold torus attaches to the imported right ring-finger bone on Bilbo and Frodo. Existing `ringPassed` remains the only owner authority: Bilbo before birthday departure; Frodo after the canonical party outcome. No duplicate story state or save-schema change.
+- Every visible grass mound has front/interior, left, right and rear collision volumes. Bag End's front approach remains open. NullEngine regressions cover side/rear blocking and door access.
+- Browser QA checks actual WebGL Ring meshes and ownership before/after the birthday outcome.
+
+Exact-head source, desktop/touch browser, screenshots and CI are pending. Physical target-PC/phone 30 FPS remains NOT RUN. The full Ring investigation, packing, Shire-road pursuit and Bree remain unimplemented.
+
 # Current cohort: 0.9.0 opening-region production candidate
 
 53 local tests PASS. New cast albedos are encoded in the GLBs themselves; preserve default glTF sRGB behavior. The source cohort also contains palm-following garden tools, sage terrain texture, horse harness, continuous approach/boarding heading, licensed forest excerpts and a boot path that skips obsolete actor geometry. Current runtime must pass exact-head Chromium desktop/touch and continuous opening before main/Pages is advanced. Prior integrated source/browser PASS: 4f46eee / Actions 41099937846.

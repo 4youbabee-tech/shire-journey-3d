@@ -47,6 +47,7 @@ async function ready(page){
  assert.equal((await snap(page)).world.importedCharacters,8,'All eight visible roles use imported GLB rigs');
  if(process.env.GITHUB_ACTIONS)assert.equal((await snap(page)).commit,checkoutSha,'Published build identity matches tested checkout');
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
+ const ringStart=await page.evaluate(()=>{const s=window.BABYLON.Engine.LastCreatedScene,b=s.getMeshByName('bilbo heirloom ring'),f=s.getMeshByName('frodo heirloom ring');return {bilbo:!!b?.isEnabled(),frodo:!!f?.isEnabled(),bone:b?.parent?.name};});assert.equal(ringStart.bilbo,true,'Bilbo visibly wears the 3D Ring before the birthday outcome');assert.equal(ringStart.frodo,false,'Frodo must not own the Ring early');assert.ok(ringStart.bone.endsWith(' ring_01_r'));
 }
 async function walk(page,key,ms){await page.keyboard.down(key);try{await page.waitForTimeout(ms);}finally{await page.keyboard.up(key);}}
 // Use the real keyboard to prove walking. Repositioning below only shortens the
@@ -125,6 +126,7 @@ try{
  assert.equal((await snap(page)).state.partyCompleted,true,'Party skip preserves canonical outcome');
  assert.equal((await snap(page)).state.ringPassed,true,'Bilbo leaves the Ring to Frodo');
  assert.equal((await snap(page)).state.bilboGone,true,'Bilbo departs after the celebration');
+ const ringEnd=await page.evaluate(()=>{const s=window.BABYLON.Engine.LastCreatedScene,b=s.getMeshByName('bilbo heirloom ring'),f=s.getMeshByName('frodo heirloom ring');return {bilbo:!!b?.isEnabled(),frodo:!!f?.isEnabled(),bone:f?.parent?.name};});assert.equal(ringEnd.bilbo,false,'Bilbo no longer wears the Ring after departure');assert.equal(ringEnd.frodo,true,'Frodo receives the visible Ring after the canonical party outcome');assert.ok(ringEnd.bone.endsWith(' ring_01_r'));
  await still(page,'desktop-after-birthday.png');
  await still(page,'desktop-completed.png');await qaReposition(page,-12,-5);await still(page,'desktop-garden-life.png');
  report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
