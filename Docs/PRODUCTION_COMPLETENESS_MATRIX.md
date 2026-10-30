@@ -1,3 +1,21 @@
+# Active production map — 0.9 opening region
+
+Application cohort `dda4170` passed exact-head Actions 41110116242 (53 source tests; desktop/touch gameplay; continuous opening; natural party). Full evidence and limitations are in [CURRENT_PROJECT_STATE.md](CURRENT_PROJECT_STATE.md). This table supersedes the historical checkpoints below.
+
+| Owner priority | Implemented and verified in this cohort | Next acceptance / scope boundary |
+|---|---|---|
+| Frodo, Gandalf, Bilbo, Sam | Four distinct licensed natural-proportion GLBs; 65-bone rigs, 12 clips, textured facial anatomy, blink/gaze/expression, authored costume and bare feet | Physical-device appearance and performance review; background actors reuse Sam's base |
+| Opening under tree and arriving pony/cart | Real 27-second world scene, reading/rise/run/greeting/board/ride, harness/reins, distance-driven wheels, restored story positions and control | Continuous WebM reviewed; source-inspired original staging, not a shot-identical film reproduction |
+| Life in the existing Shire | Three staggered gardeners, five activity states, four hand-following tools, 16 moving imported trees, bounded shared foliage instances, birds/clouds | Richer social encounters, additional residents and schedules are subsequent content |
+| Sound and atmosphere | Original sampled 51-second score, four recorded footsteps, varied recorded forest excerpts, wind/cart fallback, gesture start and separate gains | Physical speaker/headphone review; recorded horse/cart/door/tool library not represented as complete |
+| Image and environment | Sage terrain bitmap, textured summer nature and roadside planting; face-visible desktop/phone conversation cameras | Existing houses/roads retain their procedural construction; architectural/detail expansion remains queued |
+| Story and play | Gandalf-first gate, optional original apple activity, Bag End interior, Arabic rule-based dialogue/memory, saved birthday and departure/Ring outcomes | Birthday remains a compact original vignette; F1-02 investigation onward is not implemented |
+| Functional / publication | Source, real WebGL desktop/touch, save/collision/quest, full opening, both birthday paths PASS | Merge and Pages SHA checked by main's public smoke; no physical target-PC/phone FPS claim |
+
+## Historical acceptance checkpoints
+
+The records below are chronological evidence, not a second current queue. Earlier HOLD labels, pending tests and rejected assets retain their original meaning and are superseded by the active table where explicitly resolved.
+
 # 0.9.0 production candidate — authored cast and opening-region polish
 
 Prior integrated 4f46eee6bd41f81248114e0927db685a37c79d03 Actions 41099937846 PASS: source, desktop/touch gameplay and continuous opening; four packaged footstep buffers decoded. Artifact 12997642846 digest b8803c949096f1fe3beb92218aa06c57c77f3f1133c947e06965b1ee13d61d76. Reviewed its real JPEGs and chronological contact sheet. No physical-device performance claim: SwiftShader medians were 1 FPS desktop / 3 FPS touch emulation at adaptive resolution.

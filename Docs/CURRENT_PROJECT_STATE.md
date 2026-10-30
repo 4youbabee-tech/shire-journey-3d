@@ -1,3 +1,17 @@
+# Active 0.9 verification — 2026-10-30
+
+Tested application commit: `dda4170ec7f7e8ccc57b1a34564649b64b05dfd4`. Exact-head [Actions 41110116242](https://github.com/4youbabee-tech/shire-journey-3d/actions/runs/41110116242) and all three browser scenarios PASS: desktop/touch gameplay, continuous opening, independent natural birthday playback. Source: 53/53 Node tests and syntax checks PASS. The independent celebration verifies seven live cheering rigs, no early Ring outcome, natural completion, and Bilbo's disabled actor/collider. The gameplay scenario separately exercises the actual Skip button and saved canonical outcomes.
+
+Evidence artifact `13002803152`: 50,930,532 bytes; ZIP SHA256 `da1b337209a6a2f35665c6680686b525bf3e8b2e57c755c94a3ea5856a8468ad`. Downloaded and hash-verified; real JPEGs, phone dialogue, 3D wizard inspection, opening/party chronological contact sheets and WebMs reviewed. Contact sheets sample the complete recordings, including loading/welcome; their frames must not be mislabeled by assuming wall-clock time equals encoded video time. No generated promotional picture substitutes for game evidence.
+
+Software-only median: desktop 1 FPS, touch emulation 2 FPS. This runner uses Chromium/SwiftShader, not a physical GPU/phone; no 30 FPS hardware acceptance or comparative speedup is asserted. Localhost QA uses fixture player repositioning between encounters, not an accepted full-route walking test. It also exercises real WASD/touch movement. The main-push workflow additionally opens the naked permanent public URL, requires the exact deployed merge SHA, checks that public repositioning is unavailable, watches the opening, talks to Gandalf, walks with actual keys, and opens the map. Its result is the publication identity gate, separate from this candidate receipt.
+
+Permanent game: https://4youbabee-tech.github.io/shire-journey-3d/ . The accepted application cohort is the first Shire region; later film windows and physical-device acceptance remain in the production queue. This receipt does not declare the entire requested game finished.
+
+## Historical production log
+
+All sections below retain their original checkpoint state. Superseded asset names, pending tests, old public versions and rejected art describe those checkpoints only; the active receipt above and current sealed manifests take precedence.
+
 # 34ebba0 real-raster review and celebration test timing
 
 Actions 41107576136 reached the birthday celebration after loading the new cast, recording a clear Frodo conversation, decoding audio, exercising saving/interior/quests and verifying seven cheering rigs. Real screenshots confirm the corrected grey robe and sage ground. The test then timed out clicking party-skip: a blocking software-GPU screenshot consumed the remaining 14-second scene, so the button disappeared after natural completion. This is a test sequencing failure, not an accepted whole-run PASS.
