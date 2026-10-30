@@ -7,8 +7,18 @@ test('adaptive quality uses a sustained FPS window and slowly recovers',()=>{
  const q=createAdaptiveQuality();
  assert.equal(q.snapshot().scale,1);assert.equal(q.snapshot().shadows,true);
  assert.equal(feed(q,12,7.5),0);assert.equal(feed(q,12,8),1);
- assert.equal(q.snapshot().scale,1.25);assert.equal(feed(q,12,10),0);
- assert.equal(feed(q,55,21),1);assert.equal(q.snapshot().scale,1);
+ assert.equal(q.snapshot().scale,1);assert.equal(q.snapshot().shadows,false);assert.equal(feed(q,12,10),0);
+ assert.equal(feed(q,55,21),1);assert.equal(q.snapshot().scale,1);assert.equal(q.snapshot().shadows,true);
+});
+test('moderate slowdown scales gradually while severe slowdown removes shadows first',()=>{
+ const moderate=createAdaptiveQuality();assert.equal(feed(moderate,24,16),1);
+ assert.equal(moderate.snapshot().scale,1.25);assert.equal(moderate.snapshot().shadows,true);
+ const severe=createAdaptiveQuality();feed(severe,15,16);
+ assert.equal(severe.snapshot().scale,1);assert.equal(severe.snapshot().shadows,false);
+ feed(severe,15,20);assert.equal(severe.snapshot().scale,1.25);assert.equal(severe.snapshot().shadows,false);
+ // A short hitch must not lower a stable scene's quality.
+ const hitch=createAdaptiveQuality();feed(hitch,60,8);feed(hitch,8,1);feed(hitch,60,5);
+ assert.equal(hitch.snapshot().scale,1);assert.equal(hitch.snapshot().shadows,true);
 });
 test('manual modes do not react to frame rate and mobile starts light',()=>{
  const q=createAdaptiveQuality({coarse:true});

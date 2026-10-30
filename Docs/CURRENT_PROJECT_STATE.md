@@ -1,3 +1,11 @@
+# 0.9.1 measured quality response and saved device preference
+
+0.9.0 was merged through PR13 as `be008c5f833cdf1e6d6d10ff32bdebd290375862`, after exact-head Actions 41111878012 PASS. Its corrected original opening/party WebMs now visibly include return to the game interface; artifact 13004596236 ZIP SHA256 `5d473d2e81a3f20f1f824abda7d5396542f33d6a8a930cb1a56036fe98eac3f5`, downloaded and verified. The permanent public game remains the same Pages URL.
+
+Root cause: severe sustained slowdown left the expensive shadow pass active until resolution reached scale 2.25, sacrificing face/texture clarity through several cooldown windows first. Auto now disables shadows at the first qualified median below 20 FPS; moderate 20–26 FPS slowdown still takes gradual resolution steps. The eight-second startup grace, six-second/ten-sample window, hysteresis, recovery and manual override remain. No decision is based on a device-name guess. Fresh sessions retain high-first defaults; an explicit auto/high/light choice survives reload in a separate small preference key without touching story saves. The auto button no longer falsely labels a degraded mode as high quality.
+
+54 source tests PASS locally, including sustained severe/moderate cases, brief hitch rejection, manual control and recovery. Browser QA adds real touch selection of high/light, a real navigation/reload, restored light-mode render/shadow assertions and unchanged story progress. Automatic screenshots and FPS sampling occur before manual changes. Exact-head browser playback and public identity are required gates; this is a quality-policy fix, not a claimed measured target-device speedup.
+
 # Active 0.9 verification — 2026-10-30
 
 Tested application commit: `dda4170ec7f7e8ccc57b1a34564649b64b05dfd4`. Exact-head [Actions 41110116242](https://github.com/4youbabee-tech/shire-journey-3d/actions/runs/41110116242) and all three browser scenarios PASS: desktop/touch gameplay, continuous opening, independent natural birthday playback. Source: 53/53 Node tests and syntax checks PASS. The independent celebration verifies seven live cheering rigs, no early Ring outcome, natural completion, and Bilbo's disabled actor/collider. The gameplay scenario separately exercises the actual Skip button and saved canonical outcomes.

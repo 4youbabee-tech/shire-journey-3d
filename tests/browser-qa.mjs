@@ -187,6 +187,13 @@ try{
  assert.ok(Math.abs((await snap(touch)).camera.yaw-yaw)>.1,'Touch drag must orbit camera');
  await still(touch,'mobile-camera.png');
  report.mobile={status:'PASS',touchJoystick:true,touchInteract:true,touchCamera:true,qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(touch),snapshot:await snap(touch)};
+ for(const mode of ['desktop','mobile']){const q=report[mode].snapshot.quality;if(q.mode==='auto'&&q.adjustments>0&&q.median<20)assert.equal(q.shadows,false,'Sustained severe slowdown must shed shadows before image resolution');}
+ // Use actual controls, then a real page navigation, to verify the weaker-device
+ // preference without changing the automatic-mode screenshots/FPS samples above.
+ await touch.locator('#quality').tap();assert.equal((await snap(touch)).quality.mode,'quality');assert.equal((await snap(touch)).renderSize.scale,1);
+ await touch.locator('#quality').tap();const selected=(await snap(touch)).quality;assert.equal(selected.mode,'light');assert.equal(selected.shadows,false);assert.equal(selected.scale,1.75);await still(touch,'mobile-light-quality.png');
+ await ready(touch);const restored=await snap(touch);assert.equal(restored.quality.mode,'light');assert.equal(restored.renderSize.shadows,false);assert.equal(restored.renderSize.scale,1.75);assert.equal(restored.state.stage,report.mobile.snapshot.state.stage,'Quality preference must not reset story progress');
+ report.mobile.qualityPreference={selected,restored:restored.quality};console.log('QUALITY_PREFERENCE '+JSON.stringify({status:'PASS',selected:selected.mode,restored:restored.quality.mode}));
  await mobile.close();
  assert.deepEqual(report.errors,[],'No uncaught browser exceptions');report.status='PASS';
 }catch(e){report.status='FAIL';report.errors.push(e.stack||String(e));console.error(e);process.exitCode=1;

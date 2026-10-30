@@ -1,4 +1,6 @@
-# Active production map — 0.9 opening region
+# Active production map — 0.9.1 opening region
+
+0.9.1 adds earlier measured shadow relief and reload-safe manual quality; 54 local source tests PASS and exact-head browser/public checks gate release. The 0.9 art/story payload is unchanged.
 
 Application cohort `dda4170` passed exact-head Actions 41110116242 (53 source tests; desktop/touch gameplay; continuous opening; natural party). Full evidence and limitations are in [CURRENT_PROJECT_STATE.md](CURRENT_PROJECT_STATE.md). This table supersedes the historical checkpoints below.
 
