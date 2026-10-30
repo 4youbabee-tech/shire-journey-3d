@@ -27,7 +27,7 @@ if(process.env.EXPECTED_COMMIT_SHA&&checkoutSha!==process.env.EXPECTED_COMMIT_SH
 const report={commit:checkoutSha,environment:'Chromium SwiftShader (software WebGL; NOT target hardware)',host:process.env.GITHUB_ACTIONS?'GitHub Actions':'local Linux container',desktop:{},mobile:{},errors:[],status:'NOT RUN'};
 let browser;
 const snap=page=>page.evaluate(()=>window.__SHIRE__?.snapshot());
-const still=async(page,name)=>{const result=await page.screenshot({path:resolve(out,name),animations:'disabled'});if(['desktop-gandalf-opening-dialogue.png','desktop-gandalf-character-detail.png','desktop-dialogue.png','mobile-dialogue.png'].includes(name)||name.startsWith('face-visibility-failure'))console.log('SHIRE_CAPTURE:'+name+':'+(await page.screenshot({type:'jpeg',quality:40,animations:'disabled'})).toString('base64'));return result;};
+const still=async(page,name)=>{const result=await page.screenshot({path:resolve(out,name),animations:'disabled'});if(['desktop-gandalf-opening-dialogue.png','desktop-gandalf-character-detail.png','desktop-frodo-face-detail.png','desktop-dialogue.png','mobile-dialogue.png'].includes(name)||name.startsWith('face-visibility-failure'))console.log('SHIRE_CAPTURE:'+name+':'+(await page.screenshot({type:'jpeg',quality:40,animations:'disabled'})).toString('base64'));return result;};
 async function assertFaceVisible(page,id){
  try{await page.waitForFunction(id=>{
   const B=window.BABYLON,s=B.Engine.LastCreatedScene,head=s.getTransformNodeByName(id+' Head');if(!head)return false;
@@ -43,6 +43,7 @@ async function ready(page){
  if(await page.locator('#fatal').isVisible())throw Error('WebGL/scene failed: '+await page.locator('#fatal-text').innerText());
  assert.equal((await snap(page)).world.eyelidRigs,8,'Every role has real eyelid morph deformation');
  assert.equal((await snap(page)).world.naturalCastRoles,4,'Four independently authored natural humanoid roles');
+ assert.equal((await snap(page)).world.gardenToolRigs,4,'Gardening tools must follow four real imported hand rigs');
  assert.equal((await snap(page)).world.importedCharacters,8,'All eight visible roles use imported GLB rigs');
  if(process.env.GITHUB_ACTIONS)assert.equal((await snap(page)).commit,checkoutSha,'Published build identity matches tested checkout');
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
@@ -76,9 +77,10 @@ try{
  const desktop=await browser.newContext({viewport:{width:1280,height:720},recordVideo:{dir:out,size:{width:1280,height:720}}});
  const page=await desktop.newPage();page.on('pageerror',e=>report.errors.push('desktop: '+e.message));
  await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();assert.equal((await snap(page)).quality.mode,'auto');assert.equal((await snap(page)).cinematic.active,true);await still(page,'desktop-arrival-cinematic.png');await page.locator('#arrival-skip').click();assert.equal((await snap(page)).cinematic.active,false);assert.equal(await page.locator('#speaker').innerText(),'غاندالف','Opening must speak to Gandalf, not merely show his mesh');await assertFaceVisible(page,'gandalf');await still(page,'desktop-gandalf-opening-dialogue.png');await chooseFirst(page);assert.equal((await snap(page)).state.gandalfMet,true);
+ await qaReposition(page,3,-5.6);await talk(page);assert.equal(await page.locator('#speaker').innerText(),'فرودو');await assertFaceVisible(page,'frodo');await still(page,'desktop-frodo-face-detail.png');await page.locator('#dialogue-close').click();await qaReposition(page,-2,14.8);
  await page.locator('#map-open').click();assert.ok(await page.locator('#world-map').isVisible());await still(page,'desktop-village-map.png');await page.locator('#map-close').click();
  await page.waitForFunction(()=>window.__SHIRE__.snapshot().audio?.score.status==='decoded',null,{timeout:30000});
- assert.equal((await snap(page)).audio.foley.decoded,4,'Four packaged CC0 footstep variants must decode');
+ assert.equal((await snap(page)).audio.foley.decoded,4,'Four packaged CC0 footstep variants must decode');assert.equal((await snap(page)).audio.foley.forestDecoded,true,'Licensed forest ambience must decode');
  assert.match(await page.locator('#sound').innerText(),/مفعّلة/,'Original music must begin after Start interaction');
  await page.locator('#journal-open').click();
  await page.locator('#volume-music').fill('0');await page.locator('#volume-effects').fill('0.5');

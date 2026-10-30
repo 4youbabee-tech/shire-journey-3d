@@ -3,6 +3,7 @@ const caches=new WeakMap();
 export function surfaceTexture(B,scene,kind){
  if(typeof document==='undefined')return null;
  let cache=caches.get(scene);if(!cache)caches.set(scene,cache=new Map());if(cache.has(kind))return cache.get(kind);
+ if(kind==='meadow'){const texture=new B.Texture('./assets/environment/meadow-albedo-v2.jpg',scene,false,false,B.Texture.TRILINEAR_SAMPLINGMODE);texture.name='Shire original sage meadow albedo';texture.wrapU=texture.wrapV=B.Texture.WRAP_ADDRESSMODE;texture.anisotropicFilteringLevel=4;cache.set(kind,texture);return texture;}
  const texture=new B.DynamicTexture('Shire '+kind+' grain',{width:128,height:128},scene,false),ctx=texture.getContext(),image=ctx.createImageData(128,128);let seed=kind==='wood'?653:kind==='linen'?891:157;
  for(let y=0;y<128;y++)for(let x=0;x<128;x++){
   seed=(Math.imul(seed,1664525)+1013904223)>>>0;const noise=seed/4294967296-.5;
@@ -13,5 +14,5 @@ export function surfaceTexture(B,scene,kind){
  ctx.putImageData(image,0,0);texture.update(false);texture.wrapU=texture.wrapV=B.Texture.WRAP_ADDRESSMODE;texture.anisotropicFilteringLevel=4;cache.set(kind,texture);return texture;
 }
 export function dressMaterials(B,scene,materials){
- for(const m of materials){const n=m.name.toLowerCase(),kind=/oak|timber|wood|bark|book/.test(n)?'wood':/cloth|linen|robe|rug|waistcoat/.test(n)?'linen':/meadow/.test(n)?'meadow':/plaster|gravel|stone|floor/.test(n)?'plaster':null;if(!kind)continue;const t=surfaceTexture(B,scene,kind);if(!t)continue;if(kind==='meadow'){t.uScale=45;t.vScale=45;}m.diffuseTexture=t;}
+ for(const m of materials){const n=m.name.toLowerCase(),kind=/oak|timber|wood|bark|book/.test(n)?'wood':/cloth|linen|robe|rug|waistcoat/.test(n)?'linen':/meadow/.test(n)?'meadow':/plaster|gravel|stone|floor/.test(n)?'plaster':null;if(!kind)continue;const t=surfaceTexture(B,scene,kind);if(!t)continue;if(kind==='meadow'){t.uScale=45;t.vScale=45;m.diffuseColor=B.Color3.White();}m.diffuseTexture=t;}
 }

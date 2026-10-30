@@ -13,8 +13,8 @@
     ]
   },
   "frodo-natural.glb": {
-    "bytes": 1970360,
-    "sha256": "dc6824a25ebf15f2bc88a0acec8b24fe17ce62eb1604a8dfb5f9a92c47fd694f",
+    "bytes": 1971984,
+    "sha256": "e2b3183744c0f8a26b285f76fe5141be6ca4cca510721e008558a19686a151b9",
     "parts": [
       "frodo-natural.0.b64",
       "frodo-natural.1.b64",
@@ -36,8 +36,8 @@
     ]
   },
   "sam-natural.glb": {
-    "bytes": 1859308,
-    "sha256": "f6433c092c1e50b8b73bfac813741cdadb4701a3a53b441fad4f0ed8cd511fcf",
+    "bytes": 1860136,
+    "sha256": "9bae13962be0be2b2cb8d5499dedecdc57edee39c3dbaa888a542bc5b55110fe",
     "parts": [
       "sam-natural.0.b64",
       "sam-natural.1.b64",
@@ -59,8 +59,8 @@
     ]
   },
   "bilbo-natural.glb": {
-    "bytes": 1970268,
-    "sha256": "cce9c2f83e78bf60411de3a97016ac697deaca0bf746cb86607d414ad60170c5",
+    "bytes": 1970644,
+    "sha256": "47c99f96937bbe17a0b8facd1de6e8d3423097550285e6d2defe6f019dd9e0a7",
     "parts": [
       "bilbo-natural.0.b64",
       "bilbo-natural.1.b64",
@@ -82,11 +82,12 @@
     ]
   },
   "gandalf-natural.glb": {
-    "bytes": 1950676,
-    "sha256": "8a47f98256f795a95cbfe5d600221dd13864d3ea399b3218209fe817a2386865",
+    "bytes": 1952352,
+    "sha256": "6cacd3dd437ccd7e0f9fd72f94d85a132d8b85826a11901fee953431c9c8341c",
     "parts": [
       "gandalf-natural.0.b64",
-      "gandalf-natural.1.b64"
+      "gandalf-natural.1.b64",
+      "gandalf-natural.2.b64"
     ],
     "requiredAnimations": [
       "Idle",

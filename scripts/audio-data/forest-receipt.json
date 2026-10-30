@@ -1,0 +1,11 @@
+{
+  "sourceGitBlob": "a7b5c0dba3eaba0de8a8bc63950713ef900e273d",
+  "sourceSha256": "dad63455a8a55e373c0aaad5e55628f004d9fe79f3b63f74c68b0cb74335268a",
+  "derivative": {
+    "bytes": 43601,
+    "sha256": "53eb6af6ee37e2a7c0ec5cdfba52c80d67cc75af9059e1453a59d67da1132c97",
+    "parts": [
+      "forest-birds.b64"
+    ]
+  }
+}

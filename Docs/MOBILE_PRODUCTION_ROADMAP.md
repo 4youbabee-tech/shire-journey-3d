@@ -1,3 +1,7 @@
+# Current cohort: 0.9.0 opening-region production candidate
+
+53 local tests PASS. New cast albedos are encoded in the GLBs themselves; preserve default glTF sRGB behavior. The source cohort also contains palm-following garden tools, sage terrain texture, horse harness, continuous approach/boarding heading, licensed forest excerpts and a boot path that skips obsolete actor geometry. Current runtime must pass exact-head Chromium desktop/touch and continuous opening before main/Pages is advanced. Prior integrated source/browser PASS: 4f46eee / Actions 41099937846.
+
 # Current execution map — 2026-10-30
 
 | Work | Verified state | Next gate |

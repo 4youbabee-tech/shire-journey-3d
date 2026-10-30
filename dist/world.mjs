@@ -2,7 +2,7 @@
 import {HOMES,ROADS,MAP_BOUNDS} from './village-layout.mjs';
 import {enhanceHero} from './hero-art.mjs';
 import {dressMaterials} from './surface-art.mjs';
-export function createWorld(B,scene,{shadows=true,deferredNature=false}={}){
+export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredCharacters=false}={}){
  const V=B.Vector3, M=B.MeshBuilder;let seed=7349;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
  const mats={},statics=[],colliders=[],characters=[],apples=[],birds=[],leaves=[],workers=[],treeAnchors=[];
  function mat(name,hex,emission=0){const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(hex);m.specularColor=new B.Color3(.03,.03,.03);if(emission)m.emissiveColor=m.diffuseColor.scale(emission);mats[name]=m;return m;}
@@ -105,7 +105,16 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false}={}){
  // Expanded village bounds leave walkable routes behind the original village center.
  blocker('west boundary',MAP_BOUNDS.minX,3,2.5,1,6,MAP_BOUNDS.maxZ-MAP_BOUNDS.minZ);blocker('east boundary',MAP_BOUNDS.maxX,3,2.5,1,6,MAP_BOUNDS.maxZ-MAP_BOUNDS.minZ);blocker('south boundary',0,3,MAP_BOUNDS.minZ,MAP_BOUNDS.maxX-MAP_BOUNDS.minX,6,1);blocker('north boundary',0,3,MAP_BOUNDS.maxZ,MAP_BOUNDS.maxX-MAP_BOUNDS.minX,6,1);
  function character(id,x,z,{wizard=false,waistcoat=vest,player=false}={}){
-  const root=new B.TransformNode(id,scene);root.position.set(x,0,z);const parts=[];const S=(name,px,py,pz,sx,sy,sz,mt,segments=10)=>{const m=sphere(name,px,py,pz,sx,sy,sz,mt,false,root,segments);parts.push(m);return m;};const C=(name,px,py,pz,d,h,mt,top=null)=>{const m=cyl(name,px,py,pz,d,h,mt,false,root,top);parts.push(m);return m;};
+  const root=new B.TransformNode(id,scene);root.position.set(x,0,z);const parts=[];
+  // The shipped runtime loads authored GLBs; retain only the authoritative roots.
+  if(deferredCharacters){
+   const height=wizard?1.45:1,joint=(name,px,py,pz)=>{const n=new B.TransformNode(name,scene);n.parent=root;n.position.set(px,py,pz);return n;};
+   const left=joint('left arm pivot',-.36,1.12*height,0),right=joint('right arm pivot',.36,1.12*height,0),head=joint(id+' neck pivot',0,1.46*height,0);left.rotation.z=-.13;right.rotation.z=.13;
+   const leftLeg=wizard?null:joint('left leg pivot',-.19,.63,0),rightLeg=wizard?null:joint('right leg pivot',.19,.63,0);
+   root.rotation.y=Math.PI;if(id==='bilbo')root.scaling.setAll(1.04);if(id==='sam')root.scaling.setAll(.98);if(id==='frodo')root.scaling.setAll(.95);
+   const obj={id,root,left,right,leftLeg,rightLeg,head,parts,wizard,visualArt:null};characters.push(obj);return obj;
+  }
+  const S=(name,px,py,pz,sx,sy,sz,mt,segments=10)=>{const m=sphere(name,px,py,pz,sx,sy,sz,mt,false,root,segments);parts.push(m);return m;};const C=(name,px,py,pz,d,h,mt,top=null)=>{const m=cyl(name,px,py,pz,d,h,mt,false,root,top);parts.push(m);return m;};
   const height=wizard?1.45:1;const torso=S('waistcoat',0,.87*height,0,.68, .8*height,.42,wizard?grey:waistcoat);S('shirt collar',0,1.18*height,-.02,.47,.18,.4,shirt);
   const face=S('face',0,1.46*height,0,.46,.61,.45,skin,18);S('nose',0,1.43*height,-.259,.094,.14,.11,skin);for(const side of [-1,1]){S('ear',side*.24,1.47*height,0,.11,.18,.10,skin,12);S('eye',side*.114,1.51*height,-.245,.045,.042,.023,eye,10);}
   if(wizard){C('robe skirt',0,.5,0,.92,1,grey,.6);for(let i=0;i<7;i++){const a=i/7*Math.PI*2;S('grey hair',Math.cos(a)*.27,2.05,Math.sin(a)*.2,.23,.48,.19,beard);}S('long beard',0,1.7,-.27,.44,.7,.24,beard);C('hat brim',0,2.46,0,1.15,.065,hatmat);const cap=C('pointed hat',-.06,2.85,0,.75,.82,hatmat,0);cap.rotation.z=.12;C('wizard staff',.64,1.15,-.06,.075,2.3,bark);S('staff top',.64,2.28,-.06,.13,.25,.15,wood);}

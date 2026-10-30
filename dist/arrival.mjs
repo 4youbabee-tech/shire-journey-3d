@@ -19,6 +19,14 @@ export function arrivalPose(t){
   frodoMode:s<5.4?'Sit':s<7.2?'Rise':s<15.5?'Run':s<20.4?'Talk':s<22.6?'Board':'Ride',
   book:s<5.4,cartMoving};
 }
+const angleMix=(a,b,t)=>a+Math.atan2(Math.sin(b-a),Math.cos(b-a))*t;
+export function arrivalHeading(t,pose=arrivalPose(t)){
+ const guest=Math.atan2(pose.cartX-pose.frodoX,pose.cartZ-pose.frodoZ)+Math.PI,travel=Math.atan2(11.5,-5)+Math.PI;
+ if(t<7.2)return guest;
+ const towardRoad=angleMix(guest,travel,ease((t-7.2)/.35));
+ const greeting=angleMix(towardRoad,guest,ease((t-14.2)/1.3));
+ return angleMix(greeting,Math.PI,pose.boarding);
+}
 export function createArrival(B,scene,world){
  const V=B.Vector3,M=B.MeshBuilder,root=new B.TransformNode('opening pony and cart',scene);
  function mat(name,hex){const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(hex);m.specularColor=new B.Color3(.05,.05,.05);return m;}
@@ -45,6 +53,13 @@ export function createArrival(B,scene,world){
  for(const x of [-.74,.74]){box('cart side rail',wood,x,1.12,-1.15,.1,.62,2.3);
   box('pony cart shaft',wood,x*.86,.68,.76,.085,.095,3.35);}
  sphere('travel bag',linen,.45,1.06,-.36,.47,.45,.52);
+ box('cart front footboard',wood,0,.64,.44,1.25,.09,.42);
+ const leather=[];
+ function strap(name,points,radius){const path=B.Curve3.CreateCatmullRomSpline(points.map(p=>new V(...p)),8,false).getPoints();const mesh=M.CreateTube(name,{path,radius,tessellation:6},scene);mesh.material=dark;mesh.parent=root;mesh.isPickable=false;leather.push(mesh);}
+ const girth=[];for(let i=0;i<=16;i++){const a=i/16*Math.PI*2;girth.push([Math.cos(a)*.34,1.12+Math.sin(a)*.36,1.75]);}strap('pony leather belly girth',girth,.018);
+ for(const side of [-1,1]){strap('pony shaft trace',[[side*.31,1.12,1.75],[side*.53,.94,1.3],[side*.64,.7,.7]],.014);strap('driver leather rein',[[side*.21,1.46,2.55],[side*.39,1.26,1.7],[side*.36,1.34,.65],[side*.2,1.73,-.13]],.009);}
+ const harness=B.Mesh.MergeMeshes(leather,true,true,undefined,false,false);if(harness){harness.name='cart leather harness and reins';harness.parent=root;harness.isPickable=false;}
+
  const wheels=[];
  for(const x of [-.92,.92]){
   const joint=new B.TransformNode('cart wheel joint',scene);joint.parent=root;joint.position.set(x,.58,-1.3);
@@ -74,7 +89,7 @@ export function createArrival(B,scene,world){
   for(let i=0;i<legs.length;i++)legs[i].rotation.x=pose.step*(i%2?-1:1);
   for(const wheel of wheels)wheel.rotation.x=wheelAngle;
   frodo.root.position.set(pose.frodoX,pose.frodoY,pose.frodoZ);
-  frodo.root.rotation.y=pose.boarding>0?Math.PI:Math.atan2(pose.cartX-pose.frodoX,pose.cartZ-pose.frodoZ)+Math.PI;
+  frodo.root.rotation.y=arrivalHeading(time,pose);
   book.setEnabled(pose.book);
   if(camera){
    const t=Math.max(0,Math.min(ARRIVAL_DURATION,time));let position,target;

@@ -34,5 +34,12 @@
     "parts": [
       "footstep-09.b64"
     ]
+  },
+  "forest-birds.mp3": {
+    "bytes": 43601,
+    "sha256": "53eb6af6ee37e2a7c0ec5cdfba52c80d67cc75af9059e1453a59d67da1132c97",
+    "parts": [
+      "forest-birds.b64"
+    ]
   }
 }

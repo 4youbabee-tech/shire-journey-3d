@@ -238,6 +238,8 @@ if WIZARD:
    for i in range(0,len(pixels),4):
     l=pixels[i]*.21+pixels[i+1]*.72+pixels[i+2]*.07;pixels[i:i+3]=[l*.64,l*.72,l*.70]
    image.pixels=pixels;image.pack();node.image=image
+# Generated wool colors are linear material values; encode albedo texels as sRGB.
+def linear_to_srgb(v):return 12.92*v if v<=.0031308 else 1.055*v**(1/2.4)-.055
 # Small deterministic woven color maps on authored garments; no runtime noise cost.
 for material in [cloth,mat]+([grey] if WIZARD else []):
  if material.name not in bpy.data.materials:continue
@@ -245,7 +247,7 @@ for material in [cloth,mat]+([grey] if WIZARD else []):
  for y in range(256):
   for x in range(256):
    noise=math.sin(x*12.9898+y*78.233)*43758.5453;noise-=math.floor(noise);weave=(.025 if x%3==0 else -.01)+(.018 if y%3==0 else -.007);shade=.97+weave+(noise-.5)*.045
-   pixels.extend([min(1,c*shade) for c in color[:3]]+[1])
+   pixels.extend([linear_to_srgb(min(1,c*shade)) for c in color[:3]]+[1])
  image.pixels=pixels;image.pack();texture=material.node_tree.nodes.new('ShaderNodeTexImage');texture.image=image;material.node_tree.links.new(texture.outputs['Color'],bs.inputs['Base Color'])
 for o in meshes:
  if o.data.uv_layers:continue

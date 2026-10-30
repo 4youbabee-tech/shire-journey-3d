@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {HOMES,ROADS,LANDMARKS,MAP_BOUNDS} from '../dist/village-layout.mjs';
-import {arrivalPose,arrivalBeat,createArrival,ARRIVAL_DURATION} from '../dist/arrival.mjs';
+import {arrivalPose,arrivalBeat,createArrival,ARRIVAL_DURATION,arrivalHeading} from '../dist/arrival.mjs';
 import {createWorld} from '../dist/world.mjs';
 await import('../dist/vendor/babylon.js');
 const B=globalThis.BABYLON;
@@ -31,4 +31,9 @@ test('original pony cart arrival has timed visuals and restores state without co
 test('boarding is continuous and the cart waits for both passengers',()=>{
  for(let t=20;t<23;t+=.01){const a=arrivalPose(t),b=arrivalPose(t+.01);assert.ok(Math.hypot(b.frodoX-a.frodoX,b.frodoZ-a.frodoZ)<.04);}
  assert.equal(arrivalPose(21).frodoMode,'Board');assert.equal(arrivalPose(21).cartMoving,false);assert.equal(arrivalPose(18).cartY,0);assert.equal(arrivalPose(27).cartZ,-10);
+});
+
+test('Frodo turns continuously from the running path toward Gandalf and into the cart seat',()=>{
+ for(let t=0;t<27;t+=.01){const a=arrivalHeading(t),b=arrivalHeading(t+.01),delta=Math.abs(Math.atan2(Math.sin(b-a),Math.cos(b-a)));assert.ok(Number.isFinite(a));assert.ok(delta<.065,'No instantaneous heading snap at '+t);}
+ assert.ok(Math.abs(Math.sin(arrivalHeading(9)-(Math.atan2(11.5,-5)+Math.PI)))<1e-6);assert.ok(Math.abs(Math.sin(arrivalHeading(26)-Math.PI))<1e-6);
 });

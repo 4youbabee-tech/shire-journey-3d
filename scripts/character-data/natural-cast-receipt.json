@@ -1,26 +1,145 @@
 {
   "frodo": {
-    "bytes": 1970360,
-    "sha256": "dc6824a25ebf15f2bc88a0acec8b24fe17ce62eb1604a8dfb5f9a92c47fd694f",
+    "bytes": 1971984,
+    "sha256": "e2b3183744c0f8a26b285f76fe5141be6ca4cca510721e008558a19686a151b9",
     "sourceSha256": "52a553eda8aedb4e9901de618286025a9534e6fdf58649efdad3031774d9c5ef",
-    "textures": 6
+    "textures": 6,
+    "colorRepair": {
+      "inputSha256": "dc6824a25ebf15f2bc88a0acec8b24fe17ce62eb1604a8dfb5f9a92c47fd694f",
+      "sha256": "e2b3183744c0f8a26b285f76fe5141be6ca4cca510721e008558a19686a151b9",
+      "bytes": 1971984,
+      "correctedImages": [
+        {
+          "image": "frodo frodo woven waistcoat woven albedo",
+          "beforeMean": [
+            40.504730224609375,
+            17.504730224609375,
+            9.504730224609375
+          ],
+          "afterMean": [
+            111.00210571289062,
+            74.00946044921875,
+            54.50506591796875
+          ]
+        },
+        {
+          "image": "frodo moss green wool cloak woven albedo",
+          "beforeMean": [
+            15.986831665039062,
+            25.986831665039062,
+            14.986831665039062
+          ],
+          "afterMean": [
+            70.97349548339844,
+            89.9736328125,
+            68.92469787597656
+          ]
+        }
+      ]
+    }
   },
   "sam": {
-    "bytes": 1859308,
-    "sha256": "f6433c092c1e50b8b73bfac813741cdadb4701a3a53b441fad4f0ed8cd511fcf",
+    "bytes": 1860136,
+    "sha256": "9bae13962be0be2b2cb8d5499dedecdc57edee39c3dbaa888a542bc5b55110fe",
     "sourceSha256": "adf29a3129b62a8bed8188e352c854b9565afcee9ef5db7f61500568debb4d1d",
-    "textures": 5
+    "textures": 5,
+    "colorRepair": {
+      "inputSha256": "f6433c092c1e50b8b73bfac813741cdadb4701a3a53b441fad4f0ed8cd511fcf",
+      "sha256": "9bae13962be0be2b2cb8d5499dedecdc57edee39c3dbaa888a542bc5b55110fe",
+      "bytes": 1860136,
+      "correctedImages": [
+        {
+          "image": "sam sam woven waistcoat woven albedo",
+          "beforeMean": [
+            51.72547912597656,
+            39.72547912597656,
+            17.725479125976562
+          ],
+          "afterMean": [
+            124.57435607910156,
+            109.97012329101562,
+            74.45089721679688
+          ]
+        }
+      ]
+    }
   },
   "bilbo": {
-    "bytes": 1970268,
-    "sha256": "cce9c2f83e78bf60411de3a97016ac697deaca0bf746cb86607d414ad60170c5",
+    "bytes": 1970644,
+    "sha256": "47c99f96937bbe17a0b8facd1de6e8d3423097550285e6d2defe6f019dd9e0a7",
     "sourceSha256": "2ab577c167605dcb033dc9ec318a00218809ed1c56e3c401e4861a9daeea0bc9",
-    "textures": 6
+    "textures": 6,
+    "colorRepair": {
+      "inputSha256": "cce9c2f83e78bf60411de3a97016ac697deaca0bf746cb86607d414ad60170c5",
+      "sha256": "47c99f96937bbe17a0b8facd1de6e8d3423097550285e6d2defe6f019dd9e0a7",
+      "bytes": 1970644,
+      "correctedImages": [
+        {
+          "image": "bilbo bilbo woven waistcoat woven albedo",
+          "beforeMean": [
+            59.96455383300781,
+            10.964553833007812,
+            13.964553833007812
+          ],
+          "afterMean": [
+            132.9645538330078,
+            58.87223815917969,
+            65.9501953125
+          ]
+        },
+        {
+          "image": "bilbo moss green wool cloak woven albedo",
+          "beforeMean": [
+            34.97789001464844,
+            8.977890014648438,
+            11.977890014648438
+          ],
+          "afterMean": [
+            103.9547119140625,
+            52.93367004394531,
+            60.95684814453125
+          ]
+        }
+      ]
+    }
   },
   "gandalf": {
-    "bytes": 1950676,
-    "sha256": "8a47f98256f795a95cbfe5d600221dd13864d3ea399b3218209fe817a2386865",
+    "bytes": 1952352,
+    "sha256": "6cacd3dd437ccd7e0f9fd72f94d85a132d8b85826a11901fee953431c9c8341c",
     "sourceSha256": "ce3e3271ff61e1fdb852e7a1705afeda068b65ac78dae27f450841d1e541da30",
-    "textures": 6
+    "textures": 6,
+    "colorRepair": {
+      "inputSha256": "8a47f98256f795a95cbfe5d600221dd13864d3ea399b3218209fe817a2386865",
+      "sha256": "6cacd3dd437ccd7e0f9fd72f94d85a132d8b85826a11901fee953431c9c8341c",
+      "bytes": 1952352,
+      "correctedImages": [
+        {
+          "image": "gandalf moss green wool cloak woven albedo",
+          "beforeMean": [
+            32.15338134765625,
+            38.15338134765625,
+            38.15338134765625
+          ],
+          "afterMean": [
+            99.46922302246094,
+            107.93074035644531,
+            107.93074035644531
+          ]
+        },
+        {
+          "image": "gandalf weathered grey woven wool woven albedo",
+          "beforeMean": [
+            44.88031005859375,
+            50.88031005859375,
+            50.88031005859375
+          ],
+          "afterMean": [
+            116.46006774902344,
+            123.46006774902344,
+            123.46006774902344
+          ]
+        }
+      ]
+    }
   }
 }
