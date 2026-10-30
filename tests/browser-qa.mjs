@@ -27,7 +27,7 @@ if(process.env.EXPECTED_COMMIT_SHA&&checkoutSha!==process.env.EXPECTED_COMMIT_SH
 const report={commit:checkoutSha,environment:'Chromium SwiftShader (software WebGL; NOT target hardware)',host:process.env.GITHUB_ACTIONS?'GitHub Actions':'local Linux container',desktop:{},mobile:{},errors:[],status:'NOT RUN'};
 let browser;
 const snap=page=>page.evaluate(()=>window.__SHIRE__?.snapshot());
-const still=async(page,name)=>page.screenshot({path:resolve(out,name),animations:'disabled'});
+const still=async(page,name)=>{const result=await page.screenshot({path:resolve(out,name),animations:'disabled'});if(['desktop-gandalf-opening-dialogue.png','desktop-gandalf-character-detail.png','desktop-dialogue.png','mobile-dialogue.png'].includes(name))console.log('SHIRE_CAPTURE:'+name+':'+(await page.screenshot({type:'jpeg',quality:40,animations:'disabled'})).toString('base64'));return result;};
 async function ready(page){
  await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.querySelector('#welcome').hidden||!document.querySelector('#fatal').hidden,null,{timeout:90000});
