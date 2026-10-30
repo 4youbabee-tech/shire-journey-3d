@@ -12,7 +12,7 @@ test('expanded village has connected practical road network and spatially valid 
 });
 test('original pony cart arrival has timed visuals and restores state without collision or character damage',()=>{
  assert.match(arrivalBeat(2),/يقرأ/);assert.match(arrivalBeat(8),/عربة/);assert.match(arrivalBeat(12),/فرودو/);assert.equal(arrivalPose(2).frodoMode,'Sit');assert.equal(arrivalPose(6).frodoMode,'Rise');
- assert.equal(arrivalPose(11).boarded,false);assert.equal(arrivalPose(22).boarded,true);
+ assert.equal(arrivalPose(11).boarded,false);assert.equal(arrivalPose(23).boarded,true);
  const engine=new B.NullEngine({renderWidth:1280,renderHeight:720}),scene=new B.Scene(engine);
  const camera=new B.UniversalCamera('camera',new B.Vector3(0,5,-20),scene);
  const world=createWorld(B,scene,{shadows:false}),colliders=world.colliders.length;
@@ -27,3 +27,8 @@ test('original pony cart arrival has timed visuals and restores state without co
  engine.dispose();
 });
 
+
+test('boarding is continuous and the cart waits for both passengers',()=>{
+ for(let t=20;t<23;t+=.01){const a=arrivalPose(t),b=arrivalPose(t+.01);assert.ok(Math.hypot(b.frodoX-a.frodoX,b.frodoZ-a.frodoZ)<.04);}
+ assert.equal(arrivalPose(21).frodoMode,'Board');assert.equal(arrivalPose(21).cartMoving,false);assert.equal(arrivalPose(18).cartY,0);assert.equal(arrivalPose(27).cartZ,-10);
+});

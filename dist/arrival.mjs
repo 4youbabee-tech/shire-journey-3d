@@ -11,12 +11,13 @@ export function arrivalBeat(t){
 }
 export function arrivalPose(t){
  const s=Math.max(0,Math.min(ARRIVAL_DURATION,Number.isFinite(t)?t:0));
- const run=ease((s-7.2)/8.3),approach=ease((s-3)/12.5),ride=ease((s-20)/7);
- const cartZ=-25+6.5*approach+8.5*ride,boarded=s>=21;
- return {cartX:-1.2,cartZ,frodoX:boarded?-.74:-10.9+11.5*run,frodoZ:boarded?cartZ-1.4:-14-5*run,
-  boarded,step:(s>3&&s<15.5||s>20)?Math.sin(s*10)*.42:0,
-  frodoMode:s<5.4?'Sit':s<7.2?'Rise':s<15.5?'Run':s<21?'Talk':'Ride',
-  book:s<5.4,cartMoving:(s>3&&s<15.5)||s>20};
+ const run=ease((s-7.2)/8.3),approach=ease((s-3)/12.5),ride=ease((s-22.6)/4.4),boarding=ease((s-20.4)/2.2);
+ const cartZ=-25+6.5*approach+8.5*ride,boarded=s>=22.6,cartMoving=(s>3&&s<15.5)||s>22.6;
+ const groundX=-10.9+11.5*run,groundZ=-14-5*run,cartY=cartMoving?.006*Math.sin(s*8):0;
+ return {cartX:-1.2,cartZ,cartY,seatY:1.27+cartY,frodoX:groundX+(-.74-groundX)*boarding,frodoZ:groundZ+(cartZ-.2-groundZ)*boarding,
+  frodoY:boarded?.95:.95*boarding+.25*Math.sin(Math.PI*boarding),boarding,boarded,step:cartMoving?Math.sin(s*10)*.42:0,
+  frodoMode:s<5.4?'Sit':s<7.2?'Rise':s<15.5?'Run':s<20.4?'Talk':s<22.6?'Board':'Ride',
+  book:s<5.4,cartMoving};
 }
 export function createArrival(B,scene,world){
  const V=B.Vector3,M=B.MeshBuilder,root=new B.TransformNode('opening pony and cart',scene);
@@ -40,7 +41,7 @@ export function createArrival(B,scene,world){
  }
  box('oak cart bed',wood,0,.78,-1.14,1.5,.16,2.4);
  box('cart rear wall',wood,0,1.04,-2.25,1.52,.5,.14);
- box('cart seat',wood,0,1.12,-1.55,1.4,.16,.49);
+ box('cart seat',wood,0,1.12,-.15,1.4,.16,.49);
  for(const x of [-.74,.74]){box('cart side rail',wood,x,1.12,-1.15,.1,.62,2.3);
   box('pony cart shaft',wood,x*.86,.68,.76,.085,.095,3.35);}
  sphere('travel bag',linen,.45,1.06,-.36,.47,.45,.52);
@@ -55,24 +56,25 @@ export function createArrival(B,scene,world){
  }
  const gandalf=world.characters.find(c=>c.id==='gandalf'),frodo=world.characters.find(c=>c.id==='frodo');
  if(!gandalf||!frodo)throw Error('Opening characters not found');
- const book=new B.TransformNode('Frodo open reading book',scene);book.parent=frodo.root;book.position.set(0,.35,-.36);box('book leather cover',dark,0,0,0,.47,.035,.33,book);for(const side of [-1,1]){const page=box('open book pages',linen,side*.115,.04,0,.23,.025,.30,book);page.rotation.z=side*.18;}book.setEnabled(false);
+ const book=new B.TransformNode('Frodo open reading book',scene);book.parent=frodo.root;book.position.set(0,.47,-.36);box('book leather cover',dark,0,0,0,.47,.035,.33,book);for(const side of [-1,1]){const page=box('open book pages',linen,side*.115,.04,0,.23,.025,.30,book);page.rotation.z=side*.18;}book.setEnabled(false);
  dressMaterials(B,scene,[wood,linen]);
- root.setEnabled(false);let active=false,horse=null;
+ root.setEnabled(false);let active=false,horse=null,lastCartZ=null,wheelAngle=0;
  function begin(camera){
-  if(active)return;active=true;root.setEnabled(true);
+  if(active)return;active=true;lastCartZ=null;wheelAngle=0;root.setEnabled(true);
   world.player.root.setEnabled(false);
-  gandalf.root.parent=root;gandalf.root.position.set(-.26,.16,-1.62);gandalf.root.scaling.setAll(.82);
+  gandalf.root.parent=root;gandalf.root.position.set(-.36,.16,-.2);gandalf.root.scaling.setAll(.82);
   frodo.root.position.set(-10.9,0,-14);
   if(camera){camera.position.set(-7.7,2.1,-19);camera.setTarget(new V(-10.9,.9,-14));}
   update(0,camera);
  }
  function update(time,camera){
   const pose=arrivalPose(time);if(!active)return pose;horse?.setMoving(pose.cartMoving);
-  root.position.set(pose.cartX,.012*Math.sin(time*8),pose.cartZ);
+  root.position.set(pose.cartX,pose.cartY,pose.cartZ);
+  if(lastCartZ!==null)wheelAngle+=(pose.cartZ-lastCartZ)/.5;lastCartZ=pose.cartZ;
   for(let i=0;i<legs.length;i++)legs[i].rotation.x=pose.step*(i%2?-1:1);
-  for(const wheel of wheels)wheel.rotation.x=-time*1.3;
-  frodo.root.position.set(pose.frodoX,pose.boarded?.25:0,pose.frodoZ);
-  frodo.root.rotation.y=pose.boarded?Math.PI:Math.atan2(pose.cartX-pose.frodoX,pose.cartZ-pose.frodoZ)+Math.PI;
+  for(const wheel of wheels)wheel.rotation.x=wheelAngle;
+  frodo.root.position.set(pose.frodoX,pose.frodoY,pose.frodoZ);
+  frodo.root.rotation.y=pose.boarding>0?Math.PI:Math.atan2(pose.cartX-pose.frodoX,pose.cartZ-pose.frodoZ)+Math.PI;
   book.setEnabled(pose.book);
   if(camera){
    const t=Math.max(0,Math.min(ARRIVAL_DURATION,time));let position,target;

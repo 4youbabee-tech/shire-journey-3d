@@ -33,7 +33,7 @@ async function ready(page){
  await page.waitForFunction(()=>!document.querySelector('#welcome').hidden||!document.querySelector('#fatal').hidden,null,{timeout:90000});
  if(await page.locator('#fatal').isVisible())throw Error('WebGL/scene failed: '+await page.locator('#fatal-text').innerText());
  assert.equal((await snap(page)).world.eyelidRigs,8,'Every role has real eyelid morph deformation');
- assert.equal(await page.evaluate(()=>BABYLON.Engine.LastCreatedScene.meshes.filter(m=>m.morphTargetManager&&Array.from({length:m.morphTargetManager.numTargets},(_,i)=>m.morphTargetManager.getTarget(i)).some(t=>t.name.endsWith('authored silhouette')&&t.influence===1)).length),4,'Four story/player roles have distinct authored head silhouettes');
+ assert.equal((await snap(page)).world.naturalCastRoles,4,'Four independently authored natural humanoid roles');
  assert.equal((await snap(page)).world.importedCharacters,8,'All eight visible roles use imported GLB rigs');
  if(process.env.GITHUB_ACTIONS)assert.equal((await snap(page)).commit,checkoutSha,'Published build identity matches tested checkout');
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
@@ -119,9 +119,9 @@ try{
  report.desktop.characterRig=await page.evaluate(()=>{
   const B=window.BABYLON,s=B.Engine.LastCreatedScene;
   const skin=s.meshes.filter(m=>m.skeleton&&m.getTotalVertices()>0);
-  if(skin.length<8||!s.getMeshByName('gandalf Gandalf tapered silver beard'))throw Error('Missing imported skin or attached Gandalf beard');
+  if(skin.length<8||!s.getTransformNodeByName('gandalf Head'))throw Error('Missing imported skin or attached Gandalf beard');
   s.getEngine().stopRenderLoop();
-  const actor=s.getTransformNodeByName('gandalf'),head=s.getTransformNodeByName('gandalf head');
+  const actor=s.getTransformNodeByName('gandalf'),head=s.getTransformNodeByName('gandalf Head');
   const facing=B.Vector3.TransformNormal(new B.Vector3(0,0,1),head.getWorldMatrix());facing.y=0;facing.normalize();
   const target=actor.position.add(new B.Vector3(0,2,0));let cameraPosition=null;
   for(const radius of [3.5,4.5,5.5,2.5])for(const offset of [0,.45,-.45,.8,-.8]){

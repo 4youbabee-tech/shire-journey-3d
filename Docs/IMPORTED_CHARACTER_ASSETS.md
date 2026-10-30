@@ -1,3 +1,22 @@
+# Natural Shire cast — 2026-10-30 working production cohort
+
+Four distinct self-contained GLBs replace the rejected KayKit chibi bodies. This is a rebuild on the existing Babylon.js runtime, not a new project. Each has one 65-bone rig, 12 retargeted/authored clips, textured anatomical face, separate eyelid/eye controls, eyebrows, smile, gaze and role clothing. Hobbit bare feet and floor reading/stand-up are authored; Gandalf has a weighted robe, hat, beard and hand-following staff. Compatible non-morph geometry is merged; each asset has 4–5 meshes and is below 2.1MB. Authoritative binary hashes and byte lengths are in scripts/character-data/manifest.json; derivative receipts are alongside it.
+
+Source: Quaternius Universal Base Characters, Modular Character Outfits — Fantasy, Universal Animation Library (all free Standard downloads). Official pages: https://quaternius.com/packs/universalbasecharacters.html , https://quaternius.com/packs/modularcharacteroutfitsfantasy.html , https://quaternius.com/packs/universalanimationlibrary.html . Archive license texts are copied verbatim to scripts/character-data/QUATERNIUS-LICENSES.txt: CC0 1.0, no film models, actor scans, film dialogue or score.
+
+Downloaded archive SHA256:
+- universalbasecharacters.zip: fdbf1804c90dfc1ea03e992bff7da2dfd1a79318e13270a660180f9308455f40
+- modularcharacteroutfitsfantasy.zip: c3468b18871cc8c8f05ab14df7712baf22cb9f389cbd870babf130e595187f70
+- universalanimationlibrary.zip: cc73fc4e495b82958207316596317a3f40b9fa38065bde1027937452da537724
+
+Reproduce with Blender 4.5.15 LTS and scripts/build-natural-cast.py --sources UNPACKED_ARCHIVES --output RAW --role ROLE for each of frodo/sam/bilbo/gandalf; then @gltf-transform/core, functions and extensions 4.2.1 plus Pillow using node scripts/optimize-natural-cast.mjs RAW OPTIMIZED. Normal production npm ci reconstructs the sealed GLBs from committed compressed chunks without a third-party asset download. Source-image URI typos are repaired only in temporary staging. Texture budgets: face 1024, other maps 512; JPEG for opaque colors, alpha retained where used.
+
+Runtime: semantic morph selection prevents cape drape being driven as a blink. Shader influence capacity is fixed before interaction to avoid blink-dependent recompilation. Weighted interrupted fades remain normalized; one-shots retain completion across distance pauses. Gait speed follows actual root travel. The cart stops for the greeting/boarding; wheel rotation follows physical distance, and passenger hips align to the front bench after animation evaluation. First-story control begins beside Gandalf; replay preserves the saved position. Conversation camera brings actual 3D faces into view.
+
+Source validation: 48 Node tests PASS, including complete binary/skin/animation integrity for every asset, morph capacity through full blinking, crossfade interruption, one-shot pause/resume, boarding continuity and story/save gates. Blender previews are authoring evidence only. Exact-head WebGL rendering/video must be inspected before merging this working cohort. No physical-device FPS is inferred from NullEngine, Blender or CI SwiftShader.
+
+Historical asset records below describe superseded derivatives.
+
 # 0.9.0-dev current derivative manifest
 
 Current authoritative sizes/hashes: scripts/character-data/manifest.json. Ten retained clips including chair sitting, actual blink morph, reduced head proportions and authored staff replace previous 0.8 derivative hashes listed historically below. Horse source/license receipts are in QUALITY_CANDIDATE_ASSETS.md. Shared traveller faces and seated rigid-robe intersections remain unaccepted; no final art claim.

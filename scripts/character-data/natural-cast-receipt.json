@@ -1,0 +1,26 @@
+{
+  "frodo": {
+    "bytes": 1970360,
+    "sha256": "dc6824a25ebf15f2bc88a0acec8b24fe17ce62eb1604a8dfb5f9a92c47fd694f",
+    "sourceSha256": "52a553eda8aedb4e9901de618286025a9534e6fdf58649efdad3031774d9c5ef",
+    "textures": 6
+  },
+  "sam": {
+    "bytes": 1859308,
+    "sha256": "f6433c092c1e50b8b73bfac813741cdadb4701a3a53b441fad4f0ed8cd511fcf",
+    "sourceSha256": "adf29a3129b62a8bed8188e352c854b9565afcee9ef5db7f61500568debb4d1d",
+    "textures": 5
+  },
+  "bilbo": {
+    "bytes": 1970268,
+    "sha256": "cce9c2f83e78bf60411de3a97016ac697deaca0bf746cb86607d414ad60170c5",
+    "sourceSha256": "2ab577c167605dcb033dc9ec318a00218809ed1c56e3c401e4861a9daeea0bc9",
+    "textures": 6
+  },
+  "gandalf": {
+    "bytes": 1950676,
+    "sha256": "8a47f98256f795a95cbfe5d600221dd13864d3ea399b3218209fe817a2386865",
+    "sourceSha256": "ce3e3271ff61e1fdb852e7a1705afeda068b65ac78dae27f450841d1e541da30",
+    "textures": 6
+  }
+}

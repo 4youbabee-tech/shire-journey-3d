@@ -15,7 +15,7 @@ for(const [name,expected] of Object.entries(manifest))test(name+' has complete b
 });
 
 test('broken animation sampler reference is rejected before the Babylon loader',()=>{
- const name='traveller.glb',data=readFileSync(new URL('../dist/assets/characters/'+name,import.meta.url));
+ const name='frodo-natural.glb',data=readFileSync(new URL('../dist/assets/characters/'+name,import.meta.url));
  const n=data.readUInt32LE(12),json=JSON.parse(data.subarray(20,20+n));json.animations[0].channels[0].sampler=99999;
  const raw=Buffer.from(JSON.stringify(json)),padded=Buffer.alloc(Math.ceil(raw.length/4)*4,32);raw.copy(padded);
  const binaryChunks=data.subarray(20+n),header=Buffer.alloc(20);header.writeUInt32LE(0x46546c67,0);header.writeUInt32LE(2,4);header.writeUInt32LE(20+padded.length+binaryChunks.length,8);header.writeUInt32LE(padded.length,12);header.writeUInt32LE(0x4e4f534a,16);

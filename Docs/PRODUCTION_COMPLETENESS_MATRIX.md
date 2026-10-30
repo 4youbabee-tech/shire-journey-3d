@@ -1,3 +1,9 @@
+# Active work — natural cast integration, 2026-10-30
+
+The 605c86a exact-head technical run passed, but the chibi art was rejected. Four licensed natural-proportion actors now replace it, with authored weighted costume, facial controls and floor/boarding clips. See IMPORTED_CHARACTER_ASSETS.md and the sealed manifest for exact source/license/asset provenance. Runtime integration includes semantic gaze/blink, stable shader capacity, continuous seated boarding, physical-distance wheel rotation, slower analog walking and close conversation framing. 48 source/NullEngine tests PASS. These do not constitute raster art approval or physical-device performance. Current branch remains a production draft while actual WebGL results are inspected. Canonical main/Pages remains d2c5d759 until the integrated candidate passes its gates.
+
+Production map: cast source build and local integrity complete → exact-head WebGL body/face/clip/costume inspection → fix visible faults → village/audio/story-window integration → target-device acceptance → merge and Pages identity verification. F1-01 causal gates remain enforced; later chapters are not substituted for the agreed first-region quality. Source canon: supplied Story and Timeline Bible pp1–10 and Tolkien Concerning Hobbits pp25–27; film opening order remains the supplied screenplay sequence documented below. No copied protected dialogue/music.
+
 # Resumed 0.9 corrective cohort — 2026-10-30
 
 | Item | Evidence / state |
@@ -5,9 +11,9 @@
 | Recovery of existing unpublished work | PR #13 parent 6638beb; npm ci PASS; prior exact-head run 40982495511 / artifact 12945097923 hash verified |
 | Interrupted crossfades / one-shot distance resume | Real Babylon 9.32.1 AnimationGroup regression tests PASS; new browser evidence pending |
 | Distinct traveller head/hair silhouettes | Four source-authored morphs, real GLB vertex/eye bounds test PASS; final art NOT ACCEPTED |
-| Hair palettes / blinking compatibility | Four existing atlases recolored, original blink retained; requires actual WebGL review |
+| Hair palettes / blinking compatibility | Four existing atlases recolored, original blink deltas rescaled to avoid crossing eyelids; real GLB open/half/closed tests added; requires actual WebGL review |
 | Background Socialize / gaze easing | Existing Interact clip selected; elapsed-time smoothing; not a new AI authority |
-| Source verification | npm run check and 41/41 Node tests PASS locally |
+| Source verification | npm run check and 42/42 Node tests required after the eyelid deformation correction |
 | New exact-head recording | Required before merge; PENDING at commit authoring |
 | Performance / release | No physical-device results or new public release claimed; permanent Pages remains 0.8.0 |
 
