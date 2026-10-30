@@ -18,8 +18,10 @@ export function createAdaptiveQuality({coarse=false}={}){
   if(window<6||samples.length<10)return false;
   samples.sort((a,b)=>a-b);median=samples[Math.floor(samples.length/2)];
   window=0;samples=[];let updated=false;
-  if(median<26&&scale<2.25){scale=Math.min(2.25,Math.round((scale+.25)*100)/100);updated=true;}
-  else if(median<20&&!coarse&&scale>=2.25&&shadows){shadows=false;updated=true;}
+  // Preserve readable faces/textures on sustained severe slowdown: remove the
+  // extra shadow pass before reducing the primary image's pixel resolution.
+  if(median<20&&shadows){shadows=false;updated=true;}
+  else if(median<26&&scale<2.25){scale=Math.min(2.25,Math.round((scale+.25)*100)/100);updated=true;}
   else if(median>44){if(scale>baseline){scale=Math.max(baseline,Math.round((scale-.25)*100)/100);updated=true;}else if(!coarse&&!shadows){shadows=true;updated=true;}}
   if(updated){adjustments++;cooldown=12;}return updated;
  }
