@@ -1,3 +1,4 @@
+import {addActorCollision} from './actor-collision.mjs';
 // Authored Shire cast, based on reviewed Quaternius CC0 humanoids.
 export const CHARACTER_HEIGHTS=Object.freeze({player:1.48,bilbo:1.36,sam:1.48,frodo:1.42,gandalf:3.12});
 export function blinkAmount(seconds,seed=0){const period=3.7+(seed%5)*.21,t=((seconds+seed*.137)%period+period)%period;return t<.17?Math.sin(t/.17*Math.PI)**2:0;}
@@ -66,7 +67,7 @@ export async function loadCharacters(B,scene,world){
    const response=1-Math.exp(-dt*7);imported.smile+=((speaking||celebrating?.45:.1)-imported.smile)*response;
    const drape=mode==='Sit'||mode==='Ride'||mode==='RideTalk'?1:mode==='Rise'?Math.max(0,1-modeTime/1.2):0;imported.drape+=(drape-imported.drape)*response;
   }
-  imported.update=update;c.imported=imported;actors.push(c);
+  imported.update=update;c.imported=imported;addActorCollision(B,scene,world,c,CHARACTER_HEIGHTS[c.id]||1.45);actors.push(c);
  }
  // Undo only our last additive gaze before animation evaluation. This prevents
  // head drift on clips whose optimizer retained no varying head rotation keys.
@@ -84,7 +85,7 @@ export async function loadCharacters(B,scene,world){
    if(a.staff&&a.hand){a.hand.computeWorldMatrix(true);a.holder.computeWorldMatrix(true);a.holder.getWorldMatrix().invertToRef(a.matrix);B.Vector3.TransformCoordinatesToRef(a.hand.getAbsolutePosition(),a.matrix,a.staff.position);}
   }
  });
- world.stats.importedCharacters=actors.length;world.stats.characterAssets='Quaternius CC0; authored natural Shire cast';world.stats.naturalCastRoles=4;world.stats.eyelidRigs=actors.filter(c=>c.imported.morphs.blink.length>=2).length;
+ world.stats.colliders=world.colliders.length;world.stats.importedCharacters=actors.length;world.stats.characterAssets='Quaternius CC0; authored natural Shire cast';world.stats.naturalCastRoles=4;world.stats.eyelidRigs=actors.filter(c=>c.imported.morphs.blink.length>=2).length;
  const focus=B.Vector3.Zero();
  return {actors,update(dt,activeNPC,party,cinema=null){for(const c of actors){let pose=null,target=null;
   if(cinema){pose=c.id==='frodo'?cinema.frodoMode:c.id==='gandalf'?(['Talk','Board'].includes(cinema.frodoMode)?'RideTalk':'Ride'):null;if(['Talk','Board'].includes(cinema.frodoMode)&&['frodo','gandalf'].includes(c.id)){const other=actors.find(a=>a.id===(c.id==='frodo'?'gandalf':'frodo'));other.imported.head.computeWorldMatrix(true);target=other.imported.head.getAbsolutePosition().add(new B.Vector3(0,CHARACTER_HEIGHTS[other.id]*.06,0));}}
