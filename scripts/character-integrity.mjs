@@ -14,7 +14,9 @@ export function validateGLB(data,expected){
  }
  if(!json||!binary||json.buffers.length!==1||json.buffers[0].uri||json.buffers[0].byteLength>binary.length)throw Error('GLB must be self-contained');
  for(const view of json.bufferViews??[])if(view.buffer!==0||(view.byteOffset??0)+view.byteLength>binary.length)throw Error('GLB buffer view outside binary chunk');
+ for(const animation of json.animations||[])for(const channel of animation.channels||[])if(!Number.isInteger(channel.sampler)||!animation.samplers?.[channel.sampler]||!Number.isInteger(channel.target?.node)||!json.nodes?.[channel.target.node])throw Error('Invalid animation sampler or target');
+ if(expected.kind==='static')return json;
  if(!json.skins?.length||!json.meshes?.some(m=>m.primitives.some(p=>p.attributes.JOINTS_0!==undefined&&p.attributes.WEIGHTS_0!==undefined)))throw Error('Missing character skin weights');
- for(const name of ['Idle','Walking_A','Running_A','Interact','Cheer'])if(!json.animations?.some(a=>a.name===name))throw Error('Missing animation '+name);
+ for(const name of expected.requiredAnimations||['Idle','Walking_A','Running_A','Interact','Cheer'])if(!json.animations?.some(a=>a.name===name))throw Error('Missing animation '+name);
  return json;
 }

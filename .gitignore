@@ -5,4 +5,9 @@ tmp/
 dist/vendor/babylon.js
 
 dist/assets/characters/*.glb
-node_modules/
+dist/assets/audio/*.mp3
+qa-*/
+ci-final/
+public-evidence/
+
+dist/assets/environment/*.glb

@@ -1,3 +1,7 @@
+# 0.9.0-dev current derivative manifest
+
+Current authoritative sizes/hashes: scripts/character-data/manifest.json. Ten retained clips including chair sitting, actual blink morph, reduced head proportions and authored staff replace previous 0.8 derivative hashes listed historically below. Horse source/license receipts are in QUALITY_CANDIDATE_ASSETS.md. Shared traveller faces and seated rigid-robe intersections remain unaccepted; no final art claim.
+
 # Imported character assets — 0.8.0
 
 Author: Kay Lousberg / KayKit. Pack: Character Pack Adventures 1.0.

@@ -1,14 +1,22 @@
-// Original low-poly arrival vignette, with independent meshes and no film dialogue.
+// Original in-world shot sequence, checked against the supplied screenplay; no copied dialogue.
+import {dressMaterials} from './surface-art.mjs';
 const ease=x=>{const t=Math.max(0,Math.min(1,x));return t*t*(3-2*t);};
+export const ARRIVAL_DURATION=27;
 export function arrivalBeat(t){
- if(t<5)return 'على طريق الشاير القديم، تقترب عربة ضيف عزيز…';
- if(t<10)return 'يلمح فرودو العربة فيلوّح، ثم يهرع عبر العشب للقاء غاندالف.';
- return 'تتابع العربة طريقها بين البيوت والحدائق، ويبدأ صباح جديد.';
+ if(t<5.4)return 'صباح هادئ تحت الشجرة؛ فرودو يقرأ، والشاير تستيقظ من حوله.';
+ if(t<9)return 'من الطريق البعيد يقترب وقع الحوافر وصرير عربة خشبية…';
+ if(t<15.5)return 'يعرف فرودو الضيف، فيركض عبر العشب إلى الطريق.';
+ if(t<21)return 'لقاء قديم يعيد الدفء إلى الصباح؛ ولدى بيلبو الكثير ليحكيه.';
+ return 'تتابع العربة طريقها نحو هوبيتون، ويبدأ يوم الاحتفال.';
 }
 export function arrivalPose(t){
- const s=Math.max(0,Math.min(17,Number.isFinite(t)?t:0)),travel=ease(s/15),run=ease((s-5)/6);
- return {cartX:-1.2+.3*travel,cartZ:-23+13*travel,frodoX:2.8-2.5*run,frodoZ:-6-7*run,
-  boarded:s>=12,step:s>=15?0:Math.sin(s*10)*.42};
+ const s=Math.max(0,Math.min(ARRIVAL_DURATION,Number.isFinite(t)?t:0));
+ const run=ease((s-7.2)/8.3),approach=ease((s-3)/12.5),ride=ease((s-20)/7);
+ const cartZ=-25+6.5*approach+8.5*ride,boarded=s>=21;
+ return {cartX:-1.2,cartZ,frodoX:boarded?-.74:-10.9+11.5*run,frodoZ:boarded?cartZ-1.4:-14-5*run,
+  boarded,step:(s>3&&s<15.5||s>20)?Math.sin(s*10)*.42:0,
+  frodoMode:s<5.4?'Sit':s<7.2?'Rise':s<15.5?'Run':s<21?'Talk':'Ride',
+  book:s<5.4,cartMoving:(s>3&&s<15.5)||s>20};
 }
 export function createArrival(B,scene,world){
  const V=B.Vector3,M=B.MeshBuilder,root=new B.TransformNode('opening pony and cart',scene);
@@ -40,40 +48,63 @@ export function createArrival(B,scene,world){
  for(const x of [-.92,.92]){
   const joint=new B.TransformNode('cart wheel joint',scene);joint.parent=root;joint.position.set(x,.58,-1.3);
   const torus=M.CreateTorus('cart spoked wheel outline',{diameter:1,thickness:.12,tessellation:16},scene);
-  torus.material=dark;torus.parent=joint;torus.rotation.y=Math.PI/2;
+  torus.material=dark;torus.parent=joint;torus.rotation.z=Math.PI/2;
   sphere('cart wheel hub',wood,0,0,0,.17,.17,.17,joint);
+  for(let i=0;i<3;i++){const spoke=box('wooden wheel spoke',wood,0,0,0,.075,.92,.065,joint);spoke.rotation.x=i*Math.PI/3;}
   wheels.push(joint);
  }
  const gandalf=world.characters.find(c=>c.id==='gandalf'),frodo=world.characters.find(c=>c.id==='frodo');
  if(!gandalf||!frodo)throw Error('Opening characters not found');
- root.setEnabled(false);let active=false;
+ const book=new B.TransformNode('Frodo open reading book',scene);book.parent=frodo.root;book.position.set(0,.35,-.36);box('book leather cover',dark,0,0,0,.47,.035,.33,book);for(const side of [-1,1]){const page=box('open book pages',linen,side*.115,.04,0,.23,.025,.30,book);page.rotation.z=side*.18;}book.setEnabled(false);
+ dressMaterials(B,scene,[wood,linen]);
+ root.setEnabled(false);let active=false,horse=null;
  function begin(camera){
   if(active)return;active=true;root.setEnabled(true);
   world.player.root.setEnabled(false);
-  gandalf.root.parent=root;gandalf.root.position.set(-.26,.86,-1.62);gandalf.root.scaling.setAll(.82);
-  frodo.root.position.set(2.8,0,-6);
-  if(camera){camera.position.set(9,4.3,-20);camera.setTarget(new V(-1,1.5,-23));}
+  gandalf.root.parent=root;gandalf.root.position.set(-.26,.16,-1.62);gandalf.root.scaling.setAll(.82);
+  frodo.root.position.set(-10.9,0,-14);
+  if(camera){camera.position.set(-7.7,2.1,-19);camera.setTarget(new V(-10.9,.9,-14));}
   update(0,camera);
  }
  function update(time,camera){
-  const pose=arrivalPose(time);if(!active)return pose;
+  const pose=arrivalPose(time);if(!active)return pose;horse?.setMoving(pose.cartMoving);
   root.position.set(pose.cartX,.012*Math.sin(time*8),pose.cartZ);
   for(let i=0;i<legs.length;i++)legs[i].rotation.x=pose.step*(i%2?-1:1);
   for(const wheel of wheels)wheel.rotation.x=-time*1.3;
-  frodo.root.position.set(pose.boarded?pose.cartX+.45:pose.frodoX,pose.boarded?.84:0,pose.boarded?pose.cartZ-1.4:pose.frodoZ);
-  frodo.root.rotation.y=Math.PI;
+  frodo.root.position.set(pose.frodoX,pose.boarded?.25:0,pose.frodoZ);
+  frodo.root.rotation.y=pose.boarded?Math.PI:Math.atan2(pose.cartX-pose.frodoX,pose.cartZ-pose.frodoZ)+Math.PI;
+  book.setEnabled(pose.book);
   if(camera){
-   const at=time<5?new V(9,4.3,pose.cartZ+3):time<11?new V(8.7,4,-8):new V(9.5,4.2,pose.cartZ+4);
-   const look=time<5?new V(-1,1.45,pose.cartZ-.3):time<11?new V(1,1.45,-11):new V(-1,1.6,pose.cartZ-.5);
-   camera.position.copyFrom(V.Lerp(camera.position,at,.18));camera.setTarget(look);
+   const t=Math.max(0,Math.min(ARRIVAL_DURATION,time));let position,target;
+   if(t<6){position=new V(-7.7-ease(t/6)*.5,2.1,-19);target=new V(-10.9,.9,-14);}
+   else if(t<9){position=new V(9,4.3,pose.cartZ+3);target=new V(-1,1.5,pose.cartZ-.3);}
+   else if(t<15.5){position=new V(pose.frodoX+5,2.5,pose.frodoZ-5.5);target=new V(pose.frodoX,1,pose.frodoZ);}
+   else if(t<21){position=new V(5.7,2.7,-22.5);target=new V(-.8,1.6,-18);}
+   else{position=new V(8.5,3.8,pose.cartZ+4.8);target=new V(-1,1.6,pose.cartZ-.5);}
+   camera.position.copyFrom(position);camera.setTarget(target);
   }
   return pose;
  }
  function end(){
   if(!active)return;
-  gandalf.root.parent=null;gandalf.root.position.set(-2,0,17);gandalf.root.rotation.y=Math.PI;gandalf.root.scaling.setAll(1);
+  book.setEnabled(false);gandalf.root.parent=null;gandalf.root.position.set(-2,0,17);gandalf.root.rotation.y=Math.PI;gandalf.root.scaling.setAll(1);
   frodo.root.position.set(3,0,-4);frodo.root.scaling.setAll(.95);
   world.player.root.setEnabled(true);root.setEnabled(false);active=false;
  }
- return {begin,update,end,root,get active(){return active;}};
+ return {begin,update,end,root,setHorse(value){horse=value;},get active(){return active;}};
 }
+export async function loadArrivalHorse(B,scene,arrival){
+ const container=await B.SceneLoader.LoadAssetContainerAsync('./assets/characters/','horse.glb',scene);
+ const instance=container.instantiateModelsToScene(n=>'arrival horse '+n,false,{doNotInstantiate:true});
+ const holder=new B.TransformNode('reviewed skinned cart horse',scene);holder.parent=arrival.root;
+ for(const node of instance.rootNodes)node.parent=holder;
+ let min=Infinity,max=-Infinity;for(const m of holder.getChildMeshes()){m.computeWorldMatrix(true);const box=m.getBoundingInfo().boundingBox;min=Math.min(min,box.minimumWorld.y);max=Math.max(max,box.maximumWorld.y);m.isPickable=false;m.receiveShadows=true;}
+ const scale=2.12/(max-min);holder.scaling.setAll(scale);holder.position.set(0,-min*scale,1.65);holder.rotation.y=0;
+ for(const m of arrival.root.getChildMeshes())if(/^pony (torso|neck|head|white|mane|tail|ears|eyes|leg|hoof)/.test(m.name))m.dispose();
+ for(const group of instance.animationGroups)group.stop();
+ const idle=instance.animationGroups.find(g=>g.name.endsWith('Idle')),walk=instance.animationGroups.find(g=>g.name.endsWith('Walk'));if(!idle||!walk)throw Error('Horse locomotion clips missing');
+ let last=null;
+ arrival.setHorse({holder,setMoving(moving){const next=moving?walk:idle;if(next!==last){last?.stop();next.start(true);last=next;}}});
+ arrival.horse={skinnedMeshes:holder.getChildMeshes().filter(m=>m.skeleton).length,clips:instance.animationGroups.length};
+}
+

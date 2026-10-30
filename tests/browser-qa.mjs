@@ -32,6 +32,7 @@ async function ready(page){
  await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.querySelector('#welcome').hidden||!document.querySelector('#fatal').hidden,null,{timeout:90000});
  if(await page.locator('#fatal').isVisible())throw Error('WebGL/scene failed: '+await page.locator('#fatal-text').innerText());
+ assert.equal((await snap(page)).world.eyelidRigs,8,'Every role has real eyelid morph deformation');
  assert.equal((await snap(page)).world.importedCharacters,8,'All eight visible roles use imported GLB rigs');
  if(process.env.GITHUB_ACTIONS)assert.equal((await snap(page)).commit,checkoutSha,'Published build identity matches tested checkout');
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
@@ -66,6 +67,7 @@ try{
  const page=await desktop.newPage();page.on('pageerror',e=>report.errors.push('desktop: '+e.message));
  await ready(page);await still(page,'desktop-opening.png');await page.locator('#start').click();assert.equal((await snap(page)).quality.mode,'auto');assert.equal((await snap(page)).cinematic.active,true);await still(page,'desktop-arrival-cinematic.png');await page.locator('#arrival-skip').click();assert.equal((await snap(page)).cinematic.active,false);assert.equal(await page.locator('#speaker').innerText(),'غاندالف','Opening must speak to Gandalf, not merely show his mesh');await still(page,'desktop-gandalf-opening-dialogue.png');await chooseFirst(page);assert.equal((await snap(page)).state.gandalfMet,true);
  await page.locator('#map-open').click();assert.ok(await page.locator('#world-map').isVisible());await still(page,'desktop-village-map.png');await page.locator('#map-close').click();
+ await page.waitForFunction(()=>window.__SHIRE__.snapshot().audio?.score.status==='decoded',null,{timeout:30000});
  assert.match(await page.locator('#sound').innerText(),/مفعّلة/,'Original music must begin after Start interaction');
  await page.locator('#journal-open').click();
  await page.locator('#volume-music').fill('0');await page.locator('#volume-effects').fill('0.5');
@@ -77,6 +79,7 @@ try{
  await page.locator('#interaction:not([hidden])').waitFor({timeout:20000});
  await page.keyboard.press('e');
  await page.waitForFunction(()=>window.__SHIRE__.snapshot().inside,{timeout:25000});
+ assert.ok(await page.evaluate(()=>BABYLON.Engine.LastCreatedScene.meshes.some(m=>m.name.startsWith('player ')&&m.skeleton&&m.isEnabled())),'Imported player remains visible inside Bag End');
  await still(page,'desktop-bag-end-interior.png');
  assert.ok((await snap(page)).indoorStats.decor>=30,'A genuinely furnished 3D interior is rendered');
  await page.keyboard.press('e');

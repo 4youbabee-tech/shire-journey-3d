@@ -1,3 +1,16 @@
+# 0.9.0-dev release gate — HOLD / UNPUBLISHED
+
+| Area | Implemented in candidate | Unmet acceptance |
+|---|---|---|
+| Characters | Eight skinned roles, blink morph, weighted transitions, gaze, distinct heights | Shared faces/hair; costumes/skin/cloth not accepted |
+| Opening | 27s real scene, reading/rise/run/greeting/ride, real rigged horse | Seat/robe intersection and boarding polish; not cinematic acceptance |
+| Sound | Original 51s sampled harp/flute, PCM foley, controls | Audible device review and varied environmental recordings absent |
+| Life/nature | Five staggered plot-bound work states, CC0 textured instanced trees/understory | No rich social AI, hand/tool contacts or full schedules |
+| Homes | Imported player now visible indoors; furnished Bag End, restored lighting | Other interiors and final architectural quality absent |
+| Story | Existing F1-01 party/aftermath gates, original Arabic rules-based conversations | F1-02 investigation, F1-03 escape, F1-04 Bree NOT IMPLEMENTED |
+| Verification | Source tests, real WebGL desktop/touch, continuous opening capture | Full-route physical-device navigation, 30 FPS hardware and listening review NOT RUN |
+| Publication | Draft source checkpoint only | MUST NOT MERGE/PUBLISH as complete game |
+
 # 0.8.0 imported skinned character candidate — 2026-10-29
 
 Base 35a2780dbe09e9e0e1a215209d6206c9d60e89a1. Owner prioritizes a visibly playable stylized game over actor likeness. Two licensed KayKit CC0 assets now load through Babylon GLB containers and instantiate across eight roles. Original procedural render pieces are hidden, gameplay/collision roots retained. Idle/walk/run/interact/cheer clips selected from real skeletal animation. Source tests: 28 PASS locally; final Chromium visual/gameplay validation PENDING. No target-device FPS or final art acceptance claimed. Runtime assets and license recorded in Docs/IMPORTED_CHARACTER_ASSETS.md. Rollback: revert this single cohort; old save key preserved.

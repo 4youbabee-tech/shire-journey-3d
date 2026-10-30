@@ -1,3 +1,7 @@
+# 0.9.0-dev internal art/life checkpoint
+
+Replaces 16 existing tree render silhouettes with two CC0 textured summer maple variants; collider anchors unchanged. Adds sparse grass/flower patches within tree bounds, sharing asset geometry/materials. Alpha testing and 512px texture cap keep foliage budget bounded; target-device acceptance still open. Existing original gardeners retain their plot authority with staggered 72s routines and no wrap jump. Dialogue remains explicit rules, not generative AI. Opening uses supplied screenplay order: reading under tree, approaching cart sounds, rise/run, greeting, ride. Original text/music only. Existing F1-01 story gates remain; no later chapter unlocked by cosmetic updates. Keep draft until complete-game acceptance. See CURRENT_PROJECT_STATE and QUALITY_CANDIDATE_ASSETS for blockers/receipts.
+
 # Browser proof-of-concept decisions
 
 - Owner selected a cartoon style and prioritized walking and talking over photorealism.

@@ -1,7 +1,20 @@
 {
+  "horse.glb": {
+    "bytes": 1412960,
+    "sha256": "f328abdc6a7772f15c1b601c48151313a8fa20f4a475353c93819419c9a989a1",
+    "parts": [
+      "horse.0.b64",
+      "horse.1.b64"
+    ],
+    "requiredAnimations": [
+      "Idle",
+      "Walk",
+      "Eating"
+    ]
+  },
   "traveller.glb": {
-    "bytes": 2356472,
-    "sha256": "a29ce12fa455595f2f5f7c7822e5ff22ba453246649c5ddbf0f80dba4ee1dfeb",
+    "bytes": 2364404,
+    "sha256": "4e181871f2bb9d8d2cefc3fe6b3553abdb20ce32cf5242fde36ce1b0a3bbbf96",
     "parts": [
       "traveller.0.b64",
       "traveller.1.b64",
@@ -9,8 +22,8 @@
     ]
   },
   "wizard.glb": {
-    "bytes": 2372816,
-    "sha256": "c89764992fb6332cb5b2ca50e776d3aba1c1f5f7fd7b597e56ae86354ba49b90",
+    "bytes": 2386444,
+    "sha256": "e5023c558f827355f736ada9a42da50d3d82e1e5b1c03ebfa315e2635f6a56b5",
     "parts": [
       "wizard.0.b64",
       "wizard.1.b64",

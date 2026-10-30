@@ -27,7 +27,9 @@ jobs:
       - name: Exercise a real WebGL canvas and record playback
         env:
           EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: node tests/browser-qa.mjs
+        run: |
+          node tests/browser-qa.mjs
+          QA_OUT=qa-evidence/full-opening node tests/opening-playback.mjs
       - name: Preserve screenshots, video and performance report even on failure
         if: always()
         uses: actions/upload-artifact@v4
@@ -36,3 +38,4 @@ jobs:
           path: qa-evidence/
           retention-days: 14
           if-no-files-found: warn
+
