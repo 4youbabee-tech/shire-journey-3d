@@ -1,3 +1,9 @@
+# 34ebba0 real-raster review and celebration test timing
+
+Actions 41107576136 reached the birthday celebration after loading the new cast, recording a clear Frodo conversation, decoding audio, exercising saving/interior/quests and verifying seven cheering rigs. Real screenshots confirm the corrected grey robe and sage ground. The test then timed out clicking party-skip: a blocking software-GPU screenshot consumed the remaining 14-second scene, so the button disappeared after natural completion. This is a test sequencing failure, not an accepted whole-run PASS.
+
+Fix: exercise Skip immediately after live cheering is verified, before any blocking party screenshot. Add an independent natural-playback test that resumes a valid pending-party save created by the actual rules, watches the full scene without Skip, verifies canon outcomes are not committed early, and confirms Bilbo's actor/collider disappear. Its real WebM and chronological contact sheet provide the celebration visual evidence. Both paths remain required; no skip assertion is silently bypassed when the timer ends.
+
 # 0.9.0 production candidate — authored cast and opening-region polish
 
 Prior integrated 4f46eee6bd41f81248114e0927db685a37c79d03 Actions 41099937846 PASS: source, desktop/touch gameplay and continuous opening; four packaged footstep buffers decoded. Artifact 12997642846 digest b8803c949096f1fe3beb92218aa06c57c77f3f1133c947e06965b1ee13d61d76. Reviewed its real JPEGs and chronological contact sheet. No physical-device performance claim: SwiftShader medians were 1 FPS desktop / 3 FPS touch emulation at adaptive resolution.

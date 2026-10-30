@@ -118,7 +118,8 @@ try{
  await qaReposition(page,-2,21);await page.keyboard.press('e');
  assert.equal((await snap(page)).party.active,true,'Birthday party and original fireworks begin at the party tree');
  assert.ok((await snap(page)).party.participants>=7,'Seven existing villagers gather to celebrate without adding heavy meshes');
- await still(page,'desktop-birthday-party.png');
+ // Do not block the 14-second live scene on a software-GPU screenshot before testing Skip.
+ // The independent resumed-party playback below records the natural ending and celebration.
  await page.waitForFunction(()=>window.BABYLON.Engine.LastCreatedScene.animationGroups.filter(g=>g.name.endsWith('Cheer')&&g.isPlaying).length>=7,null,{timeout:10000});
  await page.locator('#party-skip').click();
  assert.equal((await snap(page)).state.partyCompleted,true,'Party skip preserves canonical outcome');
