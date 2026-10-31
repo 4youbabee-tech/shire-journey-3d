@@ -1,0 +1,53 @@
+{
+  "id": "shire-kenney-rpg-foley-v1",
+  "version": 1,
+  "category": "audio",
+  "license": "CC0-1.0",
+  "validation": "PASS: decoded PCM, bounded peak, closed SHA256 roster",
+  "files": {
+    "LICENSE.txt": {
+      "sha256": "842c42cc1942963f6fcdc18fe57e9e0631e8a4936f9803688e8152e830088eb9",
+      "bytes": 458
+    },
+    "source-receipt.json": {
+      "sha256": "885ec893adf90f026ef7a94c06e22f8fc5639ce52777b1e2d2f640d0ad5129f9",
+      "bytes": 4026
+    },
+    "audio/cart-creak-3.mp3": {
+      "sha256": "a2c5d9485121d8cdac3b643fdf6becf2d84aff3550df9f04d7d1481e50ed1aba",
+      "bytes": 3387
+    },
+    "audio/book-page.mp3": {
+      "sha256": "8c2ee2e10a797f28e0c30aca03235145969264805fd6bc50e9bbcc6933772278",
+      "bytes": 6940
+    },
+    "audio/cart-creak-2.mp3": {
+      "sha256": "fbae7829b90359eb5b730d5e97e857bef6de0db45dc4d1151a88ff848bb2ec49",
+      "bytes": 7358
+    },
+    "audio/leather-2.mp3": {
+      "sha256": "68903d409c720ca892cb4bf11fbf9ad7c8d899b89a571ed6747ee16d7ab5c9dd",
+      "bytes": 3178
+    },
+    "audio/door-open.mp3": {
+      "sha256": "44a8376cce8877ee98ca67e40991746b7ccaf2b4b2d9c805f8dcec2136ccc1fd",
+      "bytes": 8194
+    },
+    "audio/leather-1.mp3": {
+      "sha256": "507afcd1e70af0b5b393bc0d98730f9df11313e73e939c6405c5a0270219e8fe",
+      "bytes": 3387
+    },
+    "audio/cart-load.mp3": {
+      "sha256": "7cda14c124927de1ab1efd652e4e85a8c9583523212f4efb581596fedecd1b31",
+      "bytes": 2760
+    },
+    "audio/cart-creak-1.mp3": {
+      "sha256": "e9af0c3cb58e911907c8d68c71aed7559eca8669304e8ba9e432437b303940bd",
+      "bytes": 6104
+    },
+    "audio/door-close.mp3": {
+      "sha256": "2a833130c757e1e183245e25eea80b8b030bb375c40625fd6fd3f33b25058622",
+      "bytes": 6104
+    }
+  }
+}

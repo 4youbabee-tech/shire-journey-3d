@@ -1,3 +1,9 @@
+# 0.12.0 recorded world foley candidate
+
+Nine small licensed recordings add doors, wooden creaks, leather movement, books and cart cargo, with gesture-gated decoding, distance/pan, variant selection and a bounded voice count. Existing music, footsteps, nature, Ring cues, story, save and terrain are retained. See [village foley provenance](VILLAGE_FOLEY_PROVENANCE.md). Source tests cover decoding boundaries, buffer reuse, voice limits and existing gameplay; actual-browser event/decoding and interior walking gate release.
+
+## Earlier production receipts
+
 # 0.11.0 terrain continuity candidate
 
 Bag End now rises above the party meadow on an actual walkable hill. Terrain, road edges, house terraces, collision hulls, vegetation, actor feet, saves and the player camera share the same elevation model. Native tests exercise the real route up to the Bag End interaction and back down. See [terrain continuity](TERRAIN_CONTINUITY.md) for source relationship and acceptance details. This candidate is kept separate from the reviewed 0.10.0 Ring release until its own browser and public-identity gates pass.

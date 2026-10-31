@@ -1,8 +1,11 @@
+import {createVillageFoley} from './village-foley.mjs';
 // Original sampled music, procedural nature and licensed CC0 footstep recordings.
 import {pastoralPhrase} from './score.mjs';
 export function createShireAmbience(AudioContextConstructor){
  const context=new AudioContextConstructor(),master=context.createGain();master.gain.value=.22;master.connect(context.destination);
- const nature=context.createGain(),music=context.createGain(),effects=context.createGain();nature.connect(effects);music.connect(master);effects.connect(master);
+ const nature=context.createGain(),music=context.createGain(),effects=context.createGain();nature.connect(effects);music.connect(master);effects.connect(master);const village=createVillageFoley(context,effects);let creakClock=0,leatherClock=0,loadClock=0,houseClock=0,houseEvent=0;
+ let captureDestination=null,ringDrops=0;
+ function captureStream(){if(!context.createMediaStreamDestination)return null;if(!captureDestination){captureDestination=context.createMediaStreamDestination();master.connect(captureDestination);}return captureDestination.stream;}
  const levels={master:1,music:.65,effects:1};
  function setVolume(channel,value){if(!(channel in levels)||!Number.isFinite(value))return;levels[channel]=Math.max(0,Math.min(1,value));const node=channel==='master'?master:channel==='music'?music:effects;node.gain.setValueAtTime(levels[channel]*(channel==='master'?.22:1),context.currentTime);}
  for(const key of Object.keys(levels))setVolume(key,levels[key]);
@@ -23,7 +26,7 @@ export function createShireAmbience(AudioContextConstructor){
  }
  const ringImpact=context.createBuffer(1,Math.floor(context.sampleRate*.65),context.sampleRate),metal=ringImpact.getChannelData(0);
  for(let i=0;i<metal.length;i++){const t=i/context.sampleRate;metal[i]=(.35*Math.sin(t*2*Math.PI*1720)+.19*Math.sin(t*2*Math.PI*2387)+.11*Math.sin(t*2*Math.PI*3671))*Math.exp(-t*13)*Math.min(1,t*2500);}
- function ringDrop(){if(context.state!=='running')return;const source=context.createBufferSource(),gain=context.createGain();source.buffer=ringImpact;gain.gain.value=.5;source.connect(gain);gain.connect(effects);source.onended=()=>{source.disconnect?.();gain.disconnect?.();};source.start();}
+ function ringDrop(){if(context.state!=='running')return;const source=context.createBufferSource(),gain=context.createGain();source.buffer=ringImpact;gain.gain.value=.5;source.connect(gain);gain.connect(effects);source.onended=()=>{source.disconnect?.();gain.disconnect?.();};source.start();ringDrops++;}
  function setInterior(on){const value=on?.12:1;if(nature.gain.setTargetAtTime)nature.gain.setTargetAtTime(value,context.currentTime,.4);else nature.gain.setValueAtTime(value,context.currentTime);}
  function beginScore(){if(!scoreBuffer||scoreSource)return;scoreSource=context.createBufferSource();scoreSource.buffer=scoreBuffer;scoreSource.loop=true;scoreSource.connect(music);scoreSource.start();}
  const impact=context.createBuffer(1,Math.floor(context.sampleRate*.22),context.sampleRate);
@@ -62,19 +65,24 @@ export function createShireAmbience(AudioContextConstructor){
  function song(now){for(const n of pastoralPhrase(phrase++))osc(n.frequency,now+n.at,n.duration,n.volume,n.wave,n.frequency*.997,music);}
  function cycle(){if(context.state!=='running')return;const now=context.currentTime+.07;birds(now);if(!scoreBuffer&&(birdTick-1)%2===0)song(now+.12);}
  return {
-  ringDrop,setInterior,
+  captureStream,ringDrop,setInterior,cue:(name,options)=>village.cue(name,options),get worldFoley(){return {...village.snapshot,ringDrops};},
   get foley(){return {status:foleyStatus,decoded:foleyBuffers.length,forestDecoded:!!forestBuffer};},
   get score(){return {status:scoreStatus,duration:scoreBuffer?.duration||0,error:scoreError};},
-  update(dt,{moving=false,wood=false,cart=false,cartDistance=30}={}){
+  update(dt,{moving=false,wood=false,cart=false,cartDistance=30,houseDistance=Infinity,housePan=0}={}){
    if(context.state!=='running')return;
    footClock+=moving?dt:0;if(moving&&footClock>.47){footClock%=.47;step(wood?.12:.085,wood?1.03:.94,true,wood);}
+   creakClock+=cart?dt:0;leatherClock+=cart?dt:0;loadClock+=cart?dt:0;const nearGain=1/(1+Math.max(0,cartDistance)*.15);
+   if(cart&&creakClock>1.43){creakClock%=1.43;village.cue('cart-creak',{volume:.34*nearGain,rate:.94+(Math.floor(context.currentTime)%4)*.025});}
+   if(cart&&leatherClock>2.17){leatherClock%=2.17;village.cue('leather',{volume:.22*nearGain});}
+   if(cart&&loadClock>3.71){loadClock%=3.71;village.cue('cart-load',{volume:.16*nearGain,rate:.87});}
+   if(houseDistance<9){houseClock+=dt;if(houseClock>13+(houseEvent%3)*4.3){houseClock=0;const name=['leather','book-page','door-close'][houseEvent++%3];village.cue(name,{volume:.16/(1+houseDistance*.35),pan:housePan});}}
    cartClock+=cart?dt:0;if(cart&&cartClock>.28){cartClock%=.28;step(.22/(1+cartDistance*.15),.62+(Math.floor(context.currentTime*4)%2)*.15);}
   },
   setVolume,get levels(){return {...levels};},get state(){return context.state;},
-  start:async()=>{await context.resume();if(!windStarted){wind.start();windStarted=true;}await Promise.all([loadScore(),loadFoley()]);beginScore();cycle();if(!timer)timer=setInterval(cycle,6000);},
+  start:async()=>{await context.resume();if(!windStarted){wind.start();windStarted=true;}await Promise.all([loadScore(),loadFoley(),village.load()]);beginScore();cycle();if(!timer)timer=setInterval(cycle,6000);},
   suspend:()=>context.suspend(),resume:()=>context.resume(),
-  stop:()=>{if(timer){clearInterval(timer);timer=null;}return context.suspend();},
-  close:()=>{if(timer)clearInterval(timer);return context.close();}
+  stop:()=>{village.stop();if(timer){clearInterval(timer);timer=null;}return context.suspend();},
+  close:()=>{village.stop();if(timer)clearInterval(timer);return context.close();}
  };
 }
 

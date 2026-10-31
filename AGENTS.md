@@ -1,0 +1,8 @@
+# Shire Journey production rules
+
+- Continue the existing Babylon.js project. Use the connected GitHub tools for repository reads/writes and Actions; browser use is for the public game. Keep the permanent Pages URL and engine pin.
+- For Git-data API writes, require an explicit, freshly verified 40-character base tree SHA. Session stores can expire: an undefined base creates a destructive replacement tree. Never omit the base accidentally. Fetch the resulting recursive tree and verify the complete file roster plus every changed blob SHA before creating a commit or moving a ref. Use expected-head leases. A new asset or module is not permission to remove existing source/assets.
+- Admit licensed assets through a closed hash roster and retain source, licence, derivative and project receipts. The existing offline reconstruction/integrity checks are authoritative. Never silently waive an unknown licence or failed validation.
+- Keep coherent production batches separate. Run source tests and exact-head browser playback, inspect real captures, then merge and verify Pages serves the merge SHA without QA controls or ChatGPT login.
+- Source/NullEngine checks do not prove visual quality. SwiftShader FPS is not target-PC or physical-phone FPS. Never substitute generated promotional images for game captures, or call the full film-world scope complete when only an opening region is implemented.
+- Preserve current production receipts separately from historical notes; document original side activities and verify film versus book event ordering. All shipped dialogue, score and cinematic staging must be original or appropriately licensed.

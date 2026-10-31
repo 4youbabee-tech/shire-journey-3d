@@ -102,9 +102,11 @@ try{
  await page.waitForFunction(()=>window.__SHIRE__.snapshot().inside,{timeout:25000});
  assert.ok(await page.evaluate(()=>BABYLON.Engine.LastCreatedScene.meshes.some(m=>m.name.startsWith('player ')&&m.skeleton&&m.isEnabled())),'Imported player remains visible inside Bag End');
  await still(page,'desktop-bag-end-interior.png');
+ await page.waitForFunction(()=>window.__SHIRE__.snapshot().audio?.worldFoley?.decoded===9,null,{timeout:20000});assert.ok((await snap(page)).audio.worldFoley.events['door-open']>=1,'Recorded entrance cue actually started');
+ const roomFrom=await snap(page);await page.keyboard.down('w');try{await page.waitForFunction(()=>window.__SHIRE__.snapshot().position.z>=140,null,{timeout:30000});}finally{await page.keyboard.up('w');}await still(page,'desktop-interior-walking.png');const roomForward=await snap(page);await page.keyboard.down('s');try{await page.waitForFunction(()=>window.__SHIRE__.snapshot().position.z<=137.9,null,{timeout:30000});}finally{await page.keyboard.up('s');}const roomReturn=await snap(page);assert.ok(roomReturn.inside,'Walking inside must not silently teleport outdoors');
  assert.ok((await snap(page)).indoorStats.decor>=30,'A genuinely furnished 3D interior is rendered');
  await page.keyboard.press('e');
- await page.waitForFunction(()=>!window.__SHIRE__.snapshot().inside,{timeout:25000});
+ await page.waitForFunction(()=>!window.__SHIRE__.snapshot().inside,{timeout:25000});assert.ok((await snap(page)).audio.worldFoley.events['door-close']>=1,'Recorded exit cue actually started');
  await page.keyboard.down('s');try{await page.waitForFunction(()=>window.__SHIRE__.snapshot().position.z<=-3,null,{timeout:90000});}finally{await page.keyboard.up('s');}const hillReturn=await snap(page);
  await qaReposition(page,8,5.5);
  await talk(page);assert.equal(await page.locator('#portrait svg').count(),1,'Bilbo SVG portrait visible');assert.ok(await page.locator('#npc-voice').isVisible(),'Browser narration button present');await assertFaceVisible(page,'bilbo');await still(page,'desktop-dialogue.png');
@@ -136,7 +138,7 @@ try{
  assert.equal((await snap(page)).state.bilboGone,true,'Bilbo departs after the celebration');
  await still(page,'desktop-after-birthday.png');
  await still(page,'desktop-completed.png');await qaReposition(page,-12,-5);await still(page,'desktop-garden-life.png');
- report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,hillWalkEvidence:{from:hillFrom.position,arrival:hillArrival.position,returned:hillReturn.position,realKeyboard:true},qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
+ report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,roomWalkEvidence:{from:roomFrom.position,forward:roomForward.position,returned:roomReturn.position,realKeyboard:true},hillWalkEvidence:{from:hillFrom.position,arrival:hillArrival.position,returned:hillReturn.position,realKeyboard:true},qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
  // Inspect the real asset at its existing world position; no character teleport.
  report.desktop.characterRig=await page.evaluate(()=>{
   const B=window.BABYLON,s=B.Engine.LastCreatedScene;
