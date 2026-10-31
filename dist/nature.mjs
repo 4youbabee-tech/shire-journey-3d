@@ -30,7 +30,7 @@ export async function loadNature(B,scene,world){
   plant(j===2?'flowers':'grass',a.x+Math.cos(angle)*spread,a.z+Math.sin(angle)*spread,a.sy*(j===2?.62:.8),angle,'garden shrub '+i+' '+j);patches++;
  }
  for(const [i,h]of HOMES.entries())for(const side of [-1,1]){
-  plant('flowers',h.x+side*1.92*h.s,h.z-.8*h.s,.43*h.s,i*1.73+side,'window planter '+i+' '+side,.82*h.s);patches++;
+  plant('flowers',h.x+side*1.92*h.s,h.z-.8*h.s,.43*h.s,i*1.73+side,'window planter '+i+' '+side,.5*h.s);patches++;
  }
  // Shared instances soften existing path shoulders without changing walkable roads.
  const placementBounds=world.colliders.filter(c=>!c.metadata?.vegetation).map(c=>{c.computeWorldMatrix(true);const b=c.getBoundingInfo().boundingBox;return {minX:b.minimumWorld.x-.22,maxX:b.maximumWorld.x+.22,minZ:b.minimumWorld.z-.22,maxZ:b.maximumWorld.z+.22};});

@@ -77,7 +77,7 @@ export function createArrival(B,scene,world){
  function begin(camera){
   if(active)return;active=true;lastCartZ=null;wheelAngle=0;root.setEnabled(true);
   world.player.root.setEnabled(false);
-  gandalf.root.parent=root;gandalf.root.position.set(-.36,.16,-.2);gandalf.root.scaling.setAll(.82);
+  gandalf.root.parent=root;gandalf.root.position.set(-.36,.16,-.2);gandalf.root.scaling.setAll(1);
   frodo.root.position.set(-10.9,0,-14);
   if(camera){camera.position.set(-7.7,2.1,-19);camera.setTarget(new V(-10.9,.9,-14));}
   update(0,camera);

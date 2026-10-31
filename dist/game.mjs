@@ -124,7 +124,7 @@ function animate(dt){time+=dt;const B=window.BABYLON,V=B.Vector3;
   const elapsed=Math.max(0,(performance.now()-partyStart)/1000);
   if(elapsed>=PARTY_SECONDS){
    if(!ringLegacy?.active){partyFx.stop();if(!interior)interior=createBagEndInterior(B,scene);if(!ringLegacy)ringLegacy=createRingLegacy(B,scene,world,interior,{onDrop:()=>audio?.ringDrop()});ringLegacy.begin();audio?.setInterior(true);}
-   const t=elapsed-PARTY_SECONDS,pose=ringLegacy.update(t);importedActors?.update(dt,null,false,pose);$('#party-caption').textContent=legacyBeat(t).caption;
+   const t=elapsed-PARTY_SECONDS,pose=ringLegacy.update(t);importedActors?.update(dt,null,false,pose);audio?.update(dt,{moving:(t>=9&&t<12)||(t>=13&&t<16.5),wood:true});$('#party-caption').textContent=legacyBeat(t).caption;
    if(t>=LEGACY_SECONDS)finishParty();return;
   }
   if(elapsed>=8){if(!interior)interior=createBagEndInterior(B,scene);if(!ringLegacy)ringLegacy=createRingLegacy(B,scene,world,interior,{onDrop:()=>audio?.ringDrop()});ringLegacy.farewell(elapsed);if(elapsed>=11)world.characters.find(c=>c.id==='bilbo').root.setEnabled(false);}

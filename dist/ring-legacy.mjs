@@ -17,7 +17,8 @@ export function createRingLegacy(B,scene,world,room,{onDrop=()=>{}}={}){
  const fold=B.MeshBuilder.CreateLines('envelope folded flap',{points:[new V(-.115,.075,.009),new V(0,-.015,.009),new V(.115,.075,.009)]},scene);fold.parent=envelope;fold.color=B.Color3.FromHexString('#a58b64');fold.isPickable=false;
  let enabled=[],saved=[],light=null,active=false,elapsed=0,oldNear=.15,oldFov=.87,dropped=false,partyTime=null;
  const clamp=t=>Math.max(0,Math.min(1,t)),mix=(a,b,t)=>V.Lerp(a,b,clamp(t));
- function joint(id,name){const nodes=actors[id].imported.holder.getChildTransformNodes();return nodes.find(n=>n.name===id+' '+name)||nodes.find(n=>n.name===id+' hand_r');}
+ const jointCache=new Map();
+ function joint(id,name){const key=id+':'+name;if(!jointCache.has(key)){const nodes=actors[id].imported.holder.getChildTransformNodes();jointCache.set(key,nodes.find(n=>n.name===id+' '+name)||nodes.find(n=>n.name===id+' hand_r'));}return jointCache.get(key);}
  function hand(id){const wrist=joint(id,'hand_r'),finger=joint(id,'middle_01_r');wrist.computeWorldMatrix(true);finger.computeWorldMatrix(true);return V.Lerp(wrist.getAbsolutePosition(),finger.getAbsolutePosition(),.65).add(new V(0,.015,.025));}
  function farewell(t){partyTime=t;ring.setEnabled(t>=9&&t<11);}
 
@@ -33,15 +34,17 @@ export function createRingLegacy(B,scene,world,room,{onDrop=()=>{}}={}){
  function update(t){elapsed=Math.min(LEGACY_SECONDS,Math.max(0,t));if(t>=7&&!dropped){dropped=true;onDrop();}const bilbo=actors.bilbo,frodo=actors.frodo;
   bilbo.root.setEnabled(t<12);bilbo.root.position.z=136.8-Math.max(0,t-9)*.8;
   frodo.root.setEnabled(t>=13);frodo.root.position.z=132.4+clamp((t-13)/3.5)*3.6;
-  const modes={bilbo:t<6?'Talk':'Idle',gandalf:t>=20?'Talk':'Idle',frodo:t<16.5?'Walk':t<19?'Work':'Idle'};
-  return {actorModes:modes};
+  const modes={bilbo:t<6?'Talk':t>=9&&t<12?'Walk':'Idle',gandalf:t>=20?'Talk':'Idle',frodo:t<16.5?'Walk':t<19?'Work':'Idle'};
+  const partner=t<13?'bilbo':'frodo',targets={bilbo:actors.gandalf.root.position.add(new V(0,2.35,0)),gandalf:actors[partner].root.position.add(new V(0,1.2,0)),frodo:t<19?floor:actors.gandalf.root.position.add(new V(0,2.35,0))};
+  for(const id of ['bilbo','gandalf',...(t>=19?['frodo']:[])]){const p=actors[id].root.position,target=targets[id];if(id==='bilbo'&&t>=9){actors[id].root.rotation.y=0;continue;}actors[id].root.rotation.y=Math.atan2(target.x-p.x,target.z-p.z)+Math.PI;}
+  return {actorModes:modes,actorTargets:targets};
  }
  function frame(){if(!active){if(partyTime!==null&&partyTime>=9&&partyTime<11){const finger=joint('bilbo','index_02_r');finger.computeWorldMatrix(true);ring.position.copyFrom(finger.getAbsolutePosition());const tip=joint('bilbo','index_03_r');tip.computeWorldMatrix(true);const axis=tip.getAbsolutePosition().subtract(finger.getAbsolutePosition());if(axis.lengthSquared()>.000001){ring.rotationQuaternion=B.Quaternion.FromUnitVectorsToRef(V.Up(),axis.normalize(),ring.rotationQuaternion||B.Quaternion.Identity());}}return;}const t=elapsed,b=hand('bilbo'),f=hand('frodo'),g=hand('gandalf').add(new V(0,.06,.085));
   ring.setEnabled(t<23.5);ring.rotation.set(t>=7&&t<17.5?0:.2,t*.2,0);
   if(t<6)ring.position.copyFrom(b);else if(t<7)ring.position.copyFrom(mix(b,floor,(t-6)**2));else if(t<17.5)ring.position.copyFrom(floor);else if(t<19)ring.position.copyFrom(mix(floor,f,(t-17.5)/1.5));else if(t<22)ring.position.copyFrom(f);else ring.position.copyFrom(mix(f,g,(t-22)/1.5));
   envelope.setEnabled(t>=20);seal.setEnabled(t>=25);envelope.position.copyFrom(t<25?g:mix(g,f,(t-25)/2));
   let eye,target;
-  if(t<2.5){target=new V(160.45,1.35,137);eye=new V(162.5,1.9,140);}
+  if(t<2.5){target=new V(160.6,1.65,137);eye=new V(163,2.4,141);}
   else if(t<6){target=ring.position;eye=target.add(new V(.15,.1,.28));}
   else if(t<9){target=ring.position;eye=target.add(new V(.24,.24,.42));}
   else if(t<14){target=new V(160,1.1,135.5);eye=new V(163,2.1,140);}

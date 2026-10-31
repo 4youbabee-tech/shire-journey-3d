@@ -58,7 +58,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
   const d=cyl('painted round hobbit door',x,1.35*s,z-.34*s,2.35*s,.17*s,frontColor);d.rotation.x=Math.PI/2;ring('door arch',x,1.35*s,z-.46*s,2.48*s,.16*s,dark);
   for(let i=-3;i<=3;i++){const xx=i*.25*s,hh=Math.sqrt(Math.max(0,1.08*1.08-i*.25*i*.25))*s;beam([x+xx,1.35*s-hh,z-.44*s],[x+xx,1.35*s+hh,z-.44*s],.025*s,wood);}
   sphere('round brass doorknob',x+.13*s,1.35*s,z-.55*s,.16*s,.16*s,.12*s,brass);
-  for(const side of [-1,1]){const wx=x+side*1.92*s;const w=cyl('glowing round window',wx,1.9*s,z-.36*s,.92*s,.13*s,glass);w.rotation.x=Math.PI/2;ring('round window frame',wx,1.9*s,z-.45*s,1*s,.12*s,wood);beam([wx-.4*s,1.9*s,z-.49*s],[wx+.4*s,1.9*s,z-.49*s],.06*s,wood);beam([wx,1.5*s,z-.49*s],[wx,2.3*s,z-.49*s],.06*s,wood);cyl('flowerpot',wx,.6*s,z-.8*s,.55*s,.5*s,red);if(!deferredNature)sphere('window flowers',wx,.95*s,z-.8*s,.8*s,.5*s,.6*s,leaf2);}
+  for(const side of [-1,1]){const wx=x+side*1.92*s;const w=cyl('glowing round window',wx,1.9*s,z-.36*s,.92*s,.13*s,glass);w.rotation.x=Math.PI/2;ring('round window frame',wx,1.9*s,z-.45*s,1*s,.12*s,wood);beam([wx-.4*s,1.9*s,z-.49*s],[wx+.4*s,1.9*s,z-.49*s],.06*s,wood);beam([wx,1.5*s,z-.49*s],[wx,2.3*s,z-.49*s],.06*s,wood);cyl('flowerpot',wx,.25*s,z-.8*s,.55*s,.5*s,red);if(!deferredNature)sphere('window flowers',wx,.7*s,z-.8*s,.8*s,.5*s,.6*s,leaf2);}
   cyl('stone doorstep',x,.09,z-1.1*s,2.5*s,.18,stone);cyl('chimney',x+1.7*s,4.6*s,z+2*s,.7*s,2*s,stone,true,null,.65*s,6);cyl('chimney cap',x+1.7*s,5.6*s,z+2*s,1*s,.2*s,cream);
   colliders.push(addHomeCollision(B,scene,{x,z,s}));
  }

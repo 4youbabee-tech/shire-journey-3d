@@ -1,3 +1,15 @@
+# Shire Journey — 0.10.0 Ring legacy and Shire detail
+
+Existing Babylon.js 9.32.1 project, one permanent game URL: https://4youbabee-tech.github.io/shire-journey-3d/ .
+
+The birthday continues inside Bag End with a visible three-dimensional Ring: Bilbo releases it, Frodo picks it up, and it is sealed in an envelope. Completed saves can choose **شاهد انتقال الخاتم إلى فرودو** in the journal, without losing progress. The sealed envelope appears on the writing desk after the bequest. Dialogue and sound are original; the screenplay is used to verify event ordering.
+
+Phone-reported house/shrub clipping, embedded old saves, and misleading touch help are repaired. Houses have grounded arched fronts and textured turf; licensed instanced leaf/flower assets replace smooth-ball garden plants. Moving trees retain wind; static small foliage freezes its transforms. Gardeners stop before stepping into the player or a home.
+
+Validation and source provenance: [current state](Docs/CURRENT_PROJECT_STATE.md), [Ring production](Docs/RING_LEGACY_PRODUCTION.md), [production matrix](Docs/PRODUCTION_COMPLETENESS_MATRIX.md). Acceptance requires the exact-head browser recording, visual review and public deployed SHA. This README does not claim a complete film-world map or physical-device performance acceptance.
+
+## Previous production receipts
+
 # Shire Journey — 0.9 opening-region production update
 
 Existing Babylon.js 9.32.1 project. The 0.9 cohort replaces the chibi cast with four authored CC0 humanoids, improves the in-world horse/cart opening, physical actor interaction, Arabic dialogue framing, terrain and village detail, and packaged audio. The permanent game URL remains https://4youbabee-tech.github.io/shire-journey-3d/ .

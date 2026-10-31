@@ -6,7 +6,7 @@ import {arrivalPose,ARRIVAL_DURATION} from '../dist/arrival.mjs';
 test('eyelid deformation is short, bounded and staggered across the cast',()=>{
  assert.equal(blinkAmount(.085,0),1);assert.equal(blinkAmount(.5,0),0);
  let different=false;for(let t=0;t<10;t+=.02){const a=blinkAmount(t,1),b=blinkAmount(t,4);assert.ok(a>=0&&a<=1);different||=Math.abs(a-b)>.2;}
- assert.ok(different);assert.ok(CHARACTER_HEIGHTS.gandalf>CHARACTER_HEIGHTS.sam*1.5);assert.ok(CHARACTER_HEIGHTS.bilbo<CHARACTER_HEIGHTS.sam);
+ assert.ok(different);assert.ok(CHARACTER_HEIGHTS.gandalf>CHARACTER_HEIGHTS.sam*1.5);assert.ok(CHARACTER_HEIGHTS.gandalf<CHARACTER_HEIGHTS.frodo*1.9,'wizard remains human-scale relative to the hobbits');assert.ok(CHARACTER_HEIGHTS.bilbo<CHARACTER_HEIGHTS.sam);
 });
 test('a full garden day has work and rest without synchronized actors or jumps',()=>{
  const states=new Set();let different=false;
