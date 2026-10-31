@@ -1,3 +1,4 @@
+import {placePlayerOnTerrain} from './player-placement.mjs';
 import {journeyChapter} from './journey-state.mjs';
 import {createShireRoad} from './shire-road.mjs';
 import {roadObjective,drawRoadMap} from './road-state.mjs';
@@ -77,7 +78,7 @@ function showMap(){if(!started||cinematic||activeNPC||journalOpen||inside||party
 function closeMap(){mapOpen=false;$('#world-map').hidden=true;canvas.focus();}
 function restartStory(){roadRegion?.deactivate();if(inside)leaveHouse();if(activeNPC)closeDialogue();if(mapOpen)closeMap();if(partyActive)finishParty();if(revelationActive)finishRevelation();travelParty?.setActive(false);state=freshState();world.body.position.set(0,.72,-15);yaw=0;destination=null;keys.clear();started=true;$('#welcome').hidden=true;$('#hud').hidden=false;refresh();save();if(!soundEnabled)void toggleSound();beginOpening();}
 function beginOpening(){if(inside)leaveHouse();if(!arrival)return;cinematic=true;cinematicTime=0;cinematicStart=performance.now();destination=null;keys.clear();arrival.begin(scene.activeCamera);$('#hud').hidden=true;$('#arrival-cinematic').hidden=false;$('#arrival-caption').textContent=arrivalBeat(0);}
-function endOpening(){if(cinematic){arrival.end();cinematic=false;}$('#arrival-cinematic').hidden=true;$('#hud').hidden=false;refresh();canvas.focus();if(state.stage===0&&!state.gandalfMet){world.body.position.set(-2,.72,14.8);world.player.root.position.set(-2,.02,14.8);scene.activeCamera.position.set(1,2.5,13);scene.activeCamera.setTarget(new window.BABYLON.Vector3(-2,2.34,17));save();present('gandalf');notify('التقِ غاندالف لتبدأ حكاية الشاير');}else notify('أهلًا بعودتك إلى الشاير');}
+function endOpening(){if(cinematic){arrival.end();cinematic=false;}$('#arrival-cinematic').hidden=true;$('#hud').hidden=false;refresh();canvas.focus();if(state.stage===0&&!state.gandalfMet){placePlayerOnTerrain(world,-2,14.8);scene.activeCamera.position.set(1,2.5,13);scene.activeCamera.setTarget(new window.BABYLON.Vector3(-2,2.34,17));save();present('gandalf');notify('التقِ غاندالف لتبدأ حكاية الشاير');}else notify('أهلًا بعودتك إلى الشاير');}
 function enterHouse(){
  if(inside||!started||cinematic||activeNPC)return;audio?.cue('door-open',{volume:.5});
  if(!interior)interior=createBagEndInterior(window.BABYLON,scene);
