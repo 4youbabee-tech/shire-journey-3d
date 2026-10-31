@@ -1,0 +1,9 @@
+// Original two-card fire shader: no downloaded footage, particles or post process.
+export function createHearthFire(B,scene,position){
+ const key='shireHearthFlame';B.Effect.ShadersStore[key+'VertexShader']='precision highp float; attribute vec3 position; attribute vec2 uv; uniform mat4 worldViewProjection; varying vec2 vUV; void main(){vUV=uv;gl_Position=worldViewProjection*vec4(position,1.0);}';
+ B.Effect.ShadersStore[key+'FragmentShader']=`precision highp float; varying vec2 vUV; uniform float clock; void main(){float y=vUV.y;float sway=sin(y*8.0-clock*3.7)*.07*y+sin(y*17.0+clock*2.3)*.025;float x=abs(vUV.x-.5+sway);float width=.4*(1.0-y)+.025;float edge=1.0-smoothstep(width*.6,width,x);float tip=1.0-smoothstep(.7,1.0,y+sin(clock*4.0+x*17.0)*.06);float alpha=edge*tip*smoothstep(0.0,.08,y)*.8;vec3 color=mix(vec3(1.0,.75,.2),vec3(.98,.18,.025),y);gl_FragColor=vec4(color,alpha);}`;
+ const material=new B.ShaderMaterial('original living hearth fire',scene,{vertex:key,fragment:key},{attributes:['position','uv'],uniforms:['worldViewProjection','clock'],needAlphaBlending:true});material.backFaceCulling=false;material.disableDepthWrite=true;
+ const meshes=[0,Math.PI/2].map((a,i)=>{const m=B.MeshBuilder.CreatePlane('hearth flame card '+i,{width:1.6,height:.9},scene);m.material=material;m.position.copyFrom(position);m.rotation.y=a;m.isPickable=false;return m;});
+ const lamp=new B.PointLight('hearth flicker',position.add(new B.Vector3(0,.3,-.4)),scene);lamp.diffuse=new B.Color3(1,.53,.2);lamp.range=7;let clock=0;const obs=scene.onBeforeRenderObservable.add(()=>{if(!meshes[0].isEnabled())return;clock+=Math.min(.2,scene.getEngine().getDeltaTime()/1000);material.setFloat('clock',clock);lamp.intensity=.45+Math.sin(clock*7)*.035+Math.sin(clock*13.7)*.018;});
+ return {meshes,lamp,dispose(){scene.onBeforeRenderObservable.remove(obs);meshes.forEach(m=>m.dispose());material.dispose();lamp.dispose();}};
+}

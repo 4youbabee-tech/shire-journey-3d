@@ -1,3 +1,7 @@
+## 0.13.0 candidate: Ring revelation and travelling companions
+
+Saved F1-02 investigation → archive/fire/tongs/writing/window → packing and predawn farewell → control of the actual Frodo rig with Sam following native collision breadcrumbs. Real Bag End window openings and original lightweight fire. Acceptance pending exact-head browser playback; see [production notes](RING_REVELATION_PRODUCTION.md). Previous 0.12.0 audio batch accepted in PR18, merge 8f09873378951e5262c36b7bbdba899aacc8f513; 65 native tests and reviewed A/V artifact 13044746304.
+
 # 0.12.0 recorded world foley candidate
 
 Nine small licensed recordings add doors, wooden creaks, leather movement, books and cart cargo, with gesture-gated decoding, distance/pan, variant selection and a bounded voice count. Existing music, footsteps, nature, Ring cues, story, save and terrain are retained. See [village foley provenance](VILLAGE_FOLEY_PROVENANCE.md). Source tests cover decoding boundaries, buffer reuse, voice limits and existing gameplay; actual-browser event/decoding and interior walking gate release.

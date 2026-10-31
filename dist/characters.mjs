@@ -87,7 +87,7 @@ export async function loadCharacters(B,scene,world){
    for(const t of a.morphs.attention)t.influence=a.lookTarget?.35:.05;
    const eyeFactor=1-a.blink;for(const [key,value]of Object.entries({left:Math.max(0,a.lookYaw/.35),right:Math.max(0,-a.lookYaw/.35),down:a.reading?.85:Math.max(0,a.lookPitch/.35),up:Math.max(0,-a.lookPitch/.18)}))for(const t of a.morphs[key])t.influence=Math.min(1,value)*eyeFactor;
    if(a.head.rotationQuaternion){B.Quaternion.RotationYawPitchRollToRef(a.lookYaw,a.lookPitch,0,a.gazeDelta);a.head.rotationQuaternion.multiplyInPlace(a.gazeDelta);}
-   a.gardenTool?.update(!['Talk','Cheer','Ride','RideTalk'].includes(a.mode));
+   a.gardenTool?.update(!c.travelling&&!['Talk','Cheer','Ride','RideTalk'].includes(a.mode));
    if(a.staff&&a.hand){a.hand.computeWorldMatrix(true);a.holder.computeWorldMatrix(true);a.holder.getWorldMatrix().invertToRef(a.matrix);B.Vector3.TransformCoordinatesToRef(a.hand.getAbsolutePosition(),a.matrix,a.staff.position);}
   }
  });
@@ -96,7 +96,7 @@ export async function loadCharacters(B,scene,world){
  return {actors,update(dt,activeNPC,party,cinema=null){for(const c of actors){let pose=null,target=null;
   if(cinema?.actorModes){pose=cinema.actorModes[c.id]||'Idle';target=cinema.actorTargets?.[c.id]||null;}
   else if(cinema){pose=c.id==='frodo'?cinema.frodoMode:c.id==='gandalf'?(['Talk','Board'].includes(cinema.frodoMode)?'RideTalk':'Ride'):null;if(['Talk','Board'].includes(cinema.frodoMode)&&['frodo','gandalf'].includes(c.id)){const other=actors.find(a=>a.id===(c.id==='frodo'?'gandalf':'frodo'));other.imported.head.computeWorldMatrix(true);target=other.imported.head.getAbsolutePosition().add(new B.Vector3(0,CHARACTER_HEIGHTS[other.id]*.06,0));}}
-  else if(c.id!=='player'&&B.Vector3.DistanceSquared(c.root.getAbsolutePosition(),world.body.position)<64){focus.copyFrom(world.body.position);focus.y+=.55;target=focus;}
+  else if(!c.controlled&&c.id!=='player'&&B.Vector3.DistanceSquared(c.root.getAbsolutePosition(),world.body.position)<64){focus.copyFrom(world.body.position);focus.y+=.55;target=focus;}
   c.imported.update(dt,{speaking:c.id===activeNPC,celebrating:party,pose,seatY:cinema?.seatY??null,lookTarget:target?.clone()||null});
  }},dispose(){scene.onBeforeAnimationsObservable.remove(before);scene.onAfterAnimationsObservable.remove(after);}};
 }

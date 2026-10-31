@@ -1,3 +1,4 @@
+import {createHearthFire} from './hearth-fire.mjs';
 // Distinct original Hobbit-hole room; mesh and lamp visibility are disabled outdoors.
 import {dressMaterials} from './surface-art.mjs';
 export const BAG_DOOR=Object.freeze({x:11,z:8.2});
@@ -13,7 +14,12 @@ export function createBagEndInterior(B,scene){
  bx('Bag End indoor walkable floor',160,-.12,145,25,.25,28,floor,true);
  bx('back lime wall',160,3.1,159,25,6.2,.4,wall,true);
  bx('front lime wall',160,3.1,131,25,6.2,.4,wall,true);
- bx('left lime wall',147.5,3.1,145,.4,6.2,28,wall,true);
+ const leftWall=bx('left lime wall',147.5,3.1,145,.4,6.2,28,wall,true);
+ // Cut real openings once during lazy construction, never per frame.
+ let cut=B.CSG.FromMesh(leftWall);for(const z of [140,149]){const hole=M.CreateCylinder('window cutter',{diameter:2.36,height:1.2,tessellation:32},scene);hole.position.set(147.5,3.1,z);hole.rotation.z=Math.PI/2;hole.computeWorldMatrix(true);cut=cut.subtract(B.CSG.FromMesh(hole));hole.dispose();}
+ const perforated=cut.toMesh('left lime wall with open round windows',wall,scene);perforated.checkCollisions=true;perforated.isPickable=false;meshes[meshes.indexOf(leftWall)]=perforated;colliders[colliders.indexOf(leftWall)]=perforated;leftWall.dispose();
+ bx('garden beyond Bag End windows',144,-.1,145,6,.2,27,green);
+ bx('distant garden hedge',141.3,1.3,145,.3,2.6,27,green);
  bx('right lime wall',172.5,3.1,145,.4,6.2,28,wall,true);
  bx('handmade ceiling',160,6.2,145,25,.3,28,oak);
  for(const z of [134,141,148,155])bx('ceiling beam',160,5.96,z,24,.25,.34,oak);
@@ -49,7 +55,7 @@ export function createBagEndInterior(B,scene){
  for(const [x,z] of [[151,143],[170,143]]){cy('small candle stand',x,1.2,z,.3,2.4,oak);sp('candle flame',x,2.48,z,.3,.45,.3,fire);}
  for(const [x,z] of [[163,139],[165,140]]){bx('leather luggage',x,.4,z,1.1,.8,.64,book);bx('rolled blanket',x,.86,z,.85,.13,.58,linen);}
  for(const z of [140,149]){
-  const window=use(M.CreateDisc('round garden window',{radius:1.18,tessellation:32,sideOrientation:B.Mesh.DOUBLESIDE},scene),linen,147.76,3.1,z);window.rotation.y=Math.PI/2;
+  const window=use(M.CreateDisc('round garden window',{radius:1.18,tessellation:32,sideOrientation:B.Mesh.DOUBLESIDE},scene),linen,147.76,3.1,z);window.rotation.y=Math.PI/2;window.visibility=.16;
   const rim=use(M.CreateTorus('round garden window oak rim',{diameter:2.5,thickness:.19,tessellation:32},scene),oak,147.8,3.1,z);rim.rotation.z=Math.PI/2;
   bx('window mullion',147.88,3.1,z,.15,2.3,.085,oak);bx('window crosspiece',147.88,3.1,z,.15,.085,2.3,oak);
   bx('deep garden window sill',148.05,1.93,z,.68,.13,2.7,oak);
@@ -60,9 +66,12 @@ export function createBagEndInterior(B,scene){
  const lights=[new B.PointLight('Bag End hearth light',new V(156,2,153),scene),new B.PointLight('Bag End ceiling light',new V(160,4.5,145),scene)];
  lights[0].diffuse=B.Color3.FromHexString('#ffc186');lights[0].intensity=1.0;lights[0].range=12;
  lights[1].diffuse=B.Color3.FromHexString('#ffe8bc');lights[1].intensity=.85;lights[1].range=22;
+ const livingFire=createHearthFire(B,scene,new V(156,.7,153.02));meshes.push(...livingFire.meshes);lights[0].dispose();lights[0]=livingFire.lamp;
+ const windowParts=meshes.filter(m=>['round garden window','window mullion','window crosspiece'].includes(m.name)&&m.position.z===149);
+ const openWindow=on=>{for(const m of windowParts)m.setEnabled(!on);};
  const setActive=on=>{for(const m of meshes)m.setEnabled(on);for(const l of lights)l.setEnabled(on);};
  const nearby=p=>Math.hypot(p.x-160,p.z-135.5)<3?{id:'exit-house',name:'اخرج إلى الشاير'}:Math.hypot(p.x-154,p.z-147.4)<2.3?{id:'diary',name:'اقرأ دفتر بيلبو'}:Math.hypot(p.x-156,p.z-151.1)<2.5?{id:'fire',name:'تأمّل المدفأة'}:null;
  dressMaterials(B,scene,[wall,oak,floor,linen,green,rug,book]);setActive(false);
- return {meshes,colliders,nearby,setActive,spawn:{x:160,y:.72,z:137.9},stats:{decor:meshes.length,lights:lights.length}};
+ return {meshes,colliders,nearby,setActive,openWindow,spawn:{x:160,y:.72,z:137.9},stats:{decor:meshes.length,lights:lights.length}};
 }
 
