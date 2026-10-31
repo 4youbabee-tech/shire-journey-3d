@@ -54,5 +54,3 @@ export const LANDMARKS=Object.freeze([
 ]);
 export const EAST_GATE=Object.freeze({x:45,z:-8});
 export const BRANDYWINE_FERRY=Object.freeze({x:94,z:-8});
-//
-]);
