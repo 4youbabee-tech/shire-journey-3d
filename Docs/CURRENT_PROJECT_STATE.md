@@ -1,3 +1,11 @@
+# 0.14.0 road candidate: active production
+
+Streamed F1-03 fields, Merry/Pippin meeting, mounted rider cover, working Buckleberry ferry and exterior Bree approach. Native source suite: 76 PASS. Road WebGL at a9ae0b7a2f70bbe7e529013a2cb5f603020049ee PASS, Actions 41247921085 / road job 124675114536, artifact 13060650861 (SHA256 6b6210e2405c7a40fea577ed9d7ba2dbcecba68e49df879b18ba5111b95c513b). Real entry/WASD, cover/pause, natural crossing, map and saved reload covered; QA relocation explicitly used between encounters. Actual captures reviewed. Midstream foliage blocked the camera: final refinement clears the wharf corridor and adds gradual night arrival plus lanterns; requires new exact-head images. Existing full opening/touch/revelation checks still gate merge. This is not a finished full-world release; see SHIRE_ROAD_PRODUCTION.md.
+
+Companion terrain fix includes a regression preventing inactive gardener Sam from moving on early house exits. At e35bde0, desktop/mobile, opening and party all passed; revelation natural walking/reload passed but Skip timed out while two heavy GPU contexts were open. Test now closes the natural-playback context before the independent Skip case; 0254262 verification is pending.
+
+## Historical production notes
+
 ## 0.13.0 candidate: Ring revelation and travelling companions
 
 Saved F1-02 investigation → archive/fire/tongs/writing/window → packing and predawn farewell → control of the actual Frodo rig with Sam following native collision breadcrumbs. Real Bag End window openings and original lightweight fire. Acceptance pending exact-head browser playback; see [production notes](RING_REVELATION_PRODUCTION.md). Previous 0.12.0 audio batch accepted in PR18, merge 8f09873378951e5262c36b7bbdba899aacc8f513; 65 native tests and reviewed A/V artifact 13044746304.
