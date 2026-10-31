@@ -19,7 +19,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  function cyl(name,x,y,z,diameter,height,material,staticMesh=true,parent=null,top=null,tessellation=12){const m=M.CreateCylinder(name,{diameter,height,diameterTop:top??diameter,tessellation},scene);return finish(m,material,x,y,z,staticMesh,parent);}
  function beam(a,b,r,material,name='timber',staticMesh=true,parent=null){const av=new V(...a),bv=new V(...b);if(!parent){av.y+=elevation(av.x,av.z);bv.y+=elevation(bv.x,bv.z);}const mid=av.add(bv).scale(.5),delta=bv.subtract(av);const m=cyl(name,mid.x,mid.y-(parent?0:elevation(mid.x,mid.z)),mid.z,r,delta.length(),material,staticMesh,parent);m.rotationQuaternion=B.Quaternion.FromUnitVectorsToRef(V.Up(),delta.normalize(),new B.Quaternion());return m;}
  function ring(name,x,y,z,d,t,material){const m=M.CreateTorus(name,{diameter:d,thickness:t,tessellation:28},scene);m.rotation.x=Math.PI/2;return finish(m,material,x,y,z);}
- function blocker(name,x,y,z,sx,sy,sz){const m=M.CreateBox(name,{width:sx,height:sy,depth:sz},scene);m.position.set(x,y+elevation(x,z),z);m.isVisible=false;m.checkCollisions=true;m.isPickable=false;colliders.push(m);return m;}
+ function blocker(name,x,y,z,sx,sy,sz){const m=M.CreateBox(name,{width:sx,height:sy,depth:sz},scene);m.position.set(x,y+elevation(x,z),z);m.isVisible=true;m.visibility=0;m.checkCollisions=true;m.isPickable=true;m.metadata={...(m.metadata||{}),cameraBlocker:true};colliders.push(m);return m;}
  const ground=M.CreateGround('village walkable ground',{width:180,height:180,subdivisions:80},scene);shapeTerrain(B,ground);ground.material=grass;ground.receiveShadows=true;ground.checkCollisions=true;
  // Soft deterministic ground mottling provides a lived-in meadow without textures/network.
  const terrainVertices=ground.getVerticesData(B.VertexBuffer.PositionKind),terrainColors=[];
@@ -87,7 +87,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
   if(!deferredNature)sphere('wild hedge bush',x,.32,z,sx,sy,sz,i%3?leaf3:leaf2,true,null,7);
   const volume=M.CreateSphere('hedge collision part',{diameter:1,segments:7},scene);volume.position.set(x,.32+terrainHeightAt(x,z),z);volume.scaling.set(sx,sy,sz);hedgeVolumes.push(volume);
  }
- if(hedgeVolumes.length){const hedge=B.Mesh.MergeMeshes(hedgeVolumes,true,true);hedge.name='solid village hedges';hedge.metadata={vegetation:true};hedge.isVisible=false;hedge.isPickable=false;hedge.checkCollisions=true;hedge.freezeWorldMatrix();colliders.push(hedge);}
+ if(hedgeVolumes.length){const hedge=B.Mesh.MergeMeshes(hedgeVolumes,true,true);hedge.name='solid village hedges';hedge.metadata={vegetation:true,cameraBlocker:true};hedge.isVisible=true;hedge.visibility=0;hedge.isPickable=true;hedge.checkCollisions=true;hedge.freezeWorldMatrix();colliders.push(hedge);}
  for(const [x,z] of [[-29,-15],[27,-8]]){
   cyl('stone well base',x,.5,z,2.15,1,stone,true,null,null,14);
   ring('well rim',x,1.05,z,2.3,.25,cream);
