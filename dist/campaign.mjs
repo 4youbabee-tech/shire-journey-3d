@@ -60,6 +60,8 @@ export function canAdvanceChapter(state,nextId){
  if(!current||!next||!current.next.includes(nextId))return false;
  if(current.id==='F1-01'&&!state.canonicalOutcomeFlags?.ringPassed)return false;
  if(current.id==='F1-02'&&!state.canonicalOutcomeFlags?.frodoDeparted)return false;
+ if(current.id==='F1-03'&&!state.canonicalOutcomeFlags?.hobbitsReachedBree)return false;
+ if(current.id==='F1-08'&&!state.canonicalOutcomeFlags?.fellowshipBroken)return false;
  if(next.requires.some(id=>state.chapterProgress?.[id]!=='complete'))return false;
  return true;
 }

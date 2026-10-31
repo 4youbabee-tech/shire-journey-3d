@@ -16,7 +16,7 @@ test('campaign transitions enforce the Ring handoff, Shire departure and paralle
  assert.equal(canAdvanceChapter(s,'F1-03'),false);
  s.canonicalOutcomeFlags.frodoDeparted=true;assert.equal(activateChapter(s,'F1-03'),true);assert.equal(s.storyChapterId,'F1-03');
  s.storyChapterId='F1-08';s.chapterProgress['F1-08']='active';assert.equal(canAdvanceChapter(s,'F2-01'),false);
- s.canonicalOutcomeFlags.ringPassed=true;assert.equal(canAdvanceChapter(s,'F2-01'),true);assert.equal(canAdvanceChapter(s,'F2-06'),true);
+ s.canonicalOutcomeFlags.ringPassed=true;assert.equal(canAdvanceChapter(s,'F2-01'),false);s.canonicalOutcomeFlags.fellowshipBroken=true;assert.equal(canAdvanceChapter(s,'F2-01'),true);assert.equal(canAdvanceChapter(s,'F2-06'),true);
  s.storyChapterId='F2-07';s.chapterProgress['F2-07']='complete';assert.equal(canAdvanceChapter(s,'F3-01'),false);
  s.chapterProgress['F2-08']='complete';assert.equal(canAdvanceChapter(s,'F3-01'),true);
 });
