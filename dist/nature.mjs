@@ -1,4 +1,4 @@
-import {ROADS} from './village-layout.mjs';
+import {ROADS,HOMES} from './village-layout.mjs';
 // CC0 Quaternius nature. Existing world anchors/colliders remain authoritative.
 export async function loadNature(B,scene,world){
  const sources={};
@@ -8,12 +8,13 @@ export async function loadNature(B,scene,world){
   for(const m of source.materials){m.environmentIntensity=.65;m.backFaceCulling=false;}
  }
  let trees=0,patches=0;
- function plant(name,x,z,height,yaw,label){
+ function plant(name,x,z,height,yaw,label,lift=0){
   const source=sources[name],copy=source.instantiateModelsToScene(n=>label+' '+n,false,{doNotInstantiate:false}),root=new B.TransformNode(label,scene);
   for(const n of copy.rootNodes)n.parent=root;
   let low=Infinity,high=-Infinity;
   for(const m of root.getChildMeshes()){m.computeWorldMatrix(true);const b=m.getBoundingInfo().boundingBox;low=Math.min(low,b.minimumWorld.y);high=Math.max(high,b.maximumWorld.y);m.isPickable=false;m.receiveShadows=true;if(name.startsWith('maple'))world.shadow?.addShadowCaster(m);}
-  const scale=height/(high-low);root.scaling.setAll(scale);root.position.set(x,-low*scale,z);root.rotation.y=yaw;
+  const scale=height/(high-low);root.scaling.setAll(scale);root.position.set(x,-low*scale+lift,z);root.rotation.y=yaw;
+  if(!name.startsWith('maple')){root.computeWorldMatrix(true);root.freezeWorldMatrix();for(const m of root.getChildMeshes()){m.computeWorldMatrix(true);m.freezeWorldMatrix();}}
   return root;
  }
  for(const [i,a]of world.treeAnchors.entries()){
@@ -22,6 +23,14 @@ export async function loadNature(B,scene,world){
   world.leaves.push({root,phase:i*1.73,amplitude:.004+(i%3)*.001});trees++;
   // Sparse understory remains within existing tree bounds, away from village routes.
   for(let j=0;j<5;j++){const angle=j*2.399+i,r=1.1+(j%3)*.32;plant(j%3?'grass':'flowers',a.x+Math.cos(angle)*r,a.z+Math.sin(angle)*r,j%3?.28:.34,angle,'understory '+i+' '+j);patches++;}
+ }
+ // Real textured leaf/flower clusters replace the former smooth green balls.
+ for(const [i,a]of (world.hedgeAnchors||[]).entries())for(let j=0;j<3;j++){
+  const angle=j*2.399+i,spread=j? .24:0;
+  plant(j===2?'flowers':'grass',a.x+Math.cos(angle)*spread,a.z+Math.sin(angle)*spread,a.sy*(j===2?.62:.8),angle,'garden shrub '+i+' '+j);patches++;
+ }
+ for(const [i,h]of HOMES.entries())for(const side of [-1,1]){
+  plant('flowers',h.x+side*1.92*h.s,h.z-.8*h.s,.43*h.s,i*1.73+side,'window planter '+i+' '+side,.82*h.s);patches++;
  }
  // Shared instances soften existing path shoulders without changing walkable roads.
  const placementBounds=world.colliders.filter(c=>!c.metadata?.vegetation).map(c=>{c.computeWorldMatrix(true);const b=c.getBoundingInfo().boundingBox;return {minX:b.minimumWorld.x-.22,maxX:b.maximumWorld.x+.22,minZ:b.minimumWorld.z-.22,maxZ:b.maximumWorld.z+.22};});
