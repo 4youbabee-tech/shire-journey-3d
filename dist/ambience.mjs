@@ -4,6 +4,8 @@ import {pastoralPhrase} from './score.mjs';
 export function createShireAmbience(AudioContextConstructor){
  const context=new AudioContextConstructor(),master=context.createGain();master.gain.value=.22;master.connect(context.destination);
  const nature=context.createGain(),music=context.createGain(),effects=context.createGain();nature.connect(effects);music.connect(master);effects.connect(master);const village=createVillageFoley(context,effects);let creakClock=0,leatherClock=0,loadClock=0,houseClock=0,houseEvent=0;
+ let captureDestination=null,ringDrops=0;
+ function captureStream(){if(!context.createMediaStreamDestination)return null;if(!captureDestination){captureDestination=context.createMediaStreamDestination();master.connect(captureDestination);}return captureDestination.stream;}
  const levels={master:1,music:.65,effects:1};
  function setVolume(channel,value){if(!(channel in levels)||!Number.isFinite(value))return;levels[channel]=Math.max(0,Math.min(1,value));const node=channel==='master'?master:channel==='music'?music:effects;node.gain.setValueAtTime(levels[channel]*(channel==='master'?.22:1),context.currentTime);}
  for(const key of Object.keys(levels))setVolume(key,levels[key]);
@@ -24,7 +26,7 @@ export function createShireAmbience(AudioContextConstructor){
  }
  const ringImpact=context.createBuffer(1,Math.floor(context.sampleRate*.65),context.sampleRate),metal=ringImpact.getChannelData(0);
  for(let i=0;i<metal.length;i++){const t=i/context.sampleRate;metal[i]=(.35*Math.sin(t*2*Math.PI*1720)+.19*Math.sin(t*2*Math.PI*2387)+.11*Math.sin(t*2*Math.PI*3671))*Math.exp(-t*13)*Math.min(1,t*2500);}
- function ringDrop(){if(context.state!=='running')return;const source=context.createBufferSource(),gain=context.createGain();source.buffer=ringImpact;gain.gain.value=.5;source.connect(gain);gain.connect(effects);source.onended=()=>{source.disconnect?.();gain.disconnect?.();};source.start();}
+ function ringDrop(){if(context.state!=='running')return;const source=context.createBufferSource(),gain=context.createGain();source.buffer=ringImpact;gain.gain.value=.5;source.connect(gain);gain.connect(effects);source.onended=()=>{source.disconnect?.();gain.disconnect?.();};source.start();ringDrops++;}
  function setInterior(on){const value=on?.12:1;if(nature.gain.setTargetAtTime)nature.gain.setTargetAtTime(value,context.currentTime,.4);else nature.gain.setValueAtTime(value,context.currentTime);}
  function beginScore(){if(!scoreBuffer||scoreSource)return;scoreSource=context.createBufferSource();scoreSource.buffer=scoreBuffer;scoreSource.loop=true;scoreSource.connect(music);scoreSource.start();}
  const impact=context.createBuffer(1,Math.floor(context.sampleRate*.22),context.sampleRate);
@@ -63,7 +65,7 @@ export function createShireAmbience(AudioContextConstructor){
  function song(now){for(const n of pastoralPhrase(phrase++))osc(n.frequency,now+n.at,n.duration,n.volume,n.wave,n.frequency*.997,music);}
  function cycle(){if(context.state!=='running')return;const now=context.currentTime+.07;birds(now);if(!scoreBuffer&&(birdTick-1)%2===0)song(now+.12);}
  return {
-  ringDrop,setInterior,cue:(name,options)=>village.cue(name,options),get worldFoley(){return village.snapshot;},
+  captureStream,ringDrop,setInterior,cue:(name,options)=>village.cue(name,options),get worldFoley(){return {...village.snapshot,ringDrops};},
   get foley(){return {status:foleyStatus,decoded:foleyBuffers.length,forestDecoded:!!forestBuffer};},
   get score(){return {status:scoreStatus,duration:scoreBuffer?.duration||0,error:scoreError};},
   update(dt,{moving=false,wood=false,cart=false,cartDistance=30,houseDistance=Infinity,housePan=0}={}){

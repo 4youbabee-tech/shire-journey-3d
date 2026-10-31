@@ -11,3 +11,8 @@ test('recorded footsteps load after the gesture, reuse decoded buffers and vary 
  globalThis.fetch=async()=>{assert.equal(resumed,true,'No audio download/decoding before the player gesture');requests++;return {ok:true,arrayBuffer:async()=>new ArrayBuffer(8)}};
  let audio;try{audio=createShireAmbience(Context);assert.equal(requests,0);await audio.start();assert.equal(requests,15);assert.deepEqual(audio.foley,{status:'decoded',decoded:4,forestDecoded:true});const before=played.length;audio.update(.5,{moving:true,wood:true});audio.update(.5,{moving:true,wood:true});const contacts=played.slice(before);assert.equal(contacts.length,2);assert.notEqual(contacts[0],contacts[1]);assert.equal(decodes,15,'Contacts reuse existing buffers');}finally{await audio?.close();globalThis.fetch=savedFetch;}
 });
+
+test('QA may connect a post-master capture sink without starting audio or duplicating connections',async()=>{
+ let destinations=0,starts=0;const stream={id:'actual-game-mix'};class Gain{gain={setValueAtTime(){}};connect(){}}class Context{state='suspended';sampleRate=8000;currentTime=0;destination={};createGain(){return new Gain()}createBuffer(c,n){return {getChannelData:()=>new Float32Array(n)}}createBufferSource(){return {connect(){},start(){starts++}}}createMediaStreamDestination(){destinations++;return {stream}}async close(){this.state='closed'}}
+ const a=createShireAmbience(Context);assert.equal(a.captureStream(),stream);assert.equal(a.captureStream(),stream);assert.equal(destinations,1);assert.equal(starts,0,'Preparing capture cannot unlock or start sound');assert.equal(a.state,'suspended');await a.close();
+});
