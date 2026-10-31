@@ -1,5 +1,6 @@
 // All art here is original procedural stylized geometry, not imported film assets.
 import {HOMES,ROADS,MAP_BOUNDS} from './village-layout.mjs';
+import {addHomeCollision} from './home-collision.mjs';
 import {enhanceHero} from './hero-art.mjs';
 import {dressMaterials} from './surface-art.mjs';
 export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredCharacters=false}={}){
@@ -49,7 +50,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
   sphere('round brass doorknob',x+.13*s,1.35*s,z-.55*s,.16*s,.16*s,.12*s,brass);
   for(const side of [-1,1]){const wx=x+side*1.92*s;const w=cyl('glowing round window',wx,1.9*s,z-.36*s,.92*s,.13*s,glass);w.rotation.x=Math.PI/2;ring('round window frame',wx,1.9*s,z-.45*s,1*s,.12*s,wood);beam([wx-.4*s,1.9*s,z-.49*s],[wx+.4*s,1.9*s,z-.49*s],.06*s,wood);beam([wx,1.5*s,z-.49*s],[wx,2.3*s,z-.49*s],.06*s,wood);cyl('flowerpot',wx,.6*s,z-.8*s,.55*s,.5*s,red);sphere('window flowers',wx,.95*s,z-.8*s,.8*s,.5*s,.6*s,leaf2);}
   cyl('stone doorstep',x,.09,z-1.1*s,2.5*s,.18,stone);cyl('chimney',x+1.7*s,4.6*s,z+2*s,.7*s,2*s,stone,true,null,.65*s,6);cyl('chimney cap',x+1.7*s,5.6*s,z+2*s,1*s,.2*s,cream);
-  blocker('hobbit house solid interior',x,2*s,z+2.5*s,6*s,4*s,6*s);
+  colliders.push(addHomeCollision(B,scene,{x,z,s}));
  }
  for(const home of HOMES)house(home.x,home.z,home.s,home.color==='rust'?red:home.color==='blue'?blue:door);
  function fence(points){for(let i=0;i<points.length;i++){const [x,z]=points[i];cyl('fence post',x,.55,z,.16,1.1,wood,true,null,.1,6);if(i){const [px,pz]=points[i-1];beam([x,.4,z],[px,.4,pz],.09,wood);beam([x,.8,z],[px,.8,pz],.09,wood);}}}
@@ -67,10 +68,13 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
   sphere('warm lantern glass',x,3.12,z,.5,.6,.5,glass);
   const cap=M.CreateCylinder('lantern roof',{diameter:1,height:.16,tessellation:6},scene);finish(cap,dark,x,3.51,z);
  }
+ const hedgeVolumes=[];
  for(let i=0;i<45;i++){const x=-44+random()*88,z=-41+random()*89;
   if(Math.abs(x)<9&&z>-21&&z<19)continue;
-  sphere('wild hedge bush',x,.32,z,.75+random()*.6,.8+random()*.45,.8+random()*.6,i%3?leaf3:leaf2,true,null,7);
+  const bush=sphere('wild hedge bush',x,.32,z,.75+random()*.6,.8+random()*.45,.8+random()*.6,i%3?leaf3:leaf2,true,null,7);
+  const volume=M.CreateSphere('hedge collision part',{diameter:1,segments:7},scene);volume.position.copyFrom(bush.position);volume.scaling.copyFrom(bush.scaling);hedgeVolumes.push(volume);
  }
+ if(hedgeVolumes.length){const hedge=B.Mesh.MergeMeshes(hedgeVolumes,true,true);hedge.name='solid village hedges';hedge.isVisible=false;hedge.isPickable=false;hedge.checkCollisions=true;hedge.freezeWorldMatrix();colliders.push(hedge);}
  for(const [x,z] of [[-29,-15],[27,-8]]){
   cyl('stone well base',x,.5,z,2.15,1,stone,true,null,null,14);
   ring('well rim',x,1.05,z,2.3,.25,cream);
