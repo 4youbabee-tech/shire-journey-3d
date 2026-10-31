@@ -1,0 +1,11 @@
+# Recorded village and cart foley
+
+Nine Kenney RPG Audio derivatives add wooden door opening/closing, three creaks, two leather-handling variants, a book page and a wooden cargo knock. Author: Kenney Vleugels / Kenney.nl. Official listing https://kenney.nl/assets/rpg-audio declares CC0. No film recordings or actor voices are used; the existing hoof cadence remains original procedural audio, not a claimed real horse recording.
+
+Acquisition mirror: rowink/CC0-Sounds-Web at immutable commit 7ba7f169b9d30fc822475e4fb4f79d1d20627766, public/sounds/kenney_rpgaudio/Audio. Its verbatim licence is retained. Mirror footstep00.ogg SHA256 6fe61ef1fc3bcf0e253bf2eb64759db6cb69e2fe452f4d88cc597ecf78a3d601 matches the previously verified Kenney source. Each admitted recording has its own original and derivative hash in scripts/audio-data/village-foley-receipt.json.
+
+The optional game-dev CLI was absent. A closed canonical package was built outside the project, checked for extra paths/symlinks, known CC0 licence, decoded non-silent PCM, bounded peaks and exact SHA256 roster, then admitted through this project's existing fail-closed offline build. Package manifest SHA256 c976a497ba1bc72d33e8558a6463717dbecfefc7577f02df5c2c1f54673b611d is retained in the project receipt. This describes the actual project-native fallback, not a claim that the unavailable CLI ran.
+
+Conversion: mono 22050 Hz MP3, 64 kb/s, input gain 0.5. An initial conversion exposed lossy-codec overshoot above full scale; the admitted derivatives retain headroom. Nine files total 47,412 bytes, maximum decoded peak 0.737695. Lossless compressed repository payloads reconstruct during npm ci and are verified by byte count, MP3 header and SHA256.
+
+Runtime decoding starts after the audio gesture and reuses buffers. Creak/leather variants alternate; near/far gain, stereo pan, separate gain controls and a four-voice cap bound the mix. Door events follow actual entry/exit, book pages follow interaction, and quiet sounds can come from nearby ordinary homes. Bag End is excluded from automatic house noises so the system does not invent occupants after Bilbo leaves. Actual cart movement gates creak, leather and load layers. Byte admission is distinct from browser decoding, runtime-event and artistic acceptance.

@@ -1,0 +1,155 @@
+{
+  "author": "Kenney Vleugels / Kenney.nl",
+  "license": "CC0-1.0",
+  "official": "https://kenney.nl/assets/rpg-audio",
+  "mirror": "rowink/CC0-Sounds-Web",
+  "ref": "7ba7f169b9d30fc822475e4fb4f79d1d20627766",
+  "sourceDirectory": "public/sounds/kenney_rpgaudio/Audio",
+  "conversion": "FFmpeg: mono 22050 Hz MP3 64 kb/s, input gain 0.5 to retain headroom after lossy encoding",
+  "mirrorCrossCheck": "footstep00.ogg matches previously verified source SHA256",
+  "files": {
+    "door-open.mp3": {
+      "source": "doorOpen_1.ogg",
+      "sourceSha256": "4ab93bab96522d8eb109ff96dc57cb6765deb02448fe14c10472084be5bb2a0b",
+      "sourceBytes": 22848,
+      "sha256": "44a8376cce8877ee98ca67e40991746b7ccaf2b4b2d9c805f8dcec2136ccc1fd",
+      "bytes": 8194,
+      "duration": 0.9189569160997733,
+      "peak": 0.7222667336463928,
+      "rms": 0.05844497801251266
+    },
+    "door-close.mp3": {
+      "source": "doorClose_1.ogg",
+      "sourceSha256": "834d29c60a8a8bfb50b158cdb6b7dfa8f02812a408a1ee9703d038dfab0b1aeb",
+      "sourceBytes": 18564,
+      "sha256": "2a833130c757e1e183245e25eea80b8b030bb375c40625fd6fd3f33b25058622",
+      "bytes": 6104,
+      "duration": 0.6750566893424036,
+      "peak": 0.7376949787139893,
+      "rms": 0.07980154314387891
+    },
+    "cart-creak-1.mp3": {
+      "source": "creak1.ogg",
+      "sourceSha256": "8a346186fd297254248cab8e8117060a52a5cf2a84f603153a762108550ea95e",
+      "sourceBytes": 15761,
+      "sha256": "e9af0c3cb58e911907c8d68c71aed7559eca8669304e8ba9e432437b303940bd",
+      "bytes": 6104,
+      "duration": 0.6610430839002267,
+      "peak": 0.23347878456115723,
+      "rms": 0.030817186946301426
+    },
+    "cart-creak-2.mp3": {
+      "source": "creak2.ogg",
+      "sourceSha256": "8a990afdc03aebb91d528f5385e2f95582dbfa8e2c12c71098ab01be9142294a",
+      "sourceBytes": 19012,
+      "sha256": "fbae7829b90359eb5b730d5e97e857bef6de0db45dc4d1151a88ff848bb2ec49",
+      "bytes": 7358,
+      "duration": 0.8301587301587302,
+      "peak": 0.25173285603523254,
+      "rms": 0.032016862132579794
+    },
+    "cart-creak-3.mp3": {
+      "source": "creak3.ogg",
+      "sourceSha256": "f9638787f95004b9d2d06f8eff8e99d4e594c21b51947daf562856fbcec905d1",
+      "sourceBytes": 10408,
+      "sha256": "a2c5d9485121d8cdac3b643fdf6becf2d84aff3550df9f04d7d1481e50ed1aba",
+      "bytes": 3387,
+      "duration": 0.3382312925170068,
+      "peak": 0.2724383473396301,
+      "rms": 0.054798457218455145
+    },
+    "leather-1.mp3": {
+      "source": "handleSmallLeather.ogg",
+      "sourceSha256": "ae3cbf695aa0a8b98b5a80a835be5a3ccbd5446a24db2235cd4c3cd6fc92ed96",
+      "sourceBytes": 10492,
+      "sha256": "507afcd1e70af0b5b393bc0d98730f9df11313e73e939c6405c5a0270219e8fe",
+      "bytes": 3387,
+      "duration": 0.3382312925170068,
+      "peak": 0.1237388476729393,
+      "rms": 0.008277088546586066
+    },
+    "leather-2.mp3": {
+      "source": "handleSmallLeather2.ogg",
+      "sourceSha256": "a66f6db5918ad016c28a9f2768f127a7f39b5fa04481e5a3b4e78ebe2a1c282d",
+      "sourceBytes": 10028,
+      "sha256": "68903d409c720ca892cb4bf11fbf9ad7c8d899b89a571ed6747ee16d7ab5c9dd",
+      "bytes": 3178,
+      "duration": 0.3074829931972789,
+      "peak": 0.08112598210573196,
+      "rms": 0.006196659883436634
+    },
+    "book-page.mp3": {
+      "source": "bookFlip1.ogg",
+      "sourceSha256": "fa81ac2fedc8c641661b87e349630a36c9800e795e0c800e029214efdbe26a7d",
+      "sourceBytes": 18248,
+      "sha256": "8c2ee2e10a797f28e0c30aca03235145969264805fd6bc50e9bbcc6933772278",
+      "bytes": 6940,
+      "duration": 0.7686621315192744,
+      "peak": 0.6834855079650879,
+      "rms": 0.021018673423641752
+    },
+    "cart-load.mp3": {
+      "source": "chop.ogg",
+      "sourceSha256": "d00c2b3c9fff07e376145c8c8c45c90e5084ec192f6ce0387db233f7b86f1486",
+      "sourceBytes": 9370,
+      "sha256": "7cda14c124927de1ab1efd652e4e85a8c9583523212f4efb581596fedecd1b31",
+      "bytes": 2760,
+      "duration": 0.24027210884353742,
+      "peak": 0.6311883330345154,
+      "rms": 0.07383533572281255
+    }
+  },
+  "packageManifestSha256": "c976a497ba1bc72d33e8558a6463717dbecfefc7577f02df5c2c1f54673b611d",
+  "admission": {
+    "project": "4youbabee-tech/shire-journey-3d",
+    "authority": "owner instruction to prepare and integrate licensed audio",
+    "method": "existing fail-closed project build; optional game-dev CLI absent",
+    "files": {
+      "cart-creak-3.mp3": {
+        "payload": "village-cart-creak-3.b64",
+        "payloadSha256": "2eeac17603ed2ee3a9eda3fb159efd1ff05ded0b9a7ad3e931d6c49cbec7bba3",
+        "runtime": "dist/assets/audio/cart-creak-3.mp3"
+      },
+      "book-page.mp3": {
+        "payload": "village-book-page.b64",
+        "payloadSha256": "0368088565b8c4c0d9b886e5e0373742e680e810221d5e3d468082e81def4fd3",
+        "runtime": "dist/assets/audio/book-page.mp3"
+      },
+      "cart-creak-2.mp3": {
+        "payload": "village-cart-creak-2.b64",
+        "payloadSha256": "0c901896cd78bfa43d87f89c3e5cd1e341ff11a8e9af0f0ae3c40a1c45de04cf",
+        "runtime": "dist/assets/audio/cart-creak-2.mp3"
+      },
+      "leather-2.mp3": {
+        "payload": "village-leather-2.b64",
+        "payloadSha256": "1793c6ca2612dcc4fd6e2385ece4d9a1001326d6f6af340c03ad7106dbee3ea1",
+        "runtime": "dist/assets/audio/leather-2.mp3"
+      },
+      "door-open.mp3": {
+        "payload": "village-door-open.b64",
+        "payloadSha256": "6306b54b36b5c91091c4601c8dabb751b036c8fbfe57b921702c22ec72abe11d",
+        "runtime": "dist/assets/audio/door-open.mp3"
+      },
+      "leather-1.mp3": {
+        "payload": "village-leather-1.b64",
+        "payloadSha256": "e71c21c3482ac26b3dd06b02ff898f8c09ba8e401d7e75c34b689ede6d8599a5",
+        "runtime": "dist/assets/audio/leather-1.mp3"
+      },
+      "cart-load.mp3": {
+        "payload": "village-cart-load.b64",
+        "payloadSha256": "7d095867215e6f54bbc85496fd19d502db824d737a6bd12e6af21a9171c3de34",
+        "runtime": "dist/assets/audio/cart-load.mp3"
+      },
+      "cart-creak-1.mp3": {
+        "payload": "village-cart-creak-1.b64",
+        "payloadSha256": "61ac69a6e6b510a3b6e8845cbd75a782939dae7c1d290f7ec9a80b24c3bcb92a",
+        "runtime": "dist/assets/audio/cart-creak-1.mp3"
+      },
+      "door-close.mp3": {
+        "payload": "village-door-close.b64",
+        "payloadSha256": "397bc3eb50bf03ca5605e03c39070b2db017cb855438a5f0fb55cd6cc56b5d76",
+        "runtime": "dist/assets/audio/door-close.mp3"
+      }
+    }
+  }
+}
