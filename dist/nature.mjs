@@ -24,7 +24,7 @@ export async function loadNature(B,scene,world){
   for(let j=0;j<5;j++){const angle=j*2.399+i,r=1.1+(j%3)*.32;plant(j%3?'grass':'flowers',a.x+Math.cos(angle)*r,a.z+Math.sin(angle)*r,j%3?.28:.34,angle,'understory '+i+' '+j);patches++;}
  }
  // Shared instances soften existing path shoulders without changing walkable roads.
- const placementBounds=world.colliders.map(c=>{c.computeWorldMatrix(true);const b=c.getBoundingInfo().boundingBox;return {minX:b.minimumWorld.x-.22,maxX:b.maximumWorld.x+.22,minZ:b.minimumWorld.z-.22,maxZ:b.maximumWorld.z+.22};});
+ const placementBounds=world.colliders.filter(c=>!c.metadata?.vegetation).map(c=>{c.computeWorldMatrix(true);const b=c.getBoundingInfo().boundingBox;return {minX:b.minimumWorld.x-.22,maxX:b.maximumWorld.x+.22,minZ:b.minimumWorld.z-.22,maxZ:b.maximumWorld.z+.22};});
  let roadside=0;
  for(const [ri,road]of ROADS.entries()){
   const points=B.Curve3.CreateCatmullRomSpline(road.points.map(([x,z])=>new B.Vector3(x,0,z)),10,false).getPoints();

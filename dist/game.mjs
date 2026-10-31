@@ -1,3 +1,5 @@
+import {recoverHomePosition} from './home-collision.mjs';
+import {HOMES} from './village-layout.mjs';
 import {createRingLegacy,legacyBeat,LEGACY_SECONDS} from './ring-legacy.mjs';
 import {loadNature} from './nature.mjs';
 import {loadCharacters,CHARACTER_HEIGHTS} from './characters.mjs';
@@ -27,6 +29,7 @@ function notify(text){if(activeNPC){$('#toast').hidden=true;return;}$('#toast').
 function refresh(){ $('#objective').textContent=objective(state);
  const milestones=[state.gandalfMet,state.stage>=1,state.stage>=2,state.apples.length===3,state.stage>=5,state.partyCompleted];$('#quest-progress').querySelectorAll('i').forEach((e,i)=>e.classList.toggle('done',milestones[i]));
  for(const a of world.apples)a.root.setEnabled(!state.apples.includes(a.id));
+ $('#replay-legacy').hidden=!state.partyCompleted;
  const bilbo=world.characters.find(c=>c.id==='bilbo');if(bilbo&&!partyActive)bilbo.root.setEnabled(!state.partyCompleted);
  $('#journal-objective').textContent=objective(state);
  const complete=[state.gandalfMet,state.stage>=1,state.stage>=2,state.apples.length===3,state.stage>=5,state.partyCompleted];
@@ -37,7 +40,7 @@ function present(id,custom){const newCharacter=activeNPC!==id;const npc=NPCS.fin
 function sendChat(){if(!activeNPC)return;const input=$('#npc-chat-input');const question=input.value.trim().slice(0,170);if(!question)return;const response=replyToCharacter(state,activeNPC,question);spokenText=response.text;const log=$('#chat-log');for(const [kind,text] of [['player',question],['npc',response.text]]){const line=document.createElement('p');line.className='chat-'+kind;line.textContent=text;log.append(line);}input.value='';log.scrollTop=log.scrollHeight;save();}
 function choose(action){if(action==='close'){closeDialogue();return;}if(LORE[action]){present(activeNPC,{text:LORE[action],options:[['شكرًا، نكمل حديثنا.','back'],['إلى اللقاء.','close']]});return;}if(action==='back'){present(activeNPC);return;}const changed=act(state,action);if(changed){refresh();save();notify(objective(state));}closeDialogue();}
 function interact(){if(!started||activeNPC||journalOpen||cinematic||mapOpen||partyActive)return;
- if(inside){const prop=interior.nearby(world.body.position);if(!prop)return;if(prop.id==='exit-house'){leaveHouse();return;}if(prop.id==='diary'){state.insideVisited=true;save();notify('دفتر بيلبو مليء بملاحظات عن الضيوف وذكريات الأسفار القديمة.');return;}notify('المدفأة مشتعلة ودفء الصباح يملأ الغرفة.');return;}
+ if(inside){const prop=interior.nearby(world.body.position);if(!prop)return;if(prop.id==='exit-house'){leaveHouse();return;}if(prop.id==='diary'){state.insideVisited=true;save();notify(state.ringPassed?'على مكتب بيلبو ظرف مختوم يحفظ الخاتم الذي تركه لفرودو.':'دفتر بيلبو مليء بملاحظات عن الضيوف وذكريات الأسفار القديمة.');return;}notify('المدفأة مشتعلة ودفء الصباح يملأ الغرفة.');return;}
  if(nearBagDoor(world.body.position)){enterHouse();return;}
  const near=nearestInteractable(state,world.body.position);if(!near)return;if(near.id==='party-tree'){beginParty();return;}if(near.id.startsWith('apple')){if(collect(state,near.id,world.body.position)){telemetry.collects++;refresh();save();notify(state.stage===3?'اكتملت السلة! ارجع إلى سام':`تفّاحة في السلة · ${state.apples.length}/3`);}return;}talk(state,near.id);telemetry.interactions++;save();present(near.id);}
 function showJournal(){if(!started||activeNPC||partyActive)return;keys.clear();destination=null;journalOpen=true;$('#journal').hidden=false;refresh();$('#journal-close').focus();}
@@ -47,11 +50,11 @@ function setupInput(){
  window.addEventListener('keydown',e=>{if(e.target instanceof Element&&e.target.closest('input,textarea')){if(e.code==='Escape')closeDialogue();return;}if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();if(e.code==='Escape'){if(mapOpen)closeMap();if(activeNPC)closeDialogue();if(journalOpen)closeJournal();if(cinematic)endOpening();if(partyActive)finishParty();return;}if(e.code==='KeyM'){mapOpen?closeMap():showMap();return;}if(e.repeat)return;if(e.code==='KeyE'){interact();return;}if(e.code==='KeyJ'){journalOpen?closeJournal():showJournal();return;}keys.add(e.code);destination=null;});window.addEventListener('keyup',e=>keys.delete(e.code));window.addEventListener('blur',()=>{keys.clear();joystick.x=joystick.y=0;drag=null;});
  canvas.addEventListener('pointerdown',e=>{if(activeNPC||journalOpen)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,moved:false};canvas.setPointerCapture(e.pointerId);canvas.focus();});
  canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>6)drag.moved=true;yaw-=dx*.005;pitch=Math.max(.2,Math.min(.95,pitch+dy*.003));drag.x=e.clientX;drag.y=e.clientY;});
- canvas.addEventListener('pointerup',e=>{if(!drag||drag.id!==e.pointerId)return;const moved=drag.moved;drag=null;if(!moved&&started){const pick=scene.pick(scene.pointerX,scene.pointerY,m=>m===world.ground);if(pick?.hit){const p=pick.pickedPoint;if(p.x>MAP_BOUNDS.minX+2&&p.x<MAP_BOUNDS.maxX-2&&p.z>MAP_BOUNDS.minZ+2&&p.z<MAP_BOUNDS.maxZ-2){destination={x:p.x,z:p.z};notify('امشِ إلى المكان المحدّد · استخدم الأسهم لإلغاء المسار');}}}});canvas.addEventListener('pointercancel',()=>drag=null);
+ canvas.addEventListener('pointerup',e=>{if(!drag||drag.id!==e.pointerId)return;const moved=drag.moved;drag=null;if(!moved&&started){const pick=scene.pick(scene.pointerX,scene.pointerY,m=>m===world.ground);if(pick?.hit){const p=pick.pickedPoint;if(p.x>MAP_BOUNDS.minX+2&&p.x<MAP_BOUNDS.maxX-2&&p.z>MAP_BOUNDS.minZ+2&&p.z<MAP_BOUNDS.maxZ-2){destination={x:p.x,z:p.z};notify(matchMedia('(pointer:coarse)').matches?'امشِ إلى المكان المحدّد · حرّك العصا لإلغاء المسار':'امشِ إلى المكان المحدّد · استخدم الأسهم لإلغاء المسار');}}}});canvas.addEventListener('pointercancel',()=>drag=null);
  canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(4.5,Math.min(12,zoom+e.deltaY*.007));},{passive:false});
  const joy=$('#joystick'),stick=$('#stick');let joyId=null;function joyMove(e){const r=joy.getBoundingClientRect();let dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2;const len=Math.hypot(dx,dy),max=35;if(len>max){dx*=max/len;dy*=max/len;}joystick={x:dx/max,y:-dy/max};stick.style.transform=`translate(${dx}px,${dy}px)`;destination=null;}
  joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joy.setPointerCapture(e.pointerId);joyMove(e);});joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)joyMove(e);});for(const event of ['pointerup','pointercancel','lostpointercapture'])joy.addEventListener(event,()=>{joyId=null;joystick={x:0,y:0};stick.style.transform='';});
- $('#npc-chat-form').addEventListener('submit',e=>{e.preventDefault();sendChat();});$('#npc-voice').onclick=speakDialogue;$('#interact').onclick=interact;$('#dialogue-close').onclick=closeDialogue;$('#journal-open').onclick=showJournal;$('#journal-close').onclick=closeJournal;$('#return').onclick=closeJournal;$('#map-open').onclick=showMap;$('#map-close').onclick=closeMap;$('#arrival-skip').onclick=endOpening;$('#party-skip').onclick=finishParty;$('#replay-arrival').onclick=()=>{closeJournal();beginOpening();};
+ $('#npc-chat-form').addEventListener('submit',e=>{e.preventDefault();sendChat();});$('#npc-voice').onclick=speakDialogue;$('#interact').onclick=interact;$('#dialogue-close').onclick=closeDialogue;$('#journal-open').onclick=showJournal;$('#journal-close').onclick=closeJournal;$('#return').onclick=closeJournal;$('#map-open').onclick=showMap;$('#map-close').onclick=closeMap;$('#arrival-skip').onclick=endOpening;$('#party-skip').onclick=finishParty;$('#replay-legacy').onclick=()=>{closeJournal();replayLegacy();};$('#replay-arrival').onclick=()=>{closeJournal();beginOpening();};
  $('#reset').onclick=()=>{if(!confirm('هل تبدأ القصة من وصول غاندالف؟ سيُستبدل تقدّمك المحفوظ.'))return;closeJournal();restartStory();};$('#restart-story').onclick=()=>{if(!confirm('هل تبدأ من وصول غاندالف؟ سيُستبدل تقدّمك المحفوظ.'))return;restartStory();};
  // Fresh sessions retain the owner's high-first preference. Explicit manual
  // choices survive reloads, including low-cost mode on a weaker device.
@@ -73,13 +76,13 @@ function enterHouse(){
  outdoorMeshes=scene.meshes.filter(m=>!interior.meshes.includes(m)&&!keep.has(m)&&m.isEnabled());
  for(const m of outdoorMeshes)m.setEnabled(false);
  for(const collider of interior.colliders)world.colliders.push(collider);
- interiorLightState={sun:world.sun.isEnabled(),hemi:world.hemi.intensity};world.sun.setEnabled(false);world.hemi.intensity=.42;interior.setActive(true);inside=true;state.insideVisited=true;world.body.position.set(interior.spawn.x,interior.spawn.y,interior.spawn.z);
+ interiorLightState={sun:world.sun.isEnabled(),hemi:world.hemi.intensity};world.sun.setEnabled(false);world.hemi.intensity=.42;interior.setActive(true);audio?.setInterior(true);if(state.ringPassed){if(!ringLegacy)ringLegacy=createRingLegacy(window.BABYLON,scene,world,interior,{onDrop:()=>audio?.ringDrop()});ringLegacy.displayEnvelope(true);}inside=true;state.insideVisited=true;world.body.position.set(interior.spawn.x,interior.spawn.y,interior.spawn.z);
  yaw=0;zoom=5.9;destination=null;keys.clear();scene.activeCamera.position.set(160,4.1,132.8);scene.activeCamera.setTarget(new window.BABYLON.Vector3(160,1.4,143));save();$('#location>div').firstChild.textContent='داخل بيت بيلبو';
  notify('دخلت بيت الهوبيت · اقترب من الباب الأخضر للعودة');
 }
 function leaveHouse(){
  if(!inside)return;
- interior.setActive(false);if(interiorLightState){world.sun.setEnabled(interiorLightState.sun);world.hemi.intensity=interiorLightState.hemi;}for(const m of outdoorMeshes)m.setEnabled(true);outdoorMeshes=[];
+ interior.setActive(false);audio?.setInterior(false);ringLegacy?.displayEnvelope(false);if(interiorLightState){world.sun.setEnabled(interiorLightState.sun);world.hemi.intensity=interiorLightState.hemi;}for(const m of outdoorMeshes)m.setEnabled(true);outdoorMeshes=[];
  for(const collider of interior.colliders){const i=world.colliders.indexOf(collider);if(i>=0)world.colliders.splice(i,1);}
  inside=false;world.body.position.set(returnPosition.x,.72,returnPosition.z);yaw=priorView.yaw;zoom=priorView.zoom;scene.activeCamera.position.set(returnPosition.x,4.1,returnPosition.z-zoom);scene.activeCamera.setTarget(new window.BABYLON.Vector3(returnPosition.x,1.4,returnPosition.z));
  destination=null;keys.clear();save();$('#location>div').firstChild.textContent='هوبيتون';notify('عدت إلى الشاير');
@@ -97,12 +100,19 @@ function beginParty(resume=false){
  $('#hud').hidden=true;$('#party-cinematic').hidden=false;$('#party-caption').textContent=birthdayBeat(0);
  partyFx.begin(partyStart);refresh();save();
 }
+function replayLegacy(){
+ if(!state.partyCompleted||partyActive||cinematic||activeNPC)return;if(inside)leaveHouse();
+ partyActive=true;partyStart=performance.now()-PARTY_SECONDS*1000;partyOriginal=new Map();
+ for(const c of world.characters)partyOriginal.set(c.id,{position:c.root.position.clone(),rotation:c.root.rotation.clone()});
+ keys.clear();destination=null;$('#hud').hidden=true;$('#party-cinematic').hidden=false;
+}
 function finishParty(){
  if(!partyActive)return;
- partyActive=false;partyFx?.stop();ringLegacy?.end();
+ partyActive=false;partyFx?.stop();ringLegacy?.end();audio?.setInterior(false);
  if(!state.partyCompleted)act(state,'party-finalize');
  for(const c of world.characters){const old=partyOriginal.get(c.id);if(old){c.root.position.copyFrom(old.position);c.root.rotation.copyFrom(old.rotation);}}
  partyOriginal.clear();
+ const V=window.BABYLON.Vector3;scene.activeCamera.position.set(world.body.position.x,4.1,world.body.position.z-zoom);scene.activeCamera.setTarget(new V(world.body.position.x,1.25,world.body.position.z));
  $('#party-cinematic').hidden=true;$('#hud').hidden=false;refresh();save();canvas.focus();
  notify('انتهت ليلة الاحتفال، وترك بيلبو خاتمه لفرودو قبل أن يغادر.');
 }
@@ -113,7 +123,7 @@ function animate(dt){time+=dt;const B=window.BABYLON,V=B.Vector3;
  if(partyActive){
   const elapsed=Math.max(0,(performance.now()-partyStart)/1000);
   if(elapsed>=PARTY_SECONDS){
-   if(!ringLegacy?.active){partyFx.stop();if(!interior)interior=createBagEndInterior(B,scene);if(!ringLegacy)ringLegacy=createRingLegacy(B,scene,world,interior);ringLegacy.begin();}
+   if(!ringLegacy?.active){partyFx.stop();if(!interior)interior=createBagEndInterior(B,scene);if(!ringLegacy)ringLegacy=createRingLegacy(B,scene,world,interior,{onDrop:()=>audio?.ringDrop()});ringLegacy.begin();audio?.setInterior(true);}
    const t=elapsed-PARTY_SECONDS,pose=ringLegacy.update(t);importedActors?.update(dt,null,false,pose);$('#party-caption').textContent=legacyBeat(t).caption;
    if(t>=LEGACY_SECONDS)finishParty();return;
   }
@@ -151,7 +161,7 @@ function animate(dt){time+=dt;const B=window.BABYLON,V=B.Vector3;
   audio?.update(dt,{moving,wood:inside});importedActors?.update(dt,activeNPC,partyActive);telemetry.frames++;telemetry.seconds+=dt;if(qaEnabled&&telemetry.frames%15===0){const diag=$('#qa-diagnostics');if(diag)diag.textContent=JSON.stringify(snapshot());}
 }
 function snapshot(){return {version:BUILD.version,commit:BUILD.commit,storyWindow:STORY_WINDOW.id,state:structuredClone(state),position:{x:world?.body.position.x,y:world?.body.position.y,z:world?.body.position.z},started,activeNPC,journalOpen,camera:{yaw,pitch,zoom},fps:Math.round(engine?.getFps()||0),inside,indoorStats:interior?.stats||null,party:{active:partyActive,started:state?.partyStarted||false,completed:state?.partyCompleted||false,participants:partyActive?partyOriginal.size:0,legacy:ringLegacy?.active?ringLegacy.beat:null},cinematic:{active:cinematic,time:cinematicTime,duration:ARRIVAL_DURATION},audio:audio?{state:audio.state,score:audio.score,foley:audio.foley}:null,mapOpen,quality:qualityControl?.snapshot(),renderSize:engine?{width:engine.getRenderWidth(),height:engine.getRenderHeight(),scale:engine.getHardwareScalingLevel(),shadows:scene.shadowsEnabled}:null,meshes:scene?.meshes.length,triangles:scene?scene.meshes.reduce((n,m)=>n+m.getTotalIndices()/3,0):0,telemetry:{...telemetry},errors:[...errors],world:world?.stats};}
-async function boot(){try{const B=window.BABYLON;if(!B)throw Error('تعذّر تحميل محرك Babylon.js. أعد تحميل الصفحة.');engine=new B.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,powerPreference:'default'});engine.loadingScreen={displayLoadingUI(){},hideLoadingUI(){}};scene=new B.Scene(engine);const camera=new B.UniversalCamera('third-person camera',new B.Vector3(0,5,-23),scene);camera.minZ=.15;camera.maxZ=200;camera.fov=.87;camera.inputs.clear();world=createWorld(B,scene,{deferredNature:true,deferredCharacters:true});await loadNature(B,scene,world);importedActors=await loadCharacters(B,scene,world);partyFx=createBirthdayEffects($('#party-fx'));arrival=createArrival(B,scene,world);await loadArrivalHorse(B,scene,arrival);state=readSave();world.body.position.set(state.position.x,.72,state.position.z);world.body.onCollide=()=>telemetry.collisions++;
+async function boot(){try{const B=window.BABYLON;if(!B)throw Error('تعذّر تحميل محرك Babylon.js. أعد تحميل الصفحة.');engine=new B.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,powerPreference:'default'});engine.loadingScreen={displayLoadingUI(){},hideLoadingUI(){}};scene=new B.Scene(engine);const camera=new B.UniversalCamera('third-person camera',new B.Vector3(0,5,-23),scene);camera.minZ=.15;camera.maxZ=200;camera.fov=.87;camera.inputs.clear();world=createWorld(B,scene,{deferredNature:true,deferredCharacters:true});await loadNature(B,scene,world);importedActors=await loadCharacters(B,scene,world);partyFx=createBirthdayEffects($('#party-fx'));arrival=createArrival(B,scene,world);await loadArrivalHorse(B,scene,arrival);state=readSave();state.position=recoverHomePosition(state.position,HOMES);world.body.position.set(state.position.x,.72,state.position.z);world.body.onCollide=()=>telemetry.collisions++;
  for(const npc of NPCS){const label=document.createElement('span');label.className='npc-label';label.id='label-'+npc.id;label.textContent=npc.name;label.hidden=true;$('#npc-labels').append(label);labelBindings.push({npc,el:label,character:world.characters.find(c=>c.id===npc.id)});}
  if(new URLSearchParams(location.search).has('qa')){const pre=document.createElement('pre');pre.id='qa-diagnostics';pre.style.cssText='position:fixed;left:5px;bottom:2px;max-width:95%;font:8px monospace;color:white;background:#0008;pointer-events:none;z-index:2;direction:ltr;white-space:pre-wrap;max-height:36px;overflow:hidden';document.body.append(pre);}
  $('#build-version').textContent='الإصدار '+BUILD.version+(BUILD.commit?' · '+BUILD.commit.slice(0,7):' · اختبار محلي');

@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import '../dist/vendor/babylon.js';import {addHomeCollision} from '../dist/home-collision.mjs';
+import '../dist/vendor/babylon.js';import {addHomeCollision,insideHomeFootprint,recoverHomePosition} from '../dist/home-collision.mjs';
 const B=globalThis.BABYLON;
 test('mound sides and back stop native movement at the visible surface at every house scale',()=>{
  for(const s of [.67,1,1.2])for(const direction of [[1,0],[-1,0],[0,1]]){
@@ -15,4 +15,9 @@ test('mound sides and back stop native movement at the visible surface at every 
  assert.equal(scene.meshes.filter(m=>m.name==='hobbit house solid interior').length,1,'one collider draw object per home');
  }finally{scene.dispose();engine.dispose();}
  }
+});
+
+test('legacy positions embedded in a mound are recovered without moving clear saves',()=>{
+ const homes=[{x:11,z:11,s:1.2}];const clear={x:11,z:8.2};assert.deepEqual(recoverHomePosition(clear,homes),clear);
+ const embedded={x:16,z:17};assert.equal(insideHomeFootprint(embedded,homes[0]),true);const restored=recoverHomePosition(embedded,homes);assert.equal(insideHomeFootprint(restored,homes[0]),false);assert.ok(Math.hypot(restored.x-embedded.x,restored.z-embedded.z)<4);
 });

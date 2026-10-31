@@ -1,3 +1,11 @@
+# 0.10.0 — visible Ring legacy and world collision candidate
+
+The birthday continues into a 28-second in-world Bag End bequest. The gold Ring follows a real character hand, drops to the floor, passes to Frodo, then disappears inside a sealed envelope. Canonical results follow natural completion or explicit Skip. Old completed saves have a journal replay; visiting Bag End afterward shows the sealed envelope on the writing desk. All lines and sound cues are original. Source ordering and validation are recorded in [RING_LEGACY_PRODUCTION.md](RING_LEGACY_PRODUCTION.md).
+
+Phone-reported home/shrub clipping is addressed by matching visible collision geometry; embedded legacy saves recover locally without losing progress. Mounds have separately scaled grass detail; roads use a quieter earth tone. Indoor nature attenuates smoothly. Native tests: 57 PASS with unchanged strict mesh budget. Exact-head browser captures, playback review and publication identity remain the release gates. The existing map is an original compact layout, not an exact survey of the film set; the official Hobbiton source places Bag End above the Party Tree and lakeside. Modern tourist additions are not treated as Fellowship scenes. Later story windows remain separate production work, never implied by this checkpoint.
+
+## Previous production receipts
+
 # 0.9.1 measured quality response and saved device preference
 
 0.9.0 was merged through PR13 as `be008c5f833cdf1e6d6d10ff32bdebd290375862`, after exact-head Actions 41111878012 PASS. Its corrected original opening/party WebMs now visibly include return to the game interface; artifact 13004596236 ZIP SHA256 `5d473d2e81a3f20f1f824abda7d5396542f33d6a8a930cb1a56036fe98eac3f5`, downloaded and verified. The permanent public game remains the same Pages URL.
