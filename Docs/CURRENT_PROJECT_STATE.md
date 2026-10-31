@@ -22,3 +22,8 @@ Actions 41187332860 passed npm install, syntax and all source tests, then Chromi
 ## Visual-evidence correction — d4ffc8a
 
 Exact-head Actions 41187684996 passed source tests, desktop/touch Chromium, full opening playback and full birthday playback. However, inspection of the uploaded artifact showed both Ring close-up PNGs were black even though the report confirmed the real mesh and correct finger bone. The gameplay engine is created with `preserveDrawingBuffer:false`; the inspection helper stopped the render loop and issued only one manual render, so the browser screenshot did not retain the WebGL frame. The next QA helper keeps a render-only loop active during the close-up capture, hides the HUD, and uses an oblique camera around the finger. Until the new PNGs are inspected, Ring visual acceptance remains NOT PASSED; no merge or publication.
+
+
+## Ring capture frame synchronization — 4dae2c3
+
+The next exact-head browser run passed its source gates and real desktop/touch playback, but the two Ring close-up PNGs remained black. The capture helper now awaits two browser animation/compositor frames after switching to the inspection camera and records ring world position, ring axis and camera position/target in the QA report. The ring visual gate is still NOT PASSED until those actual PNGs show the hand and band clearly.

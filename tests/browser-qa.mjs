@@ -49,7 +49,7 @@ async function ready(page){
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
  const ringStart=await page.evaluate(()=>{const s=window.BABYLON.Engine.LastCreatedScene,b=s.getMeshByName('bilbo heirloom ring'),f=s.getMeshByName('frodo heirloom ring');return {bilbo:!!b?.isEnabled(),frodo:!!f?.isEnabled(),bone:b?.parent?.name,diameter:b?.metadata?.localDiameter};});assert.equal(ringStart.bilbo,true,'Bilbo visibly wears the 3D Ring before the birthday outcome');assert.equal(ringStart.frodo,false,'Frodo must not own the Ring early');assert.ok(ringStart.bone.endsWith(' ring_01_r'));assert.ok(ringStart.diameter>=.018&&ringStart.diameter<=.03,'Bilbo Ring must have a delicate finger-sized diameter');
 }
-async function inspectRing(page,ownerId){return page.evaluate(id=>{
+async function inspectRing(page,ownerId){return page.evaluate(async id=>{
  const B=window.BABYLON,s=B.Engine.LastCreatedScene,ring=s.getMeshByName(id+' heirloom ring');
  if(!ring?.isEnabled())throw Error('Missing visible 3D Ring on '+id);
  if(ring.parent?.name!==id+' ring_01_r')throw Error('Ring is not attached to the real ring finger on '+id);
@@ -69,7 +69,9 @@ async function inspectRing(page,ownerId){return page.evaluate(id=>{
  const hud=document.querySelector('#hud');if(hud)hud.style.visibility='hidden';
  const debug=document.querySelector('#qa-diagnostics');if(debug)debug.style.display='none';
  engine.runRenderLoop(()=>s.render());s.render();
- return {owner:id,bone:ring.parent.name,localDiameter:diameter,localThickness:ring.metadata.localThickness,worldSize:size.asArray(),vertices:ring.getTotalVertices(),inspectionCameraOnly:true,continuousWebGLCapture:true};
+ // Wait for two compositor frames before Playwright captures the WebGL canvas.
+ await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+ return {owner:id,bone:ring.parent.name,localDiameter:diameter,localThickness:ring.metadata.localThickness,worldSize:size.asArray(),vertices:ring.getTotalVertices(),ringPosition:p.asArray(),ringAxis:axis.asArray(),cameraPosition:camera.position.asArray(),cameraTarget:p.asArray(),inspectionCameraOnly:true,continuousWebGLCapture:true};
 },ownerId);}
 async function walk(page,key,ms){await page.keyboard.down(key);try{await page.waitForTimeout(ms);}finally{await page.keyboard.up(key);}}
 // Use the real keyboard to prove walking. Repositioning below only shortens the
