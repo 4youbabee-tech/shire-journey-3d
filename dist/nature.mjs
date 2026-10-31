@@ -1,3 +1,4 @@
+import {terrainHeightAt} from './terrain.mjs';
 import {ROADS,HOMES} from './village-layout.mjs';
 // CC0 Quaternius nature. Existing world anchors/colliders remain authoritative.
 export async function loadNature(B,scene,world){
@@ -13,7 +14,7 @@ export async function loadNature(B,scene,world){
   for(const n of copy.rootNodes)n.parent=root;
   let low=Infinity,high=-Infinity;
   for(const m of root.getChildMeshes()){m.computeWorldMatrix(true);const b=m.getBoundingInfo().boundingBox;low=Math.min(low,b.minimumWorld.y);high=Math.max(high,b.maximumWorld.y);m.isPickable=false;m.receiveShadows=true;if(name.startsWith('maple'))world.shadow?.addShadowCaster(m);}
-  const scale=height/(high-low);root.scaling.setAll(scale);root.position.set(x,-low*scale+lift,z);root.rotation.y=yaw;
+  const scale=height/(high-low);root.scaling.setAll(scale);root.position.set(x,-low*scale+lift+terrainHeightAt(x,z),z);root.rotation.y=yaw;
   if(!name.startsWith('maple')){root.computeWorldMatrix(true);root.freezeWorldMatrix();for(const m of root.getChildMeshes()){m.computeWorldMatrix(true);m.freezeWorldMatrix();}}
   return root;
  }

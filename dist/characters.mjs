@@ -30,13 +30,14 @@ export async function loadCharacters(B,scene,world){
  for(const role of ['frodo','sam','bilbo','gandalf']){const a=await B.SceneLoader.LoadAssetContainerAsync('./assets/characters/',role+'-natural.glb',scene);for(const g of a.animationGroups)g.stop();assets[role]=a;}
  const actors=[];
  for(const c of world.characters){
+  const terrainY=c.root.position.y;c.root.position.y=0;
   const role=roleFor(c.id),instance=assets[role].instantiateModelsToScene(n=>c.id+' '+n,false,{doNotInstantiate:true});
   const holder=new B.TransformNode(c.id+' imported rig',scene);holder.parent=c.root;for(const n of instance.rootNodes)n.parent=holder;
   const meshes=holder.getChildMeshes();let low=Infinity,high=-Infinity;
   if(role==='gandalf'){const wool=assets.gandalf.materials.find(m=>m.name.includes('weathered grey woven wool'));if(!wool)throw Error('Missing wizard wool material');for(const m of meshes)if(m.material?.name.includes('MI_Peasant'))m.material=wool;}
   for(const m of meshes){m.computeWorldMatrix(true);const box=m.getBoundingInfo().boundingBox;if(!m.name.endsWith('walking staff')){low=Math.min(low,box.minimumWorld.y);high=Math.max(high,box.maximumWorld.y);}m.isPickable=false;m.receiveShadows=true;world.shadow?.addShadowCaster(m);}
   if(!(high>low))throw Error('Invalid character bounds: '+c.id);
-  const scale=(CHARACTER_HEIGHTS[c.id]||1.45)/(high-low);holder.scaling.setAll(scale);holder.position.y=-low*scale;holder.rotation.y=Math.PI;
+  const scale=(CHARACTER_HEIGHTS[c.id]||1.45)/(high-low);holder.scaling.setAll(scale);holder.position.y=-low*scale;holder.rotation.y=Math.PI;c.root.position.y=terrainY;
   for(const m of c.parts){world.shadow?.removeShadowCaster(m);m.dispose(false,false);}
   if(role==='sam'&&c.id!=='sam')for(const material of new Set(meshes.map(m=>m.material).filter(m=>m?.name.includes('waistcoat')))){
    const copy=material.clone(c.id+' waistcoat');copy.albedoColor=new B.Color3(...(c.id==='player'?[.65,.9,.7]:c.id==='farmer-berin'?[.9,.68,.55]:[.75,.8,.65]));for(const m of meshes)if(m.material===material)m.material=copy;

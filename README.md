@@ -1,3 +1,9 @@
+# 0.11.0 terrain continuity candidate
+
+Bag End now rises above the party meadow on an actual walkable hill. Terrain, road edges, house terraces, collision hulls, vegetation, actor feet, saves and the player camera share the same elevation model. Native tests exercise the real route up to the Bag End interaction and back down. See [terrain continuity](Docs/TERRAIN_CONTINUITY.md) for source relationship and acceptance details. This candidate is kept separate from the reviewed 0.10.0 Ring release until its own browser and public-identity gates pass.
+
+## Earlier production receipts
+
 # Shire Journey — 0.10.0 Ring legacy and Shire detail
 
 Existing Babylon.js 9.32.1 project, one permanent game URL: https://4youbabee-tech.github.io/shire-journey-3d/ .

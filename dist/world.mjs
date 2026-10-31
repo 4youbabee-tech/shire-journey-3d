@@ -1,3 +1,4 @@
+import {terrainHeightAt,shapeTerrain} from './terrain.mjs';
 // All art here is original procedural stylized geometry, not imported film assets.
 import {HOMES,ROADS,MAP_BOUNDS} from './village-layout.mjs';
 import {addHomeCollision} from './home-collision.mjs';
@@ -5,6 +6,7 @@ import {enhanceHero} from './hero-art.mjs';
 import {dressMaterials} from './surface-art.mjs';
 export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredCharacters=false}={}){
  const V=B.Vector3, M=B.MeshBuilder;let seed=7349;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+ let houseBase=null;const elevation=(x,z)=>houseBase??terrainHeightAt(x,z);
  const mats={},statics=[],colliders=[],characters=[],apples=[],birds=[],leaves=[],workers=[],treeAnchors=[],hedgeAnchors=[];
  function mat(name,hex,emission=0){const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(hex);m.specularColor=new B.Color3(.03,.03,.03);if(emission)m.emissiveColor=m.diffuseColor.scale(emission);mats[name]=m;return m;}
  const grass=mat('meadow','#81966c'),hill=mat('hill','#6e8b59'),hill2=mat('distant hills','#7c9b7a'),cream=mat('lime plaster','#e8d3a0'),wood=mat('oak timber','#715034'),dark=mat('dark timber','#493d2c'),pathmat=mat('warm gravel','#b7a27a'),bark=mat('bark','#6d5338'),leaf=mat('summer leaves','#688c55'),leaf2=mat('sunlit leaves','#91ab68'),leaf3=mat('deep leaves','#4f7650'),door=mat('bag end green','#355f47'),brass=mat('warm brass','#dcac4e'),glass=mat('warm windows','#f4ca75',.3),stone=mat('path stone','#9d9a7b'),white=mat('cream cloth','#eee3c0'),red=mat('rust bunting','#b97151'),blue=mat('sky bunting','#7a9a9b'),yellow=mat('wildflower gold','#e8bc53'),pink=mat('wildflower pink','#d48c8f'),skin=mat('hobbit skin','#e5b18a'),hair=mat('brown curls','#65412b'),bilboHair=mat('Bilbo silver-brown hair','#76634d'),samHair=mat('Sam sandy curls','#8b693e'),frodoHair=mat('Frodo dark curls','#47372c'),bookLeather=mat('Bilbo book leather','#54382d'),trousers=mat('trousers','#685a3b'),feetmat=mat('bare feet','#dca77c'),eye=mat('eyes','#27372b'),rosy=mat('warm skin midtones','#d7a18b'),lip=mat('soft lip shadow','#a86d60'),shirt=mat('cream shirt','#f5e6bc'),vest=mat('player vest','#99704a'),cloak=mat('green cloak','#506950'),samvest=mat('sam waistcoat','#a78e56'),bilbovest=mat('bilbo waistcoat','#a9664b'),bilboCoat=mat('Bilbo burgundy coat','#663c4e'),frodoVest=mat('Frodo blue waistcoat','#426b70'),grey=mat('grey robes','#969e9a'),hatmat=mat('blue grey hat','#7c8f94'),beard=mat('grey beard','#d8d9cb'),applemat=mat('red apples','#ce6941');
@@ -12,13 +14,13 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  const sun=new B.DirectionalLight('warm morning sunlight',new V(-.8,-1.6,.65),scene);sun.position=new V(35,55,-30);sun.intensity=.95;sun.diffuse=new B.Color3(1,.91,.73);const hemi=new B.HemisphericLight('sky fill',new V(0,1,0),scene);hemi.intensity=.6;hemi.groundColor=B.Color3.FromHexString('#66794c');
  scene.clearColor=B.Color4.FromHexString('#bcd9dfff');scene.fogMode=B.Scene.FOGMODE_LINEAR;scene.fogStart=70;scene.fogEnd=190;scene.fogColor=B.Color3.FromHexString('#bcd9df');scene.ambientColor=new B.Color3(.12,.11,.09);scene.imageProcessingConfiguration.contrast=1.09;scene.imageProcessingConfiguration.exposure=1.005;scene.collisionsEnabled=true;scene.skipPointerMovePicking=true;
  const shadow=shadows?new B.ShadowGenerator(1024,sun):null;if(shadow){shadow.usePercentageCloserFiltering=true;shadow.filteringQuality=B.ShadowGenerator.QUALITY_LOW;shadow.bias=.005;shadow.normalBias=.3;shadow.darkness=.22;}
- function finish(mesh,material,x,y,z,staticMesh=true,parent=null){mesh.material=material;mesh.position.set(x,y,z);mesh.isPickable=false;if(parent)mesh.parent=parent;else if(staticMesh)statics.push(mesh);mesh.receiveShadows=true;return mesh;}
+ function finish(mesh,material,x,y,z,staticMesh=true,parent=null){mesh.material=material;mesh.position.set(x,y+(parent?0:elevation(x,z)),z);mesh.isPickable=false;if(parent)mesh.parent=parent;else if(staticMesh)statics.push(mesh);mesh.receiveShadows=true;return mesh;}
  function sphere(name,x,y,z,sx,sy,sz,material,staticMesh=true,parent=null,segments=10){const m=M.CreateSphere(name,{diameter:1,segments},scene);m.scaling.set(sx,sy,sz);return finish(m,material,x,y,z,staticMesh,parent);}
  function cyl(name,x,y,z,diameter,height,material,staticMesh=true,parent=null,top=null,tessellation=12){const m=M.CreateCylinder(name,{diameter,height,diameterTop:top??diameter,tessellation},scene);return finish(m,material,x,y,z,staticMesh,parent);}
- function beam(a,b,r,material,name='timber',staticMesh=true,parent=null){const av=new V(...a),bv=new V(...b),mid=av.add(bv).scale(.5),delta=bv.subtract(av);const m=cyl(name,mid.x,mid.y,mid.z,r,delta.length(),material,staticMesh,parent);m.rotationQuaternion=B.Quaternion.FromUnitVectorsToRef(V.Up(),delta.normalize(),new B.Quaternion());return m;}
+ function beam(a,b,r,material,name='timber',staticMesh=true,parent=null){const av=new V(...a),bv=new V(...b);if(!parent){av.y+=elevation(av.x,av.z);bv.y+=elevation(bv.x,bv.z);}const mid=av.add(bv).scale(.5),delta=bv.subtract(av);const m=cyl(name,mid.x,mid.y-(parent?0:elevation(mid.x,mid.z)),mid.z,r,delta.length(),material,staticMesh,parent);m.rotationQuaternion=B.Quaternion.FromUnitVectorsToRef(V.Up(),delta.normalize(),new B.Quaternion());return m;}
  function ring(name,x,y,z,d,t,material){const m=M.CreateTorus(name,{diameter:d,thickness:t,tessellation:28},scene);m.rotation.x=Math.PI/2;return finish(m,material,x,y,z);}
- function blocker(name,x,y,z,sx,sy,sz){const m=M.CreateBox(name,{width:sx,height:sy,depth:sz},scene);m.position.set(x,y,z);m.isVisible=false;m.checkCollisions=true;m.isPickable=false;colliders.push(m);return m;}
- const ground=M.CreateGround('village walkable ground',{width:180,height:180,subdivisions:48},scene);ground.material=grass;ground.receiveShadows=true;ground.checkCollisions=true;
+ function blocker(name,x,y,z,sx,sy,sz){const m=M.CreateBox(name,{width:sx,height:sy,depth:sz},scene);m.position.set(x,y+elevation(x,z),z);m.isVisible=false;m.checkCollisions=true;m.isPickable=false;colliders.push(m);return m;}
+ const ground=M.CreateGround('village walkable ground',{width:180,height:180,subdivisions:80},scene);shapeTerrain(B,ground);ground.material=grass;ground.receiveShadows=true;ground.checkCollisions=true;
  // Soft deterministic ground mottling provides a lived-in meadow without textures/network.
  const terrainVertices=ground.getVerticesData(B.VertexBuffer.PositionKind),terrainColors=[];
  for(let i=0;i<terrainVertices.length;i+=3){
@@ -29,7 +31,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  ground.setVerticesData(B.VertexBuffer.ColorKind,new Float32Array(terrainColors));
  // A broad, quiet horizon gives the village a real landscape silhouette.
  for(let i=0;i<16;i++){const angle=i/16*Math.PI*2;const r=64+random()*20;sphere('rolling distant hill',Math.cos(angle)*r,-3+random()*2,Math.sin(angle)*r,37+random()*20,14+random()*16,35+random()*18,i%2?hill2:hill);}
- function path(points,width=2.5){const p=B.Curve3.CreateCatmullRomSpline(points.map(([x,z])=>new V(x,.035,z)),10,false).getPoints();const left=[],right=[];for(let i=0;i<p.length;i++){const t=p[Math.min(i+1,p.length-1)].subtract(p[Math.max(i-1,0)]).normalize(),n=new V(t.z,0,-t.x);left.push(p[i].add(n.scale(width/2)));right.push(p[i].subtract(n.scale(width/2)));}const m=M.CreateRibbon('winding village path',{pathArray:[left,right],sideOrientation:B.Mesh.DOUBLESIDE},scene);m.material=pathmat;m.receiveShadows=true;statics.push(m);}
+ function path(points,width=2.5){const p=B.Curve3.CreateCatmullRomSpline(points.map(([x,z])=>new V(x,.035,z)),10,false).getPoints();const left=[],right=[];for(let i=0;i<p.length;i++){const t=p[Math.min(i+1,p.length-1)].subtract(p[Math.max(i-1,0)]).normalize(),n=new V(t.z,0,-t.x);const l=p[i].add(n.scale(width/2)),r=p[i].subtract(n.scale(width/2));l.y=terrainHeightAt(l.x,l.z)+.065;r.y=terrainHeightAt(r.x,r.z)+.065;left.push(l);right.push(r);}const m=M.CreateRibbon('winding village path',{pathArray:[left,right],sideOrientation:B.Mesh.DOUBLESIDE},scene);m.material=pathmat;m.receiveShadows=true;statics.push(m);}
  for(const road of ROADS)path(road.points,road.width);
  function tree(x,z,s=1,kind='normal'){
   treeAnchors.push({x,z,s,kind});
@@ -37,12 +39,12 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
   cyl('tapering trunk',x,1.5*s,z,.55*s,3*s,bark,true,null,.3*s,8);blocker('tree trunk collision',x,1.5*s,z,.65*s,3*s,.65*s);
   beam([x,1.6*s,z],[x-.8*s,3*s,z],.2*s,bark);beam([x,1.8*s,z],[x+.9*s,3.2*s,z+.3*s],.2*s,bark);
   for(let j=0;j<5;j++){const a=j/5*6.28;sphere('rounded tree crown',x+Math.cos(a)*1.1*s,3.7*s+(j%2)*.6*s,z+Math.sin(a)*.9*s,2.7*s,2.7*s,2.5*s,j%3===0?leaf2:j%3===1?leaf:leaf3);}
-  if(leaves.length<11){const canopy=new B.TransformNode('gentle wind in tree leaves',scene);canopy.position.set(x,3.4*s,z);const crown=sphere('swaying upper foliage',0,.45*s,0,2.2*s,1.8*s,2*s,kind==='apple'?leaf2:leaf,false,canopy,8);crown.receiveShadows=true;leaves.push({root:canopy,phase:x*.14+z*.2,amplitude:.025+.008*(leaves.length%3)});}
+  if(leaves.length<11){const canopy=new B.TransformNode('gentle wind in tree leaves',scene);canopy.position.set(x,3.4*s+terrainHeightAt(x,z),z);const crown=sphere('swaying upper foliage',0,.45*s,0,2.2*s,1.8*s,2*s,kind==='apple'?leaf2:leaf,false,canopy,8);crown.receiveShadows=true;leaves.push({root:canopy,phase:x*.14+z*.2,amplitude:.025+.008*(leaves.length%3)});}
    if(kind==='apple')for(let j=0;j<9;j++){const a=j*2.4;sphere('apples in tree',x+Math.cos(a)*1.7*s,2.7*s+(j%3)*.55*s,z+Math.sin(a)*1.3*s,.2,.23,.2,applemat);}
  }
  tree(-2,22,2.2);tree(-20,13,1.15,'apple');tree(-17,19,1,'apple');tree(-23,19,1.2,'apple');
  [[-25,-8,1.3],[-28,4,1.8],[24,14,1.5],[29,1,1.2],[17,27,1.7],[-27,28,1.5],[-13,-14,1.3],[19,-15,1.4],[-30,-18,1.6],[31,-18,1.2],[-30,18,1.1],[29,25,1.8]].forEach(p=>tree(...p));
- function house(x,z,s=1,frontColor=door){
+ function house(x,z,s=1,frontColor=door){houseBase=terrainHeightAt(x,z-1.6*s);
   sphere('grass covered hobbit mound',x,1.3*s,z+4.6*s,11*s,6*s,9*s,hill,true,null,18);sphere('golden roof edge',x,2*s,z+2.9*s,8*s,4.8*s,5.5*s,turf,true,null,16);
   // A grounded plaster frontage under a turf arch, rather than a freestanding disc.
   const outline=[[-3.2,0],[3.2,0]];
@@ -60,7 +62,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
   sphere('round brass doorknob',x+.13*s,1.35*s,z-.55*s,.16*s,.16*s,.12*s,brass);
   for(const side of [-1,1]){const wx=x+side*1.92*s;const w=cyl('glowing round window',wx,1.9*s,z-.36*s,.92*s,.13*s,glass);w.rotation.x=Math.PI/2;ring('round window frame',wx,1.9*s,z-.45*s,1*s,.12*s,wood);beam([wx-.4*s,1.9*s,z-.49*s],[wx+.4*s,1.9*s,z-.49*s],.06*s,wood);beam([wx,1.5*s,z-.49*s],[wx,2.3*s,z-.49*s],.06*s,wood);cyl('flowerpot',wx,.25*s,z-.8*s,.55*s,.5*s,red);if(!deferredNature)sphere('window flowers',wx,.7*s,z-.8*s,.8*s,.5*s,.6*s,leaf2);}
   cyl('stone doorstep',x,.09,z-1.1*s,2.5*s,.18,stone);cyl('chimney',x+1.7*s,4.6*s,z+2*s,.7*s,2*s,stone,true,null,.65*s,6);cyl('chimney cap',x+1.7*s,5.6*s,z+2*s,1*s,.2*s,cream);
-  colliders.push(addHomeCollision(B,scene,{x,z,s}));
+  colliders.push(addHomeCollision(B,scene,{x,z,s,y:houseBase}));houseBase=null;
  }
  for(const home of HOMES)house(home.x,home.z,home.s,home.color==='rust'?red:home.color==='blue'?blue:door);
  function fence(points){for(let i=0;i<points.length;i++){const [x,z]=points[i];cyl('fence post',x,.55,z,.16,1.1,wood,true,null,.1,6);if(i){const [px,pz]=points[i-1];beam([x,.4,z],[px,.4,pz],.09,wood);beam([x,.8,z],[px,.8,pz],.09,wood);}}}
@@ -83,7 +85,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
   if(Math.abs(x)<9&&z>-21&&z<19)continue;
   const sx=.75+random()*.6,sy=.8+random()*.45,sz=.8+random()*.6;hedgeAnchors.push({x,z,sx,sy,sz});
   if(!deferredNature)sphere('wild hedge bush',x,.32,z,sx,sy,sz,i%3?leaf3:leaf2,true,null,7);
-  const volume=M.CreateSphere('hedge collision part',{diameter:1,segments:7},scene);volume.position.set(x,.32,z);volume.scaling.set(sx,sy,sz);hedgeVolumes.push(volume);
+  const volume=M.CreateSphere('hedge collision part',{diameter:1,segments:7},scene);volume.position.set(x,.32+terrainHeightAt(x,z),z);volume.scaling.set(sx,sy,sz);hedgeVolumes.push(volume);
  }
  if(hedgeVolumes.length){const hedge=B.Mesh.MergeMeshes(hedgeVolumes,true,true);hedge.name='solid village hedges';hedge.metadata={vegetation:true};hedge.isVisible=false;hedge.isPickable=false;hedge.checkCollisions=true;hedge.freezeWorldMatrix();colliders.push(hedge);}
  for(const [x,z] of [[-29,-15],[27,-8]]){
@@ -120,7 +122,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  // Expanded village bounds leave walkable routes behind the original village center.
  blocker('west boundary',MAP_BOUNDS.minX,3,2.5,1,6,MAP_BOUNDS.maxZ-MAP_BOUNDS.minZ);blocker('east boundary',MAP_BOUNDS.maxX,3,2.5,1,6,MAP_BOUNDS.maxZ-MAP_BOUNDS.minZ);blocker('south boundary',0,3,MAP_BOUNDS.minZ,MAP_BOUNDS.maxX-MAP_BOUNDS.minX,6,1);blocker('north boundary',0,3,MAP_BOUNDS.maxZ,MAP_BOUNDS.maxX-MAP_BOUNDS.minX,6,1);
  function character(id,x,z,{wizard=false,waistcoat=vest,player=false}={}){
-  const root=new B.TransformNode(id,scene);root.position.set(x,0,z);const parts=[];
+  const root=new B.TransformNode(id,scene);root.position.set(x,terrainHeightAt(x,z),z);const parts=[];
   // The shipped runtime loads authored GLBs; retain only the authoritative roots.
   if(deferredCharacters){
    const height=wizard?1.45:1,joint=(name,px,py,pz)=>{const n=new B.TransformNode(name,scene);n.parent=root;n.position.set(px,py,pz);return n;};
