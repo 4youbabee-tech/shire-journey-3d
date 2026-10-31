@@ -1,5 +1,6 @@
 import {createGardenToolRig} from './garden-tools.mjs';
 import {addActorCollision} from './actor-collision.mjs';
+import {createOneRing} from './ring-prop.mjs';
 // Authored Shire cast, based on reviewed Quaternius CC0 humanoids.
 export const CHARACTER_HEIGHTS=Object.freeze({player:1.48,bilbo:1.36,sam:1.48,frodo:1.42,gandalf:3.12});
 export function blinkAmount(seconds,seed=0){const period=3.7+(seed%5)*.21,t=((seconds+seed*.137)%period+period)%period;return t<.17?Math.sin(t/.17*Math.PI)**2:0;}
@@ -28,6 +29,8 @@ export async function loadCharacters(B,scene,world){
  const assets={};
  for(const role of ['frodo','sam','bilbo','gandalf']){const a=await B.SceneLoader.LoadAssetContainerAsync('./assets/characters/',role+'-natural.glb',scene);for(const g of a.animationGroups)g.stop();assets[role]=a;}
  const actors=[];
+ const ringMaterial=new B.StandardMaterial('One Ring warm gold',scene);
+ ringMaterial.diffuseColor=new B.Color3(.9,.66,.22);ringMaterial.specularColor=new B.Color3(1,.88,.56);ringMaterial.specularPower=96;ringMaterial.emissiveColor=new B.Color3(.055,.032,.007);
  for(const c of world.characters){
   const role=roleFor(c.id),instance=assets[role].instantiateModelsToScene(n=>c.id+' '+n,false,{doNotInstantiate:true});
   const holder=new B.TransformNode(c.id+' imported rig',scene);holder.parent=c.root;for(const n of instance.rootNodes)n.parent=holder;
@@ -46,6 +49,12 @@ export async function loadCharacters(B,scene,world){
   for(const name of ['Idle','Walk','Run','Talk','Sit','Rise','Ride','RideTalk','Board'])if(!clips[name])throw Error('Missing '+name+' for '+c.id);
   const nodes=holder.getChildTransformNodes(),head=nodes.find(n=>n.name===c.id+' Head'),pelvis=nodes.find(n=>n.name===c.id+' pelvis'),hand=nodes.find(n=>n.name===c.id+' hand_l'),staff=meshes.find(m=>m.name.endsWith('walking staff'));
   if(!head||!pelvis)throw Error('Missing natural head/pelvis rig: '+c.id);
+  let ring=null;
+  if(c.id==='bilbo'||c.id==='frodo'){
+   const finger=nodes.find(n=>n.name===c.id+' ring_01_r'),nextFinger=nodes.find(n=>n.name===c.id+' ring_02_r');
+   if(!finger)throw Error('Missing right ring-finger bone for '+c.id);
+   ring=createOneRing(B,scene,{actorId:c.id,parent:finger,nextBone:nextFinger,material:ringMaterial});
+  }
   if(staff){staff.parent=holder;staff.rotationQuaternion=B.Quaternion.Identity();staff.scaling.setAll(1);}
   const gardenTool=(c.id==='sam'||world.workers.some(w=>w.id===c.id))?createGardenToolRig(B,scene,{parent:holder,id:c.id,hand:nodes.find(n=>n.name===c.id+' hand_r'),middle:nodes.find(n=>n.name===c.id+' middle_01_r'),index:nodes.find(n=>n.name===c.id+' index_01_r'),ring:nodes.find(n=>n.name===c.id+' ring_01_r')}):null;
   const morphs={blink:[],smile:[],attention:[],seated:[],left:[],right:[],down:[],up:[]};
@@ -56,7 +65,7 @@ export async function loadCharacters(B,scene,world){
   }
   if(morphs.blink.length<2)throw Error('Missing skin/eye blink controls: '+c.id);
   const mixer=createClipMixer(),seed=seedFor(c.id);let last=c.root.position.clone(),clock=seed*.137,previousMode=null,modeTime=0;
-  const imported={holder,meshes,gardenTool,clips:instance.animationGroups,head,pelvis,hand,staff,morphs,mode:'Idle',blink:0,lookYaw:0,lookPitch:0,dt:0,paused:false,seatY:null,reading:false,lookTarget:null,smile:0,drape:0,gazeDelta:B.Quaternion.Identity(),inverseGaze:B.Quaternion.Identity(),matrix:B.Matrix.Identity(),localTarget:B.Vector3.Zero()};
+  const imported={holder,meshes,gardenTool,clips:instance.animationGroups,head,pelvis,hand,staff,ring,morphs,mode:'Idle',blink:0,lookYaw:0,lookPitch:0,dt:0,paused:false,seatY:null,reading:false,lookTarget:null,smile:0,drape:0,gazeDelta:B.Quaternion.Identity(),inverseGaze:B.Quaternion.Identity(),matrix:B.Matrix.Identity(),localTarget:B.Vector3.Zero()};
   function update(dt,{speaking=false,celebrating=false,pose=null,seatY=null,lookTarget=null}={}){
    clock+=dt;imported.dt=dt;const distance=B.Vector3.Distance(last,c.root.position);last.copyFrom(c.root.position);
    imported.paused=!c.root.isEnabled()||B.Vector3.DistanceSquared(c.root.getAbsolutePosition(),scene.activeCamera.position)>42*42;mixer.setPaused(imported.paused);if(imported.paused)return;
@@ -88,7 +97,7 @@ export async function loadCharacters(B,scene,world){
    if(a.staff&&a.hand){a.hand.computeWorldMatrix(true);a.holder.computeWorldMatrix(true);a.holder.getWorldMatrix().invertToRef(a.matrix);B.Vector3.TransformCoordinatesToRef(a.hand.getAbsolutePosition(),a.matrix,a.staff.position);}
   }
  });
- world.stats.gardenToolRigs=actors.filter(c=>c.imported.gardenTool).length;world.stats.colliders=world.colliders.length;world.stats.importedCharacters=actors.length;world.stats.characterAssets='Quaternius CC0; authored natural Shire cast';world.stats.naturalCastRoles=4;world.stats.eyelidRigs=actors.filter(c=>c.imported.morphs.blink.length>=2).length;
+ world.stats.gardenToolRigs=actors.filter(c=>c.imported.gardenTool).length;world.stats.oneRingRigs=actors.filter(c=>c.imported.ring).length;world.stats.colliders=world.colliders.length;world.stats.importedCharacters=actors.length;world.stats.characterAssets='Quaternius CC0; authored natural Shire cast';world.stats.naturalCastRoles=4;world.stats.eyelidRigs=actors.filter(c=>c.imported.morphs.blink.length>=2).length;
  const focus=B.Vector3.Zero();
  return {actors,update(dt,activeNPC,party,cinema=null){for(const c of actors){let pose=null,target=null;
   if(cinema){pose=c.id==='frodo'?cinema.frodoMode:c.id==='gandalf'?(['Talk','Board'].includes(cinema.frodoMode)?'RideTalk':'Ride'):null;if(['Talk','Board'].includes(cinema.frodoMode)&&['frodo','gandalf'].includes(c.id)){const other=actors.find(a=>a.id===(c.id==='frodo'?'gandalf':'frodo'));other.imported.head.computeWorldMatrix(true);target=other.imported.head.getAbsolutePosition().add(new B.Vector3(0,CHARACTER_HEIGHTS[other.id]*.06,0));}}

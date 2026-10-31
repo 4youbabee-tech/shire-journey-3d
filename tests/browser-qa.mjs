@@ -47,7 +47,37 @@ async function ready(page){
  assert.equal((await snap(page)).world.importedCharacters,8,'All eight visible roles use imported GLB rigs');
  if(process.env.GITHUB_ACTIONS)assert.equal((await snap(page)).commit,checkoutSha,'Published build identity matches tested checkout');
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
+ const ringStart=await page.evaluate(()=>{const s=window.BABYLON.Engine.LastCreatedScene,b=s.getMeshByName('bilbo heirloom ring'),f=s.getMeshByName('frodo heirloom ring');return {bilbo:!!b?.isEnabled(),frodo:!!f?.isEnabled(),bone:b?.parent?.name,diameter:b?.metadata?.localDiameter};});assert.equal(ringStart.bilbo,true,'Bilbo visibly wears the 3D Ring before the birthday outcome');assert.equal(ringStart.frodo,false,'Frodo must not own the Ring early');assert.ok(ringStart.bone.endsWith(' ring_01_r'));assert.ok(ringStart.diameter>=.018&&ringStart.diameter<=.03,'Bilbo Ring must have a delicate finger-sized diameter');
 }
+async function inspectRing(page,ownerId){return page.evaluate(async id=>{
+ const B=window.BABYLON,s=B.Engine.LastCreatedScene,ring=s.getMeshByName(id+' heirloom ring');
+ if(!ring?.isEnabled())throw Error('Missing visible 3D Ring on '+id);
+ if(ring.parent?.name!==id+' ring_01_r')throw Error('Ring is not attached to the real ring finger on '+id);
+ ring.computeWorldMatrix(true);const p=ring.getAbsolutePosition(),bounds=ring.getBoundingInfo().boundingBox,size=bounds.maximumWorld.subtract(bounds.minimumWorld),diameter=ring.metadata?.localDiameter;
+ const largest=Math.max(size.x,size.y,size.z);
+ if(!(diameter>=.018&&diameter<=.03&&largest>.004&&largest<.04))throw Error('Ring scale is not plausible on '+id+': '+JSON.stringify({diameter,worldSize:size.asArray()}));
+ const actorRoot=s.getTransformNodeByName(id);
+ if(!actorRoot)throw Error('Missing character root for Ring close-up: '+id);
+ actorRoot.computeWorldMatrix(true);
+ const rootPosition=actorRoot.getAbsolutePosition();
+ // Place the inspection camera beyond the hand, away from the torso, not along the finger into the palm.
+ const outward=p.subtract(rootPosition);outward.y=0;
+ if(outward.lengthSquared()<.01)outward.copyFrom(ring.getDirection(B.Vector3.Right()));
+ outward.normalize();
+ const camera=s.activeCamera,engine=s.getEngine();
+ engine.stopRenderLoop();
+ camera.minZ=.001;camera.maxZ=10;camera.fov=.28;
+ camera.position.copyFrom(p.add(outward.scale(.22)).add(new B.Vector3(0,.065,0)));
+ camera.setTarget(p);
+ // The game uses preserveDrawingBuffer:false. Keep a render-only loop alive so the
+ // browser compositor captures the actual WebGL hand/ring frame, not a cleared buffer.
+ const hud=document.querySelector('#hud');if(hud)hud.style.visibility='hidden';
+ const debug=document.querySelector('#qa-diagnostics');if(debug)debug.style.display='none';
+ engine.runRenderLoop(()=>s.render());s.render();
+ // Wait for two compositor frames before Playwright captures the WebGL canvas.
+ await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+ return {owner:id,bone:ring.parent.name,localDiameter:diameter,localThickness:ring.metadata.localThickness,worldSize:size.asArray(),vertices:ring.getTotalVertices(),ringPosition:p.asArray(),actorRootPosition:rootPosition.asArray(),cameraOutward:outward.asArray(),cameraPosition:camera.position.asArray(),cameraTarget:p.asArray(),inspectionCameraOnly:true,continuousWebGLCapture:true};
+},ownerId);}
 async function walk(page,key,ms){await page.keyboard.down(key);try{await page.waitForTimeout(ms);}finally{await page.keyboard.up(key);}}
 // Use the real keyboard to prove walking. Repositioning below only shortens the
 // scripted quest in very slow software GPU CI; it is NOT a navigation acceptance test.
@@ -125,6 +155,7 @@ try{
  assert.equal((await snap(page)).state.partyCompleted,true,'Party skip preserves canonical outcome');
  assert.equal((await snap(page)).state.ringPassed,true,'Bilbo leaves the Ring to Frodo');
  assert.equal((await snap(page)).state.bilboGone,true,'Bilbo departs after the celebration');
+ const ringEnd=await page.evaluate(()=>{const s=window.BABYLON.Engine.LastCreatedScene,b=s.getMeshByName('bilbo heirloom ring'),f=s.getMeshByName('frodo heirloom ring');return {bilbo:!!b?.isEnabled(),frodo:!!f?.isEnabled(),bone:f?.parent?.name,diameter:f?.metadata?.localDiameter};});assert.equal(ringEnd.bilbo,false,'Bilbo no longer wears the Ring after departure');assert.equal(ringEnd.frodo,true,'Frodo receives the visible Ring after the canonical party outcome');assert.ok(ringEnd.bone.endsWith(' ring_01_r'));assert.ok(ringEnd.diameter>=.018&&ringEnd.diameter<=.03,'Frodo Ring must remain a delicate finger-sized band');
  await still(page,'desktop-after-birthday.png');
  await still(page,'desktop-completed.png');await qaReposition(page,-12,-5);await still(page,'desktop-garden-life.png');
  report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
@@ -149,7 +180,12 @@ try{
   return {skinnedMeshes:skin.length,skeletons:s.skeletons.length,animationGroups:s.animationGroups.length,inspectionCameraOnly:true};
  });
  await still(page,'desktop-gandalf-character-detail.png');
+ report.desktop.frodoRingDetail=await inspectRing(page,'frodo');await still(page,'desktop-frodo-ring-detail.png');
  await desktop.close();
+ const ringContext=await browser.newContext({viewport:{width:1280,height:720}}),ringPage=await ringContext.newPage();ringPage.on('pageerror',e=>report.errors.push('ring-detail: '+e.message));
+ await ready(ringPage);await ringPage.locator('#start').click();if((await snap(ringPage)).cinematic.active)await ringPage.locator('#arrival-skip').click();
+ if(await ringPage.locator('#dialogue:not([hidden])').isVisible())await ringPage.locator('#dialogue-close').click();
+ await ringPage.waitForTimeout(250);report.ringBilboDetail=await inspectRing(ringPage,'bilbo');await still(ringPage,'desktop-bilbo-ring-detail.png');await ringContext.close();
  const mobile=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,recordVideo:{dir:out,size:{width:390,height:844}}});
  const touch=await mobile.newPage();touch.on('pageerror',e=>report.errors.push('mobile: '+e.message));
  await ready(touch);await touch.locator('#start').tap();if((await snap(touch)).cinematic.active)await touch.locator('#arrival-skip').tap();assert.equal(await touch.locator('#speaker').innerText(),'غاندالف');await touch.locator('#choices button').first().tap();assert.equal((await snap(touch)).state.gandalfMet,true);await touch.locator('#map-open').tap();assert.ok(await touch.locator('#world-map').isVisible());await still(touch,'mobile-village-map.png');await touch.locator('#map-close').tap();

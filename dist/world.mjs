@@ -15,7 +15,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  function cyl(name,x,y,z,diameter,height,material,staticMesh=true,parent=null,top=null,tessellation=12){const m=M.CreateCylinder(name,{diameter,height,diameterTop:top??diameter,tessellation},scene);return finish(m,material,x,y,z,staticMesh,parent);}
  function beam(a,b,r,material,name='timber',staticMesh=true,parent=null){const av=new V(...a),bv=new V(...b),mid=av.add(bv).scale(.5),delta=bv.subtract(av);const m=cyl(name,mid.x,mid.y,mid.z,r,delta.length(),material,staticMesh,parent);m.rotationQuaternion=B.Quaternion.FromUnitVectorsToRef(V.Up(),delta.normalize(),new B.Quaternion());return m;}
  function ring(name,x,y,z,d,t,material){const m=M.CreateTorus(name,{diameter:d,thickness:t,tessellation:28},scene);m.rotation.x=Math.PI/2;return finish(m,material,x,y,z);}
- function blocker(name,x,y,z,sx,sy,sz){const m=M.CreateBox(name,{width:sx,height:sy,depth:sz},scene);m.position.set(x,y,z);m.isVisible=false;m.checkCollisions=true;m.isPickable=false;colliders.push(m);return m;}
+ function blocker(name,x,y,z,sx,sy,sz,collisionKind='world'){const m=M.CreateBox(name,{width:sx,height:sy,depth:sz},scene);m.position.set(x,y,z);m.isVisible=false;m.checkCollisions=true;m.isPickable=false;m.metadata={cameraBlocker:true,collisionKind};colliders.push(m);return m;}
  const ground=M.CreateGround('village walkable ground',{width:180,height:180,subdivisions:48},scene);ground.material=grass;ground.receiveShadows=true;ground.checkCollisions=true;
  // Soft deterministic ground mottling provides a lived-in meadow without textures/network.
  const terrainVertices=ground.getVerticesData(B.VertexBuffer.PositionKind),terrainColors=[];
@@ -49,7 +49,11 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
   sphere('round brass doorknob',x+.13*s,1.35*s,z-.55*s,.16*s,.16*s,.12*s,brass);
   for(const side of [-1,1]){const wx=x+side*1.92*s;const w=cyl('glowing round window',wx,1.9*s,z-.36*s,.92*s,.13*s,glass);w.rotation.x=Math.PI/2;ring('round window frame',wx,1.9*s,z-.45*s,1*s,.12*s,wood);beam([wx-.4*s,1.9*s,z-.49*s],[wx+.4*s,1.9*s,z-.49*s],.06*s,wood);beam([wx,1.5*s,z-.49*s],[wx,2.3*s,z-.49*s],.06*s,wood);cyl('flowerpot',wx,.6*s,z-.8*s,.55*s,.5*s,red);sphere('window flowers',wx,.95*s,z-.8*s,.8*s,.5*s,.6*s,leaf2);}
   cyl('stone doorstep',x,.09,z-1.1*s,2.5*s,.18,stone);cyl('chimney',x+1.7*s,4.6*s,z+2*s,.7*s,2*s,stone,true,null,.65*s,6);cyl('chimney cap',x+1.7*s,5.6*s,z+2*s,1*s,.2*s,cream);
-  blocker('hobbit house solid interior',x,2*s,z+2.5*s,6*s,4*s,6*s);
+  // Close the visible mound sides and rear; preserve the front door approach.
+  blocker('hobbit house solid interior',x,2*s,z+2.5*s,6*s,4*s,6*s,'house');
+  blocker('hobbit house left mound hull',x-4.1*s,2*s,z+4.7*s,3.6*s,4.4*s,8.8*s,'house');
+  blocker('hobbit house right mound hull',x+4.1*s,2*s,z+4.7*s,3.6*s,4.4*s,8.8*s,'house');
+  blocker('hobbit house rear mound hull',x,2*s,z+7.4*s,5.6*s,4.4*s,3.4*s,'house');
  }
  for(const home of HOMES)house(home.x,home.z,home.s,home.color==='rust'?red:home.color==='blue'?blue:door);
  function fence(points){for(let i=0;i<points.length;i++){const [x,z]=points[i];cyl('fence post',x,.55,z,.16,1.1,wood,true,null,.1,6);if(i){const [px,pz]=points[i-1];beam([x,.4,z],[px,.4,pz],.09,wood);beam([x,.8,z],[px,.8,pz],.09,wood);}}}
@@ -155,7 +159,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  const groups=new Map();for(const mesh of statics){const key=mesh.material.uniqueId;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(mesh);}let mergedCount=0;for(const group of groups.values()){const m=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);if(m){m.name='batched '+m.material.name;m.receiveShadows=true;m.freezeWorldMatrix();if(shadow&& !['warm gravel','clouds','pond water'].includes(m.material.name))shadow.addShadowCaster(m);mergedCount++;}}
  const body=M.CreateSphere('player collision ellipsoid',{diameter:1,segments:6},scene);body.position.set(0,.72,-15);body.isVisible=false;body.isPickable=false;body.ellipsoid=new V(.32,.7,.32);body.checkCollisions=true;
  dressMaterials(B,scene,Object.values(mats));
- return {player,body,characters,workers,leaves,treeAnchors,apples,birds,sun,hemi,shadow,colliders,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,roads:ROADS.length,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,animatedCanopies:leaves.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
+ return {player,body,characters,workers,leaves,treeAnchors,apples,birds,sun,hemi,shadow,colliders,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,roads:ROADS.length,colliders:colliders.length,houseCollisionHulls:colliders.filter(m=>m.metadata?.collisionKind==='house').length,characters:characters.length,backgroundVillagers:workers.length,animatedCanopies:leaves.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
 }
 
 

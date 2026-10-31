@@ -1,5 +1,5 @@
 // Shire-inspired original compact village layout. Keep story landmarks clear.
-export const MAP_BOUNDS=Object.freeze({minX:-49,maxX:49,minZ:-47,maxZ:52});
+export const MAP_BOUNDS=Object.freeze({minX:-49,maxX:110,minZ:-47,maxZ:52});
 export const HOMES=Object.freeze([
  {x:11,z:11,s:1.2,color:'green',name:'Bag End'},
  {x:-12,z:7,s:.9,color:'rust',name:'West Hill'},
@@ -18,6 +18,11 @@ export const HOMES=Object.freeze([
  {x:-26,z:41,s:.78,color:'green',name:'Upper Orchard'},
  {x:-38,z:25,s:.71,color:'blue',name:'Garden Lane'},
  {x:-40,z:5,s:.7,color:'rust',name:'West Lane'},
+ {x:63,z:-23,s:.72,color:'green',name:'Buckland Bank'},
+ {x:73,z:-22,s:.78,color:'rust',name:'Brandy Hall Lane'},
+ {x:83,z:-18,s:.7,color:'blue',name:'Riverbank Cottage'},
+ {x:66,z:17,s:.74,color:'blue',name:'Buckland Orchard'},
+ {x:82,z:16,s:.72,color:'green',name:'Ferry Meadow'},
 ]);
 export const ROADS=Object.freeze([
  {width:3.3,points:[[0,-43],[0,-31],[0,-23],[0,-14],[1,-6],[1,1],[4,6],[3,12],[-1,19],[1,30],[1,43]]},
@@ -32,6 +37,9 @@ export const ROADS=Object.freeze([
  {width:2.2,points:[[-34,39],[-23,37],[-11,36],[1,37],[15,39]]},
  {width:2.25,points:[[-41,13],[-32,12],[-25,9],[-17,4],[-11,1]]},
  {width:2.2,points:[[-29,-33],[-22,-25],[-14,-22],[-8,-22],[0,-23]]},
+ {width:3.1,points:[[39,-8],[48,-8],[57,-9],[66,-10],[75,-9],[84,-8],[90,-8]]},
+ {width:2.25,points:[[66,-10],[66,-19],[70,-24],[78,-26],[85,-20]]},
+ {width:2.15,points:[[74,-9],[78,0],[80,9],[82,16]]},
 ]);
 export const LANDMARKS=Object.freeze([
  {id:'bag',name:'بيت بيلبو',x:11,z:11,type:'home'},
@@ -39,5 +47,10 @@ export const LANDMARKS=Object.freeze([
  {id:'orchard',name:'بستان التفّاح',x:-20,z:17,type:'orchard'},
  {id:'market',name:'سوق القرية',x:27,z:-9,type:'market'},
  {id:'pond',name:'البركة',x:21,z:-2,type:'pond'},
- {id:'mill',name:'بئر القرية',x:-30,z:-15,type:'well'}
+ {id:'mill',name:'بئر القرية',x:-30,z:-15,type:'well'},
+ {id:'shire-gate',name:'البوابة الشرقية',x:45,z:-8,type:'gate'},
+ {id:'buckland',name:'باكلبري',x:75,z:-13,type:'village'},
+ {id:'brandywine',name:'عبّارة برانديواين',x:94,z:-8,type:'ferry'}
 ]);
+export const EAST_GATE=Object.freeze({x:45,z:-8});
+export const BRANDYWINE_FERRY=Object.freeze({x:94,z:-8});
