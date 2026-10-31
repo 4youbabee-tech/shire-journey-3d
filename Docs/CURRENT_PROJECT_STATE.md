@@ -12,3 +12,8 @@
 
 Historical 0.9.1 and earlier evidence remains below for provenance.
 
+
+
+## Exact-head browser correction — 90d8519
+
+Actions 41187332860 passed npm install, syntax and all source tests, then Chromium correctly exposed one stale browser assertion: the post-party Frodo ownership check still expected the previous oversized Ring range (0.035–0.065), while the new intended range is 0.018–0.03. The runtime handoff itself was not the failing condition; the stale expected-size assertion was. The assertion now matches the new finger-sized geometry. Re-run exact-head desktop/touch Chromium and inspect the new unobstructed Ring close-ups before accepting this candidate.
