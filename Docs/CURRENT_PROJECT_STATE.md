@@ -27,3 +27,8 @@ Exact-head Actions 41187684996 passed source tests, desktop/touch Chromium, full
 ## Ring capture frame synchronization — 4dae2c3
 
 The next exact-head browser run passed its source gates and real desktop/touch playback, but the two Ring close-up PNGs remained black. The capture helper now awaits two browser animation/compositor frames after switching to the inspection camera and records ring world position, ring axis and camera position/target in the QA report. The ring visual gate is still NOT PASSED until those actual PNGs show the hand and band clearly.
+
+
+## Ring close-up camera correction — 6399279
+
+The latest artifact still showed black close-ups despite two awaited compositor frames. Its diagnostic report confirmed finite Ring positions around Bilbo `[8.245, 0.488, 6.900]` and Frodo `[3.245, 0.558, -4.105]`, plus valid finger axes. The camera had been placed along/near the finger's inward axis, which can put it inside the hand/torso. The next QA view derives an outward horizontal vector from the actual character root to the Ring and positions the camera beyond the hand, with a slightly elevated oblique angle. The visual gate remains open until actual screenshots show the hand and band.

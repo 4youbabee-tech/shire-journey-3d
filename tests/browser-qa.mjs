@@ -56,13 +56,18 @@ async function inspectRing(page,ownerId){return page.evaluate(async id=>{
  ring.computeWorldMatrix(true);const p=ring.getAbsolutePosition(),bounds=ring.getBoundingInfo().boundingBox,size=bounds.maximumWorld.subtract(bounds.minimumWorld),diameter=ring.metadata?.localDiameter;
  const largest=Math.max(size.x,size.y,size.z);
  if(!(diameter>=.018&&diameter<=.03&&largest>.004&&largest<.04))throw Error('Ring scale is not plausible on '+id+': '+JSON.stringify({diameter,worldSize:size.asArray()}));
- const axis=ring.getDirection(B.Vector3.Up()).normalize();
- const side=ring.getDirection(B.Vector3.Forward()).normalize();
- const up=ring.getDirection(B.Vector3.Right()).normalize();
+ const actorRoot=s.getTransformNodeByName(id);
+ if(!actorRoot)throw Error('Missing character root for Ring close-up: '+id);
+ actorRoot.computeWorldMatrix(true);
+ const rootPosition=actorRoot.getAbsolutePosition();
+ // Place the inspection camera beyond the hand, away from the torso, not along the finger into the palm.
+ const outward=p.subtract(rootPosition);outward.y=0;
+ if(outward.lengthSquared()<.01)outward.copyFrom(ring.getDirection(B.Vector3.Right()));
+ outward.normalize();
  const camera=s.activeCamera,engine=s.getEngine();
  engine.stopRenderLoop();
- camera.minZ=.001;camera.maxZ=5;camera.fov=.32;
- camera.position.copyFrom(p.add(axis.scale(.14)).add(side.scale(.055)).add(up.scale(.025)));
+ camera.minZ=.001;camera.maxZ=10;camera.fov=.28;
+ camera.position.copyFrom(p.add(outward.scale(.22)).add(new B.Vector3(0,.065,0)));
  camera.setTarget(p);
  // The game uses preserveDrawingBuffer:false. Keep a render-only loop alive so the
  // browser compositor captures the actual WebGL hand/ring frame, not a cleared buffer.
@@ -71,7 +76,7 @@ async function inspectRing(page,ownerId){return page.evaluate(async id=>{
  engine.runRenderLoop(()=>s.render());s.render();
  // Wait for two compositor frames before Playwright captures the WebGL canvas.
  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
- return {owner:id,bone:ring.parent.name,localDiameter:diameter,localThickness:ring.metadata.localThickness,worldSize:size.asArray(),vertices:ring.getTotalVertices(),ringPosition:p.asArray(),ringAxis:axis.asArray(),cameraPosition:camera.position.asArray(),cameraTarget:p.asArray(),inspectionCameraOnly:true,continuousWebGLCapture:true};
+ return {owner:id,bone:ring.parent.name,localDiameter:diameter,localThickness:ring.metadata.localThickness,worldSize:size.asArray(),vertices:ring.getTotalVertices(),ringPosition:p.asArray(),actorRootPosition:rootPosition.asArray(),cameraOutward:outward.asArray(),cameraPosition:camera.position.asArray(),cameraTarget:p.asArray(),inspectionCameraOnly:true,continuousWebGLCapture:true};
 },ownerId);}
 async function walk(page,key,ms){await page.keyboard.down(key);try{await page.waitForTimeout(ms);}finally{await page.keyboard.up(key);}}
 // Use the real keyboard to prove walking. Repositioning below only shortens the
