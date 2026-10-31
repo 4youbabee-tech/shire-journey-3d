@@ -32,3 +32,8 @@ Historical records below are retained for provenance only; the active matrix abo
 ## Exact-head browser correction — 90d8519
 
 Actions 41187332860 passed npm install, syntax and all source tests, then Chromium correctly exposed one stale browser assertion: the post-party Frodo ownership check still expected the previous oversized Ring range (0.035–0.065), while the new intended range is 0.018–0.03. The runtime handoff itself was not the failing condition; the stale expected-size assertion was. The assertion now matches the new finger-sized geometry. Re-run exact-head desktop/touch Chromium and inspect the new unobstructed Ring close-ups before accepting this candidate.
+
+
+## Visual-evidence correction — d4ffc8a
+
+Exact-head Actions 41187684996 passed source tests, desktop/touch Chromium, full opening playback and full birthday playback. However, inspection of the uploaded artifact showed both Ring close-up PNGs were black even though the report confirmed the real mesh and correct finger bone. The gameplay engine is created with `preserveDrawingBuffer:false`; the inspection helper stopped the render loop and issued only one manual render, so the browser screenshot did not retain the WebGL frame. The next QA helper keeps a render-only loop active during the close-up capture, hides the HUD, and uses an oblique camera around the finger. Until the new PNGs are inspected, Ring visual acceptance remains NOT PASSED; no merge or publication.

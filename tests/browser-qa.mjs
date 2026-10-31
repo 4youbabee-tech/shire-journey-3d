@@ -56,10 +56,20 @@ async function inspectRing(page,ownerId){return page.evaluate(id=>{
  ring.computeWorldMatrix(true);const p=ring.getAbsolutePosition(),bounds=ring.getBoundingInfo().boundingBox,size=bounds.maximumWorld.subtract(bounds.minimumWorld),diameter=ring.metadata?.localDiameter;
  const largest=Math.max(size.x,size.y,size.z);
  if(!(diameter>=.018&&diameter<=.03&&largest>.004&&largest<.04))throw Error('Ring scale is not plausible on '+id+': '+JSON.stringify({diameter,worldSize:size.asArray()}));
- const direction=ring.getDirection(B.Vector3.Up()).normalize();
- const camera=s.activeCamera;s.getEngine().stopRenderLoop();camera.minZ=.001;camera.fov=.52;camera.position.copyFrom(p.add(direction.scale(.18)).add(new B.Vector3(.035,.035,.025)));camera.setTarget(p);s.render();
+ const axis=ring.getDirection(B.Vector3.Up()).normalize();
+ const side=ring.getDirection(B.Vector3.Forward()).normalize();
+ const up=ring.getDirection(B.Vector3.Right()).normalize();
+ const camera=s.activeCamera,engine=s.getEngine();
+ engine.stopRenderLoop();
+ camera.minZ=.001;camera.maxZ=5;camera.fov=.32;
+ camera.position.copyFrom(p.add(axis.scale(.14)).add(side.scale(.055)).add(up.scale(.025)));
+ camera.setTarget(p);
+ // The game uses preserveDrawingBuffer:false. Keep a render-only loop alive so the
+ // browser compositor captures the actual WebGL hand/ring frame, not a cleared buffer.
+ const hud=document.querySelector('#hud');if(hud)hud.style.visibility='hidden';
  const debug=document.querySelector('#qa-diagnostics');if(debug)debug.style.display='none';
- return {owner:id,bone:ring.parent.name,localDiameter:diameter,localThickness:ring.metadata.localThickness,worldSize:size.asArray(),vertices:ring.getTotalVertices(),inspectionCameraOnly:true};
+ engine.runRenderLoop(()=>s.render());s.render();
+ return {owner:id,bone:ring.parent.name,localDiameter:diameter,localThickness:ring.metadata.localThickness,worldSize:size.asArray(),vertices:ring.getTotalVertices(),inspectionCameraOnly:true,continuousWebGLCapture:true};
 },ownerId);}
 async function walk(page,key,ms){await page.keyboard.down(key);try{await page.waitForTimeout(ms);}finally{await page.keyboard.up(key);}}
 // Use the real keyboard to prove walking. Repositioning below only shortens the
