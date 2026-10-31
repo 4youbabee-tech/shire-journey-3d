@@ -1,3 +1,4 @@
+import {terrainHeightAt} from '../dist/terrain.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -28,7 +29,7 @@ test('Babylon scene builds and advances native player collisions with houses and
   assert.ok(c.left.getChildMeshes().length>0);c.head.rotation.y=0;
  }
  // Walk straight into Bag End's solid front; the same native collision API is used by the game.
- w.body.position.set(11,.72,6);for(let i=0;i<100;i++){w.body.moveWithCollisions(new B.Vector3(0,-.04,.1));scene.render();}const house=w.colliders.find(m=>m.name==='hobbit house solid interior');const front=house.getBoundingInfo().boundingBox.minimumWorld.z;assert.ok(w.body.position.z<=front-w.body.ellipsoid.z+.01,'house wall must stop the full player ellipsoid');assert.ok(w.body.position.z>6,'player moves before hitting wall');assert.ok(w.body.position.y>.65,'player stays above ground');
+ w.body.position.set(11,.72+terrainHeightAt(11,6),6);for(let i=0;i<100;i++){w.body.moveWithCollisions(new B.Vector3(0,-.04,.1));scene.render();}const house=w.colliders.find(m=>m.name==='hobbit house solid interior');const front=house.getBoundingInfo().boundingBox.minimumWorld.z;assert.ok(w.body.position.z<=front-w.body.ellipsoid.z+.01,'house wall must stop the full player ellipsoid');assert.ok(w.body.position.z>6,'player moves before hitting wall');assert.ok(w.body.position.y>.65,'player stays above ground');
  w.body.position.set(MAP_BOUNDS.maxX-3,.72,0);for(let i=0;i<80;i++){w.body.moveWithCollisions(new B.Vector3(.1,-.04,0));scene.render();}assert.ok(w.body.position.x<MAP_BOUNDS.maxX-.5,'expanded eastern boundary must stop player');assert.ok(w.body.position.x>MAP_BOUNDS.maxX-3,'player can traverse expanded lanes before hitting boundary');console.log(JSON.stringify({sceneMeshes:scene.meshes.length,triangles:scene.meshes.reduce((n,m)=>n+m.getTotalIndices()/3,0),...w.stats}));engine.dispose();
 });
 test('all HTML local scripts and styles exist; no external runtime asset calls',()=>{const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');for(const path of ['vendor/babylon.js','game.mjs','style.css']){assert.ok(html.includes(path));assert.ok(readFileSync(new URL('../dist/'+path,import.meta.url)).length);}assert.ok(!/https?:\/\//.test(html));});

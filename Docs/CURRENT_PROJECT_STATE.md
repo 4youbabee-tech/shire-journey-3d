@@ -1,3 +1,9 @@
+# 0.11.0 terrain continuity candidate
+
+Bag End now rises above the party meadow on an actual walkable hill. Terrain, road edges, house terraces, collision hulls, vegetation, actor feet, saves and the player camera share the same elevation model. Native tests exercise the real route up to the Bag End interaction and back down. See [terrain continuity](TERRAIN_CONTINUITY.md) for source relationship and acceptance details. This candidate is kept separate from the reviewed 0.10.0 Ring release until its own browser and public-identity gates pass.
+
+## Earlier production receipts
+
 # 0.10.0 — visible Ring legacy and world collision candidate
 
 The birthday continues into a 28-second in-world Bag End bequest. The gold Ring follows a real character hand, drops to the floor, passes to Frodo, then disappears inside a sealed envelope. Canonical results follow natural completion or explicit Skip. Old completed saves have a journal replay; visiting Bag End afterward shows the sealed envelope on the writing desk. All lines and sound cues are original. Source ordering and validation are recorded in [RING_LEGACY_PRODUCTION.md](RING_LEGACY_PRODUCTION.md).

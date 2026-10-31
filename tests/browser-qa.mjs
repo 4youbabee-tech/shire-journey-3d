@@ -87,8 +87,16 @@ try{
  await still(page,'desktop-audio-settings.png');await page.locator('#journal-close').click();
  const walkEvidence=await realWalk(page);await still(page,'desktop-moving.png');assert.equal((await snap(page)).state.gandalfMet,true);await qaReposition(page,8,5.5);
  await still(page,'desktop-arrived.png');await still(page,'desktop-enhanced-hero-0.6.png');
- // Enter the real Babylon room using the gameplay key, inspect the 3D interior and exit.
- await qaReposition(page,11,8.2);await page.waitForTimeout(1000);await still(page,'desktop-home-frontage.png');
+ // The new terrain gets a real keyboard route, not a teleport to its door.
+ await qaReposition(page,11,-5);const hillFrom=await snap(page);
+ await page.keyboard.down('w');try{await page.waitForFunction(()=>window.__SHIRE__.snapshot().position.z>=7.7,null,{timeout:90000});}finally{await page.keyboard.up('w');}
+ await page.waitForFunction(()=>{
+  const B=window.BABYLON,scene=B.Engine.LastCreatedScene,root=scene.getTransformNodeByName('player'),body=scene.getMeshByName('player collision ellipsoid'),ground=scene.getMeshByName('village walkable ground');
+  const p=B.Vector3.Project(root.position.add(new B.Vector3(0,1,0)),B.Matrix.Identity(),scene.getTransformMatrix(),scene.activeCamera.viewport.toGlobal(scene.getEngine().getRenderWidth(),scene.getEngine().getRenderHeight()));
+  return Math.abs(body.position.y-.72-ground.getHeightAtCoordinates(body.position.x,body.position.z))<.2&&p.z>0&&p.z<1&&p.x>30&&p.x<scene.getEngine().getRenderWidth()-30&&p.y>30&&p.y<scene.getEngine().getRenderHeight()-80;
+ },null,{timeout:30000});
+ const hillArrival=await snap(page);assert.ok(hillArrival.position.y>2.2);assert.ok(Math.abs(hillArrival.position.x-11)<.25);
+ await still(page,'desktop-home-frontage.png');
  await page.locator('#interaction:not([hidden])').waitFor({timeout:20000});
  await page.keyboard.press('e');
  await page.waitForFunction(()=>window.__SHIRE__.snapshot().inside,{timeout:25000});
@@ -97,6 +105,7 @@ try{
  assert.ok((await snap(page)).indoorStats.decor>=30,'A genuinely furnished 3D interior is rendered');
  await page.keyboard.press('e');
  await page.waitForFunction(()=>!window.__SHIRE__.snapshot().inside,{timeout:25000});
+ await page.keyboard.down('s');try{await page.waitForFunction(()=>window.__SHIRE__.snapshot().position.z<=-3,null,{timeout:90000});}finally{await page.keyboard.up('s');}const hillReturn=await snap(page);
  await qaReposition(page,8,5.5);
  await talk(page);assert.equal(await page.locator('#portrait svg').count(),1,'Bilbo SVG portrait visible');assert.ok(await page.locator('#npc-voice').isVisible(),'Browser narration button present');await assertFaceVisible(page,'bilbo');await still(page,'desktop-dialogue.png');
  await page.locator('#npc-chat-input').fill('من أنت؟');await page.locator('#npc-chat-send').click();
@@ -127,7 +136,7 @@ try{
  assert.equal((await snap(page)).state.bilboGone,true,'Bilbo departs after the celebration');
  await still(page,'desktop-after-birthday.png');
  await still(page,'desktop-completed.png');await qaReposition(page,-12,-5);await still(page,'desktop-garden-life.png');
- report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
+ report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,hillWalkEvidence:{from:hillFrom.position,arrival:hillArrival.position,returned:hillReturn.position,realKeyboard:true},qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
  // Inspect the real asset at its existing world position; no character teleport.
  report.desktop.characterRig=await page.evaluate(()=>{
   const B=window.BABYLON,s=B.Engine.LastCreatedScene;

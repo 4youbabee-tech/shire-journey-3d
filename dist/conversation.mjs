@@ -1,4 +1,4 @@
-// Original Arabic character conversation constrained to F1-01 (before Bilbo leaves).
+// Original Arabic character conversation scoped to the before/after states of F1-01.
 // This is an offline, intent-aware conversation engine, NOT a hosted generative LLM.
 // Save stores small topical memories only; player text is never persisted.
 export const STORY_WINDOW = Object.freeze({id:'F1-01',title:'تحضيرات عيد ميلاد بيلبو',status:'OPENING_SAFE_WINDOW',source:'FILM-CANON CONTEXT',dialogue:'ORIGINAL-GAME'});
@@ -65,18 +65,24 @@ const SCRIPT={
   unknown:'يسعدني أن نتحدث. أسأل نفسي أحيانًا كيف تبدو البلاد وراء تلال الشاير، لكنني هنا اليوم لأساعد في الاستعدادات.',
  }
 };
+const AFTER_PARTY={
+ sam:{ring:'لا علم لي بهذه الأمور الخاصة. أعتني بالحديقة وأترك أسئلة أصحاب البيت لهم.',party:'انتهت الحفلة وبقي ترتيب الساحة والسلال. سنذكر تلك الأنوار طويلًا.',fireworks:'ما زلت أتذكر الألعاب النارية فوق التلال. سأجمع ما بقي من الزينة قبل العودة إلى الحديقة.',apple:'انتهت سلال الاحتفال. يمكنك زيارة البستان الآن على مهل، من دون أن تنتظر منك الحفلة شيئًا.',direction:'البستان غرب الطريق وبيت باغنز عند الباب الأخضر. بيلبو غادر، لكن فرودو ما زال هنا.',friends:'غادر بيلبو بعد الاحتفال. أحب أن أرى فرودو محاطًا بأصدقائه في هذه الأيام.',help:'دعنا نرتّب الحديقة، وإن التقيت فرودو فابقَ بقربه قليلًا؛ البيت يبدو أهدأ بعد سفر عمه.',unknown:'أفكر اليوم في الحديقة وفي البيت بعد رحيل بيلبو. ما الذي تريد أن تعرفه عن الشاير؟'},
+ frodo:{ring:'ترك عمي الخاتم في البيت. صار محفوظًا في ظرف مختوم، وأحتاج إلى نصيحة غاندالف قبل أن أفهم أكثر.',party:'كانت ليلة لا تشبه أي ليلة أخرى. ما زلت أستعيد الوجوه والأنوار، ثم لحظة مغادرة عمي.',fireworks:'أذكر الأضواء فوق الشجرة، لكن هدوء البيت بعد الحفلة هو ما يشغلني الآن.',apple:'شكرًا لمن اهتم بسلال البستان. انتهت التحضيرات والاحتفال، وبقيت لنا ذكريات هذا اليوم.',direction:'يمكنك زيارة باج إند من الباب الأخضر. أما أنا فما زلت في الشاير؛ لم أحدد رحلة جديدة بعد.',friends:'عمي بيلبو سافر. سام قريب من الحديقة وغاندالف لم يترك أسئلتي بلا اهتمام.',help:'يسعدني أن تبقى قريبًا من البيت قليلًا. لست مستعدًا لمغامرة جديدة قبل أن أفهم ما تركه عمي.',unknown:'كل شيء يبدو مألوفًا في الشاير، لكن البيت تغيّر برحيل عمي. اسألني عنه أو عن هذه الليلة.'},
+ gandalf:{ring:'ترك بيلبو خاتمه لفرودو. بعض الأسئلة تحتاج إلى تحقّق هادئ؛ لا أريد أن أستبق ما نعرفه.',party:'انتهى الاحتفال وغادر بيلبو. ينبغي أن نمنح فرودو وقتًا يستوعب فيه هذا التغيير.',fireworks:'صارت الأنوار ذكرى جميلة. لا نحتاج الآن إلى مفاجأة أخرى، بل إلى بعض الهدوء.',apple:'انتهى عمل سلال الحفلة. العناية بأهل البيت الآن أهم من الاستعداد لاحتفال مضى.',direction:'فرودو ما زال في الشاير وباج إند قريب من الباب الأخضر. لن نبدأ سفرًا قبل أن يتضح ما يلزم.',friends:'اختار بيلبو طريقه، وفرودو يحتاج إلى نصيحة وصحبة مأمونة. سام لا يبتعد عن هذه الحدائق.',help:'الزم الهدوء ولا تستعجل الرحيل. سأتثبت من بعض الأسئلة قبل أن أنصح فرودو بخطوته التالية.',unknown:'للرحيل وقته وللتفكير وقته. الآن نهتم بفرودو وبالبيت بعد مغادرة بيلبو.'}
+};
 export function replyToCharacter(state,id,userText){
+ if(state.partyCompleted&&id==='bilbo')return {text:'بيلبو غادر الشاير بعد الحفلة؛ لم يعد متاحًا للمحادثة هنا.',topic:'departed',mode:'offline-contextual',provenance:'ORIGINAL-GAME',storyWindow:STORY_WINDOW.id};
  if(!ACTORS.includes(id))return {text:'الشخصية غير متاحة.',topic:'invalid',mode:'offline-contextual'};
  const msg=normalize(userText).slice(0,170);
  if(!msg)return {text:'تفضل، أنا أسمعك.',topic:'empty',mode:'offline-contextual'};
  const topic=INTENTS.find(([,pattern])=>pattern.test(msg))?.[0]||'unknown';
  const entries=Array.isArray(state.memories)?state.memories:[];
  const previous=entries.filter(e=>e.id===id&&e.topic===topic).length;
- const raw=SCRIPT[id][topic]??SCRIPT[id].unknown;
+ const raw=state.partyCompleted?(AFTER_PARTY[id][topic]??AFTER_PARTY[id].unknown):(SCRIPT[id][topic]??SCRIPT[id].unknown);
  const text=typeof raw==='function'?raw(state):raw;
  if(!Array.isArray(state.memories))state.memories=[];
  state.memories.push({id,topic});
  if(state.memories.length>16)state.memories.splice(0,state.memories.length-16);
- const preface=previous>0&&topic!=='unknown'?'كما قلت لك من قبل: ':'';
+ const preface=previous>0&&topic!=='unknown'?(state.partyCompleted?'أذكر حديثنا. ':'كما قلت لك من قبل: '):'';
  return {text:preface+text,topic,remembered:previous>0,mode:'offline-contextual',provenance:'ORIGINAL-GAME',storyWindow:STORY_WINDOW.id};
 }
