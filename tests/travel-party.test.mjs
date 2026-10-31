@@ -14,7 +14,7 @@ test('Sam starts and resets on his own terrain height, follows the hill, and res
  const at=(x,z)=>{body.position.set(x,.72+terrainHeightAt(x,z),z);player.root.position.set(x,terrainHeightAt(x,z),z);};
  const grounded=()=>assert.ok(Math.abs(sam.root.position.y-terrainHeightAt(sam.root.position.x,sam.root.position.z))<1e-5,'Sam feet must meet his terrain, including after a door transition');
  try{
-  at(11,9);party.setActive(true);grounded();
+  sam.root.position.set(-6,0,1);at(11,9);party.resetFollower();assert.deepEqual(sam.root.position.asArray(),[-6,0,1],'visiting a house before departure must leave gardener Sam at his garden');party.setActive(true);grounded();
   const start=sam.root.position.clone();
   for(let i=0;i<150;i++){at(11,9+i*.035);party.update(1/60);scene.render();grounded();}
   assert.ok(B.Vector3.Distance(sam.root.position,start)>.5,'the companion must actually move');
