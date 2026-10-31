@@ -1,6 +1,7 @@
 // Additional live canvas + post-master Web Audio recording. Original Playwright
 // UI video remains separate; this stream does not pretend to include the DOM HUD.
 import {writeFile} from 'node:fs/promises';import {resolve} from 'node:path';import {execFileSync} from 'node:child_process';import assert from 'node:assert/strict';
+export function decodeRecorderDataURL(data){const marker=';base64,',at=data.indexOf(marker);assert.ok(data.startsWith('data:')&&at>5,'Missing recorder data URL boundary');const payload=data.slice(at+marker.length);assert.ok(/^[A-Za-z0-9+/=]+$/.test(payload),'Invalid recorder base64');return Buffer.from(payload,'base64');}
 export async function startLiveAV(page){
  return page.evaluate(()=>new Promise((resolve,reject)=>{
   const source=document.querySelector('#game'),scene=BABYLON.Engine.LastCreatedScene,audio=window.__SHIRE__.qaAudioStream();
@@ -17,7 +18,7 @@ export async function stopLiveAV(page,out,label){
   const state=window.__SHIRE_AV__;if(!state){resolve(null);return;}const scene=BABYLON.Engine.LastCreatedScene;scene.onAfterRenderObservable.remove(state.observer);
   state.recorder.onstop=()=>{if(state.error){reject(Error(state.error));return;}const blob=new Blob(state.chunks,{type:state.recorder.mimeType}),reader=new FileReader();reader.onerror=()=>reject(Error('A/V export failed'));reader.onload=()=>{for(const t of state.stream.getTracks())t.stop();window.__SHIRE_AV__=null;resolve({data:reader.result,frames:state.frames,captions:state.captions,wallSeconds:(performance.now()-state.start)/1000});};reader.readAsDataURL(blob);};state.recorder.stop();
  }));
- assert.ok(result&&result.frames>4,'A/V must contain actual rendered game frames');const raw=resolve(out,label+'-live-av-raw.webm'),file=resolve(out,label+'-live-av.webm');await writeFile(raw,Buffer.from(result.data.slice(result.data.indexOf(',')+1),'base64'));
+ assert.ok(result&&result.frames>4,'A/V must contain actual rendered game frames');const raw=resolve(out,label+'-live-av-raw.webm'),file=resolve(out,label+'-live-av.webm');await writeFile(raw,decodeRecorderDataURL(result.data));
  // Stream-copy only: write seek/duration metadata, without retiming or inserting audio.
  execFileSync('ffmpeg',['-v','error','-y','-i',raw,'-c','copy',file],{timeout:30000});
  const probe=JSON.parse(execFileSync('ffprobe',['-v','error','-show_entries','stream=codec_type,codec_name,width,height','-show_entries','format=duration','-of','json',file],{encoding:'utf8'}));assert.ok(probe.streams.some(s=>s.codec_type==='video'));assert.ok(probe.streams.some(s=>s.codec_type==='audio'));
