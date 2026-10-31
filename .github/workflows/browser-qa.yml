@@ -32,6 +32,7 @@ jobs:
           node tests/browser-qa.mjs
           QA_OUT=qa-evidence/full-opening node tests/opening-playback.mjs
           QA_OUT=qa-evidence/full-party node tests/party-playback.mjs
+          QA_OUT=qa-evidence/full-revelation node tests/revelation-playback.mjs
       - name: Verify the permanent public game after main deployment
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:

@@ -1,3 +1,4 @@
+import {journeyChapter,ringDangerKnown} from './journey-state.mjs';
 // Original Arabic character conversation scoped to the before/after states of F1-01.
 // This is an offline, intent-aware conversation engine, NOT a hosted generative LLM.
 // Save stores small topical memories only; player text is never persisted.
@@ -78,11 +79,13 @@ export function replyToCharacter(state,id,userText){
  const topic=INTENTS.find(([,pattern])=>pattern.test(msg))?.[0]||'unknown';
  const entries=Array.isArray(state.memories)?state.memories:[];
  const previous=entries.filter(e=>e.id===id&&e.topic===topic).length;
- const raw=state.partyCompleted?(AFTER_PARTY[id][topic]??AFTER_PARTY[id].unknown):(SCRIPT[id][topic]??SCRIPT[id].unknown);
+ const travelling=['departure','roads'].includes(state.journeyPhase);
+ const roadText={ring:'سمعت حديث الخاتم وعرفت أن بقاءه هنا يعرّض البيت للخطر. سنخفيه ونلازم الطريق بحذر؛ لا نعرف بعد ما ينتظرنا.',party:'صارت ليلة بيلبو ذكرى وراءنا. الزاد جاهز، والآن أرافق فرودو في أول خطوات السفر.',apple:'حملت ما نحتاجه من زاد. ستظل الحديقة عزيزة عليّ، لكنني لن أترك فرودو وحده.',direction:'لنلازم الدرب وننتبه إلى المسافرين. وجهتنا التالية نحو معبر النهر، ثم بري.',friends:'أنا وفرودو نسافر معًا. مضى غاندالف بحصانه، ولم ينضم إلينا رفاق جدد بعد.',help:'ابقَ قريبًا من الدرب، وراقب الأصوات والغرباء. لا نحتاج إلى لفت الأنظار.',unknown:'نحن في أول الطريق يا سيد فرودو. اسألني عن الزاد أو الرفقة؛ أمّا ما وراء التلال فلم أره بعد.'};
+ const raw=travelling&&id==='sam'?(roadText[topic]||roadText.unknown):ringDangerKnown(state,id)&&topic==='ring'?'كشف غاندالف حقيقة الخاتم. علينا أن نخفيه ونبتعد به عن الشاير؛ لا نعرف ما ستكشفه الأيام.':state.partyCompleted?(AFTER_PARTY[id][topic]??AFTER_PARTY[id].unknown):(SCRIPT[id][topic]??SCRIPT[id].unknown);
  const text=typeof raw==='function'?raw(state):raw;
  if(!Array.isArray(state.memories))state.memories=[];
  state.memories.push({id,topic});
  if(state.memories.length>16)state.memories.splice(0,state.memories.length-16);
  const preface=previous>0&&topic!=='unknown'?(state.partyCompleted?'أذكر حديثنا. ':'كما قلت لك من قبل: '):'';
- return {text:preface+text,topic,remembered:previous>0,mode:'offline-contextual',provenance:'ORIGINAL-GAME',storyWindow:STORY_WINDOW.id};
+ return {text:preface+text,topic,remembered:previous>0,mode:'offline-contextual',provenance:'ORIGINAL-GAME',storyWindow:journeyChapter(state)};
 }

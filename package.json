@@ -1,11 +1,11 @@
 {
   "name": "shire-journey-browser",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check dist/game.mjs && node --check dist/world.mjs && node --check dist/simulation.mjs && node --check dist/conversation.mjs && node --check dist/portraits.mjs && node --check dist/ambience.mjs && node --check dist/adaptive-quality.mjs && node --check dist/life.mjs && node --check dist/village-layout.mjs && node --check dist/map.mjs && node --check dist/arrival.mjs && node --check dist/interior.mjs && node --check dist/party.mjs && node --check dist/hero-art.mjs && node --check dist/score.mjs && node --check dist/characters.mjs && node --check dist/garden-tools.mjs && node --check dist/actor-collision.mjs && node --check dist/surface-art.mjs && node --check dist/nature.mjs && node --check dist/home-collision.mjs && node --check dist/ring-legacy.mjs && node --check dist/beard-art.mjs && node --check dist/terrain.mjs && node --check dist/village-foley.mjs",
+    "check": "node --check dist/game.mjs && node --check dist/world.mjs && node --check dist/simulation.mjs && node --check dist/conversation.mjs && node --check dist/portraits.mjs && node --check dist/ambience.mjs && node --check dist/adaptive-quality.mjs && node --check dist/life.mjs && node --check dist/village-layout.mjs && node --check dist/map.mjs && node --check dist/arrival.mjs && node --check dist/interior.mjs && node --check dist/party.mjs && node --check dist/hero-art.mjs && node --check dist/score.mjs && node --check dist/characters.mjs && node --check dist/garden-tools.mjs && node --check dist/actor-collision.mjs && node --check dist/surface-art.mjs && node --check dist/nature.mjs && node --check dist/home-collision.mjs && node --check dist/ring-legacy.mjs && node --check dist/beard-art.mjs && node --check dist/terrain.mjs && node --check dist/village-foley.mjs && node --check dist/journey-state.mjs && node --check dist/revelation.mjs && node --check dist/travel-party.mjs && node --check dist/hearth-fire.mjs && node --check tests/revelation-playback.mjs",
     "postinstall": "node scripts/prepare-engine.mjs && node scripts/stamp-build.mjs",
     "prepare-engine": "node scripts/prepare-engine.mjs"
   },

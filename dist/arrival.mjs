@@ -123,5 +123,14 @@ export async function loadArrivalHorse(B,scene,arrival){
  let last=null;
  arrival.setHorse({holder,setMoving(moving){const next=moving?walk:idle;if(next!==last){last?.stop();next.start(true);last=next;}}});
  arrival.horse={skinnedMeshes:holder.getChildMeshes().filter(m=>m.skeleton).length,clips:instance.animationGroups.length};
+ // Reuse the sealed horse container for the later journey; independent skeleton/clips.
+ arrival.createTravelHorse=()=>{
+  const copy=container.instantiateModelsToScene(n=>'journey horse '+n,false,{doNotInstantiate:true}),root=new B.TransformNode('Gandalf travel horse',scene),body=new B.TransformNode('journey horse normalized rig',scene);body.parent=root;
+  for(const n of copy.rootNodes)n.parent=body;body.scaling.setAll(scale);body.position.y=-min*scale;
+  for(const m of body.getChildMeshes()){m.isPickable=false;m.receiveShadows=true;}
+  for(const g of copy.animationGroups)g.stop();let current=null;
+  return {root,setMoving(on){const next=copy.animationGroups.find(g=>g.name.endsWith(on?'Walk':'Idle'));if(next!==current){current?.stop();next.start(true);current=next;}},stop(){current?.stop();root.setEnabled(false);}};
+ };
+
 }
 
