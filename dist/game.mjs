@@ -1,3 +1,4 @@
+import {createRingLegacy,legacyBeat,LEGACY_SECONDS} from './ring-legacy.mjs';
 import {loadNature} from './nature.mjs';
 import {loadCharacters,CHARACTER_HEIGHTS} from './characters.mjs';
 import {BUILD} from './build-info.mjs';
@@ -15,7 +16,7 @@ import {portraitSVG} from './portraits.mjs';
 import {SAVE_KEY,NPCS,APPLES,frameDelta,freshState,restoreState,objective,nearestInteractable,talk,act,collect,dialogue,LORE} from './simulation.mjs';
 const $=s=>document.querySelector(s),canvas=$('#game');
 const qaEnabled=new URLSearchParams(location.search).has('qa');
-let uiElapsed=0;const labelBindings=[];let qualityControl=null,arrival=null,cinematic=false,cinematicTime=0,cinematicStart=0,mapOpen=false,inside=false,interior=null,interiorLightState=null,outdoorMeshes=[],returnPosition={x:11,z:8.2},priorView={yaw:0,zoom:7.8},partyFx=null,partyActive=false,partyStart=0,partyOriginal=new Map();
+let uiElapsed=0;const labelBindings=[];let qualityControl=null,arrival=null,cinematic=false,cinematicTime=0,cinematicStart=0,mapOpen=false,inside=false,interior=null,interiorLightState=null,outdoorMeshes=[],returnPosition={x:11,z:8.2},priorView={yaw:0,zoom:7.8},partyFx=null,partyActive=false,partyStart=0,partyOriginal=new Map(),ringLegacy=null;
 let importedActors,engine,scene,world,state,started=false,activeNPC=null,journalOpen=false,yaw=0,pitch=.44,zoom=7.8,keys=new Set(),drag=null,joystick={x:0,y:0},toastTimer,saveTimer=0,time=0,soundEnabled=false,audio=null,audioTimer=null,destination=null,spokenText='';
 const errors=[],telemetry={frames:0,seconds:0,collisions:0,interactions:0,collects:0,saves:0};
 window.addEventListener('unhandledrejection',e=>fatal(e.reason?.message||String(e.reason)));
@@ -89,7 +90,7 @@ function beginParty(resume=false){
  else if(!act(state,'start-party'))return;
  partyActive=true;partyStart=performance.now();partyOriginal=new Map();keys.clear();destination=null;
  const positions={bilbo:[-3,25],frodo:[0,25],gandalf:[-6,26],sam:[2.7,25],'farmer-ada':[-4.8,23.2],'farmer-berin':[4.5,26.4],'gardener-nell':[.3,27.4]};
- for(const c of world.characters){if(!positions[c.id])continue;partyOriginal.set(c.id,c.root.position.clone());c.root.position.set(positions[c.id][0],0,positions[c.id][1]);c.root.rotation.y=Math.PI;}
+ for(const c of world.characters){if(!positions[c.id])continue;partyOriginal.set(c.id,{position:c.root.position.clone(),rotation:c.root.rotation.clone()});c.root.position.set(positions[c.id][0],0,positions[c.id][1]);c.root.rotation.y=Math.PI;}
  const B=window.BABYLON,V=B.Vector3;
  // View from the north path, away from the roof mound that obscured the first party screenshot.
  scene.activeCamera.position.set(4,5.7,34);scene.activeCamera.setTarget(new V(-1,1.8,24));
@@ -98,9 +99,9 @@ function beginParty(resume=false){
 }
 function finishParty(){
  if(!partyActive)return;
- partyActive=false;partyFx?.stop();
+ partyActive=false;partyFx?.stop();ringLegacy?.end();
  if(!state.partyCompleted)act(state,'party-finalize');
- for(const c of world.characters){const old=partyOriginal.get(c.id);if(old)c.root.position.copyFrom(old);}
+ for(const c of world.characters){const old=partyOriginal.get(c.id);if(old){c.root.position.copyFrom(old.position);c.root.rotation.copyFrom(old.rotation);}}
  partyOriginal.clear();
  $('#party-cinematic').hidden=true;$('#hud').hidden=false;refresh();save();canvas.focus();
  notify('انتهت ليلة الاحتفال، وترك بيلبو خاتمه لفرودو قبل أن يغادر.');
@@ -110,7 +111,13 @@ async function toggleSound(){soundEnabled=!soundEnabled;$('#sound').textContent=
 function animate(dt){time+=dt;const B=window.BABYLON,V=B.Vector3;
  if(cinematic){cinematicTime=Math.min(ARRIVAL_DURATION,(performance.now()-cinematicStart)/1000);const pose=arrival.update(cinematicTime,scene.activeCamera);importedActors?.update(dt,null,false,pose);audio?.update(dt,{cart:pose.cartMoving,cartDistance:window.BABYLON.Vector3.Distance(scene.activeCamera.position,arrival.root.position)});$('#arrival-caption').textContent=arrivalBeat(cinematicTime);if(cinematicTime>=ARRIVAL_DURATION)endOpening();return;}
  if(partyActive){
-  const elapsed=Math.max(0,(performance.now()-partyStart)/1000);partyFx.frame(performance.now());
+  const elapsed=Math.max(0,(performance.now()-partyStart)/1000);
+  if(elapsed>=PARTY_SECONDS){
+   if(!ringLegacy?.active){partyFx.stop();if(!interior)interior=createBagEndInterior(B,scene);if(!ringLegacy)ringLegacy=createRingLegacy(B,scene,world,interior);ringLegacy.begin();}
+   const t=elapsed-PARTY_SECONDS,pose=ringLegacy.update(t);importedActors?.update(dt,null,false,pose);$('#party-caption').textContent=legacyBeat(t).caption;
+   if(t>=LEGACY_SECONDS)finishParty();return;
+  }
+  partyFx.frame(performance.now());
   $('#party-caption').textContent=birthdayBeat(elapsed);
   for(const c of world.characters){if(!partyOriginal.has(c.id))continue;c.left.rotation.x=Math.sin(elapsed*2.5+c.root.uniqueId)*.28;c.right.rotation.x=-c.left.rotation.x;c.head.rotation.y=Math.sin(elapsed*.8+c.root.uniqueId)*.15;}
   importedActors?.update(dt,null,true);
@@ -143,7 +150,7 @@ function animate(dt){time+=dt;const B=window.BABYLON,V=B.Vector3;
  if(mapOpen&&telemetry.frames%20===0)drawVillageMap($('#village-map'),world.body.position,state.stage,state.apples);
   audio?.update(dt,{moving,wood:inside});importedActors?.update(dt,activeNPC,partyActive);telemetry.frames++;telemetry.seconds+=dt;if(qaEnabled&&telemetry.frames%15===0){const diag=$('#qa-diagnostics');if(diag)diag.textContent=JSON.stringify(snapshot());}
 }
-function snapshot(){return {version:BUILD.version,commit:BUILD.commit,storyWindow:STORY_WINDOW.id,state:structuredClone(state),position:{x:world?.body.position.x,y:world?.body.position.y,z:world?.body.position.z},started,activeNPC,journalOpen,camera:{yaw,pitch,zoom},fps:Math.round(engine?.getFps()||0),inside,indoorStats:interior?.stats||null,party:{active:partyActive,started:state?.partyStarted||false,completed:state?.partyCompleted||false,participants:partyActive?partyOriginal.size:0},cinematic:{active:cinematic,time:cinematicTime,duration:ARRIVAL_DURATION},audio:audio?{state:audio.state,score:audio.score,foley:audio.foley}:null,mapOpen,quality:qualityControl?.snapshot(),renderSize:engine?{width:engine.getRenderWidth(),height:engine.getRenderHeight(),scale:engine.getHardwareScalingLevel(),shadows:scene.shadowsEnabled}:null,meshes:scene?.meshes.length,triangles:scene?scene.meshes.reduce((n,m)=>n+m.getTotalIndices()/3,0):0,telemetry:{...telemetry},errors:[...errors],world:world?.stats};}
+function snapshot(){return {version:BUILD.version,commit:BUILD.commit,storyWindow:STORY_WINDOW.id,state:structuredClone(state),position:{x:world?.body.position.x,y:world?.body.position.y,z:world?.body.position.z},started,activeNPC,journalOpen,camera:{yaw,pitch,zoom},fps:Math.round(engine?.getFps()||0),inside,indoorStats:interior?.stats||null,party:{active:partyActive,started:state?.partyStarted||false,completed:state?.partyCompleted||false,participants:partyActive?partyOriginal.size:0,legacy:ringLegacy?.active?ringLegacy.beat:null},cinematic:{active:cinematic,time:cinematicTime,duration:ARRIVAL_DURATION},audio:audio?{state:audio.state,score:audio.score,foley:audio.foley}:null,mapOpen,quality:qualityControl?.snapshot(),renderSize:engine?{width:engine.getRenderWidth(),height:engine.getRenderHeight(),scale:engine.getHardwareScalingLevel(),shadows:scene.shadowsEnabled}:null,meshes:scene?.meshes.length,triangles:scene?scene.meshes.reduce((n,m)=>n+m.getTotalIndices()/3,0):0,telemetry:{...telemetry},errors:[...errors],world:world?.stats};}
 async function boot(){try{const B=window.BABYLON;if(!B)throw Error('تعذّر تحميل محرك Babylon.js. أعد تحميل الصفحة.');engine=new B.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,powerPreference:'default'});engine.loadingScreen={displayLoadingUI(){},hideLoadingUI(){}};scene=new B.Scene(engine);const camera=new B.UniversalCamera('third-person camera',new B.Vector3(0,5,-23),scene);camera.minZ=.15;camera.maxZ=200;camera.fov=.87;camera.inputs.clear();world=createWorld(B,scene,{deferredNature:true,deferredCharacters:true});await loadNature(B,scene,world);importedActors=await loadCharacters(B,scene,world);partyFx=createBirthdayEffects($('#party-fx'));arrival=createArrival(B,scene,world);await loadArrivalHorse(B,scene,arrival);state=readSave();world.body.position.set(state.position.x,.72,state.position.z);world.body.onCollide=()=>telemetry.collisions++;
  for(const npc of NPCS){const label=document.createElement('span');label.className='npc-label';label.id='label-'+npc.id;label.textContent=npc.name;label.hidden=true;$('#npc-labels').append(label);labelBindings.push({npc,el:label,character:world.characters.find(c=>c.id===npc.id)});}
  if(new URLSearchParams(location.search).has('qa')){const pre=document.createElement('pre');pre.id='qa-diagnostics';pre.style.cssText='position:fixed;left:5px;bottom:2px;max-width:95%;font:8px monospace;color:white;background:#0008;pointer-events:none;z-index:2;direction:ltr;white-space:pre-wrap;max-height:36px;overflow:hidden';document.body.append(pre);}

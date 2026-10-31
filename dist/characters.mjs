@@ -91,7 +91,8 @@ export async function loadCharacters(B,scene,world){
  world.stats.gardenToolRigs=actors.filter(c=>c.imported.gardenTool).length;world.stats.colliders=world.colliders.length;world.stats.importedCharacters=actors.length;world.stats.characterAssets='Quaternius CC0; authored natural Shire cast';world.stats.naturalCastRoles=4;world.stats.eyelidRigs=actors.filter(c=>c.imported.morphs.blink.length>=2).length;
  const focus=B.Vector3.Zero();
  return {actors,update(dt,activeNPC,party,cinema=null){for(const c of actors){let pose=null,target=null;
-  if(cinema){pose=c.id==='frodo'?cinema.frodoMode:c.id==='gandalf'?(['Talk','Board'].includes(cinema.frodoMode)?'RideTalk':'Ride'):null;if(['Talk','Board'].includes(cinema.frodoMode)&&['frodo','gandalf'].includes(c.id)){const other=actors.find(a=>a.id===(c.id==='frodo'?'gandalf':'frodo'));other.imported.head.computeWorldMatrix(true);target=other.imported.head.getAbsolutePosition().add(new B.Vector3(0,CHARACTER_HEIGHTS[other.id]*.06,0));}}
+  if(cinema?.actorModes){pose=cinema.actorModes[c.id]||'Idle';}
+  else if(cinema){pose=c.id==='frodo'?cinema.frodoMode:c.id==='gandalf'?(['Talk','Board'].includes(cinema.frodoMode)?'RideTalk':'Ride'):null;if(['Talk','Board'].includes(cinema.frodoMode)&&['frodo','gandalf'].includes(c.id)){const other=actors.find(a=>a.id===(c.id==='frodo'?'gandalf':'frodo'));other.imported.head.computeWorldMatrix(true);target=other.imported.head.getAbsolutePosition().add(new B.Vector3(0,CHARACTER_HEIGHTS[other.id]*.06,0));}}
   else if(c.id!=='player'&&B.Vector3.DistanceSquared(c.root.getAbsolutePosition(),world.body.position)<64){focus.copyFrom(world.body.position);focus.y+=.55;target=focus;}
   c.imported.update(dt,{speaking:c.id===activeNPC,celebrating:party,pose,seatY:cinema?.seatY??null,lookTarget:target?.clone()||null});
  }},dispose(){scene.onBeforeAnimationsObservable.remove(before);scene.onAfterAnimationsObservable.remove(after);}};
