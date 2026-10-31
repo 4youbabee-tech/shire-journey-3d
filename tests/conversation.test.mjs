@@ -26,3 +26,12 @@ test('dialogue responds to the actual side-activity stage without touching canon
  assert.equal(state.stage,2);
  assert.equal(replyToCharacter(state,'frodo','الخاتم').storyWindow,'F1-01');
 });
+test('after the bequest, villagers remember the departure without learning future Ring secrets',()=>{
+ const s={...fresh(),stage:5,partyCompleted:true,ringPassed:true};
+ assert.match(replyToCharacter(s,'frodo','الخاتم').text,/ظرف مختوم/);
+ const sam=replyToCharacter(s,'sam','الخاتم').text;assert.doesNotMatch(sam,/ساورون|فرودو|موردور/);
+ assert.match(replyToCharacter(s,'sam','أين بيلبو؟').text,/غادر/);
+ assert.match(replyToCharacter(s,'gandalf','الاحتفال').text,/انتهى/);
+ assert.equal(replyToCharacter(s,'bilbo','مرحبا').topic,'departed');
+ assert.doesNotMatch(replyToCharacter(s,'gandalf','خبرني عن الخاتم ساورون').text,/ساورون|بركان|موردور/);
+});

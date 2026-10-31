@@ -9,3 +9,5 @@ The ground is one 80-subdivision render/collision mesh. Road edges independently
 Native acceptance uses the actual Babylon collision solver: climb onto the terrace, reach the real door interaction and walk back down without reset or falling. Both isolated terrain and full-world traversal are tested. Browser raster, return-from-interior, natural scenes, save and measured performance remain the next acceptance gates before this terrain branch can merge.
 
 Reference: https://www.hobbitontours.com/discover/our-story/ . Modern tourist interiors and additions are not treated as Fellowship canon.
+
+The same cohort repairs after-party conversation context: Sam no longer directs the player to departed Bilbo, the lore choices remember the completed birthday, and private Ring knowledge stays with Frodo/Gandalf. Original Arabic replies distinguish remembrance from future spoilers; Bilbo cannot answer after departure. Source regression tests cover those gates.
