@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import '../dist/vendor/babylon.js';
 import {createOneRing,syncOneRingOwner} from '../dist/ring-prop.mjs';
 const B=globalThis.BABYLON;
-test('One Ring is finger-proportioned, attached to the real finger bone, and transfers from Bilbo to Frodo',()=>{
+test('One Ring is delicate, aligned to the real finger bone, and transfers from Bilbo to Frodo',()=>{
  const engine=new B.NullEngine(),scene=new B.Scene(engine);
  try{
   const material=new B.StandardMaterial('gold',scene);
@@ -16,15 +16,18 @@ test('One Ring is finger-proportioned, attached to the real finger bone, and tra
   const frodoRing=createOneRing(B,scene,{actorId:'frodo',parent:frodoFinger,nextBone:frodoNext,material});
   for(const ring of [bilboRing,frodoRing]){
    assert.ok(ring.getTotalVertices()>0);
-   assert.ok(ring.metadata.localDiameter>=.035&&ring.metadata.localDiameter<=.065,'ring diameter must stay finger-sized');
-   assert.ok(ring.metadata.localThickness/ring.metadata.localDiameter<=.17,'ring band must remain delicate');
+   assert.ok(ring.metadata.localDiameter>=.018&&ring.metadata.localDiameter<=.03,'ring diameter must stay delicate and finger-sized');
+   assert.ok(ring.metadata.localThickness/ring.metadata.localDiameter<=.13,'ring band must remain thin');
    ring.computeWorldMatrix(true);
    const box=ring.getBoundingInfo().boundingBox,size=box.maximumWorld.subtract(box.minimumWorld);
-   assert.ok(Math.max(size.x,size.y,size.z)<.08,'ring must not exceed a small fraction of the character');
+   assert.ok(Math.max(size.x,size.y,size.z)<.04,'ring must stay smaller than the finger width');
+   const expected=ring.metadata.fingerSegmentLength;
+   assert.ok(expected>.01,'finger segment measurement must be valid');
+   const aligned=ring.getDirection(B.Vector3.Up()).normalize().dot(new B.Vector3(.08,.04,0).normalize());
+   assert.ok(aligned>.999,'ring opening axis must follow the actual finger direction');
   }
   assert.equal(bilboRing.parent,bilboFinger);assert.equal(frodoRing.parent,frodoFinger);
-  assert.equal(bilboRing.metadata.attachedBone,'bilbo ring_01_r');
-  assert.equal(frodoRing.metadata.attachedBone,'frodo ring_01_r');
+  assert.equal(bilboRing.metadata.attachedBone,'bilbo ring_01_r');assert.equal(frodoRing.metadata.attachedBone,'frodo ring_01_r');
   const actors=[{id:'bilbo',root:bilboRoot,imported:{ring:bilboRing}},{id:'frodo',root:frodoRoot,imported:{ring:frodoRing}}];
   assert.equal(syncOneRingOwner(actors,'bilbo'),'bilbo');assert.ok(bilboRing.isEnabled());assert.ok(!frodoRing.isEnabled());
   bilboRoot.setEnabled(false);

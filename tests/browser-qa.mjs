@@ -47,7 +47,7 @@ async function ready(page){
  assert.equal((await snap(page)).world.importedCharacters,8,'All eight visible roles use imported GLB rigs');
  if(process.env.GITHUB_ACTIONS)assert.equal((await snap(page)).commit,checkoutSha,'Published build identity matches tested checkout');
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
- const ringStart=await page.evaluate(()=>{const s=window.BABYLON.Engine.LastCreatedScene,b=s.getMeshByName('bilbo heirloom ring'),f=s.getMeshByName('frodo heirloom ring');return {bilbo:!!b?.isEnabled(),frodo:!!f?.isEnabled(),bone:b?.parent?.name,diameter:b?.metadata?.localDiameter};});assert.equal(ringStart.bilbo,true,'Bilbo visibly wears the 3D Ring before the birthday outcome');assert.equal(ringStart.frodo,false,'Frodo must not own the Ring early');assert.ok(ringStart.bone.endsWith(' ring_01_r'));assert.ok(ringStart.diameter>=.035&&ringStart.diameter<=.065,'Bilbo Ring must have a real finger-sized diameter');
+ const ringStart=await page.evaluate(()=>{const s=window.BABYLON.Engine.LastCreatedScene,b=s.getMeshByName('bilbo heirloom ring'),f=s.getMeshByName('frodo heirloom ring');return {bilbo:!!b?.isEnabled(),frodo:!!f?.isEnabled(),bone:b?.parent?.name,diameter:b?.metadata?.localDiameter};});assert.equal(ringStart.bilbo,true,'Bilbo visibly wears the 3D Ring before the birthday outcome');assert.equal(ringStart.frodo,false,'Frodo must not own the Ring early');assert.ok(ringStart.bone.endsWith(' ring_01_r'));assert.ok(ringStart.diameter>=.018&&ringStart.diameter<=.03,'Bilbo Ring must have a delicate finger-sized diameter');
 }
 async function inspectRing(page,ownerId){return page.evaluate(id=>{
  const B=window.BABYLON,s=B.Engine.LastCreatedScene,ring=s.getMeshByName(id+' heirloom ring');
@@ -55,9 +55,10 @@ async function inspectRing(page,ownerId){return page.evaluate(id=>{
  if(ring.parent?.name!==id+' ring_01_r')throw Error('Ring is not attached to the real ring finger on '+id);
  ring.computeWorldMatrix(true);const p=ring.getAbsolutePosition(),bounds=ring.getBoundingInfo().boundingBox,size=bounds.maximumWorld.subtract(bounds.minimumWorld),diameter=ring.metadata?.localDiameter;
  const largest=Math.max(size.x,size.y,size.z);
- if(!(diameter>=.035&&diameter<=.065&&largest>.006&&largest<.12))throw Error('Ring scale is not plausible on '+id+': '+JSON.stringify({diameter,worldSize:size.asArray()}));
- const direction=ring.parent.getDirection(B.Vector3.Forward());if(direction.lengthSquared()<1e-6)direction.set(0,0,-1);direction.normalize();
- const camera=s.activeCamera;s.getEngine().stopRenderLoop();camera.minZ=.001;camera.fov=.52;camera.position.copyFrom(p.add(direction.scale(.18)).add(new B.Vector3(0,.045,0)));camera.setTarget(p);s.render();
+ if(!(diameter>=.018&&diameter<=.03&&largest>.004&&largest<.04))throw Error('Ring scale is not plausible on '+id+': '+JSON.stringify({diameter,worldSize:size.asArray()}));
+ const direction=ring.getDirection(B.Vector3.Up()).normalize();
+ const camera=s.activeCamera;s.getEngine().stopRenderLoop();camera.minZ=.001;camera.fov=.52;camera.position.copyFrom(p.add(direction.scale(.18)).add(new B.Vector3(.035,.035,.025)));camera.setTarget(p);s.render();
+ const debug=document.querySelector('#qa-diagnostics');if(debug)debug.style.display='none';
  return {owner:id,bone:ring.parent.name,localDiameter:diameter,localThickness:ring.metadata.localThickness,worldSize:size.asArray(),vertices:ring.getTotalVertices(),inspectionCameraOnly:true};
 },ownerId);}
 async function walk(page,key,ms){await page.keyboard.down(key);try{await page.waitForTimeout(ms);}finally{await page.keyboard.up(key);}}
@@ -165,8 +166,9 @@ try{
  report.desktop.frodoRingDetail=await inspectRing(page,'frodo');await still(page,'desktop-frodo-ring-detail.png');
  await desktop.close();
  const ringContext=await browser.newContext({viewport:{width:1280,height:720}}),ringPage=await ringContext.newPage();ringPage.on('pageerror',e=>report.errors.push('ring-detail: '+e.message));
- await ready(ringPage);await ringPage.locator('#start').click();if((await snap(ringPage)).cinematic.active)await ringPage.locator('#arrival-skip').click();await ringPage.waitForTimeout(250);
- report.ringBilboDetail=await inspectRing(ringPage,'bilbo');await still(ringPage,'desktop-bilbo-ring-detail.png');await ringContext.close();
+ await ready(ringPage);await ringPage.locator('#start').click();if((await snap(ringPage)).cinematic.active)await ringPage.locator('#arrival-skip').click();
+ if(await ringPage.locator('#dialogue:not([hidden])').isVisible())await ringPage.locator('#dialogue-close').click();
+ await ringPage.waitForTimeout(250);report.ringBilboDetail=await inspectRing(ringPage,'bilbo');await still(ringPage,'desktop-bilbo-ring-detail.png');await ringContext.close();
  const mobile=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,recordVideo:{dir:out,size:{width:390,height:844}}});
  const touch=await mobile.newPage();touch.on('pageerror',e=>report.errors.push('mobile: '+e.message));
  await ready(touch);await touch.locator('#start').tap();if((await snap(touch)).cinematic.active)await touch.locator('#arrival-skip').tap();assert.equal(await touch.locator('#speaker').innerText(),'غاندالف');await touch.locator('#choices button').first().tap();assert.equal((await snap(touch)).state.gandalfMet,true);await touch.locator('#map-open').tap();assert.ok(await touch.locator('#world-map').isVisible());await still(touch,'mobile-village-map.png');await touch.locator('#map-close').tap();

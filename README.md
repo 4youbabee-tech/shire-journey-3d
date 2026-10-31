@@ -1,4 +1,8 @@
-# Shire Journey — 0.9 opening-region production update
+# Shire Journey — 0.9.2 Cozy Shire candidate
+
+Shire Journey is now deliberately scoped as a small, warm Babylon.js storybook experience: one Shire village, a short Gandalf arrival, friendly conversations, Sam's apple/garden task, a walkable Bag End, Bilbo's birthday gathering, a visible Ring handoff and relaxed free exploration. No full-trilogy campaign or giant-world expansion is in the current product scope. The permanent public URL remains https://4youbabee-tech.github.io/shire-journey-3d/.
+
+
 
 Existing Babylon.js 9.32.1 project. The 0.9 cohort replaces the chibi cast with four authored CC0 humanoids, improves the in-world horse/cart opening, physical actor interaction, Arabic dialogue framing, terrain and village detail, and packaged audio. The permanent game URL remains https://4youbabee-tech.github.io/shire-journey-3d/ .
 
