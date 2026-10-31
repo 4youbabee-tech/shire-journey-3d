@@ -34,6 +34,7 @@ export const ROADS=Object.freeze([
  {width:2.2,points:[[-29,-33],[-22,-25],[-14,-22],[-8,-22],[0,-23]]},
 ]);
 export const LANDMARKS=Object.freeze([
+ {id:'road-exit',name:'درب الخروج جنوبًا',x:0,z:-41,type:'road'},
  {id:'bag',name:'بيت بيلبو',x:11,z:11,type:'home'},
  {id:'party',name:'شجرة الاحتفال',x:-2,z:22,type:'tree'},
  {id:'orchard',name:'بستان التفّاح',x:-20,z:17,type:'orchard'},
