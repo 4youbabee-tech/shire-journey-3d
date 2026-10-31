@@ -1,3 +1,11 @@
+# 0.9.2 production decision — Ring scale and story/map gates / 2026-10-31
+
+- Previous candidate used a torus diameter of 1.5 local units and thickness 0.22. This was far too large for a finger-mounted ring. The current patch derives diameter from the actual `ring_01_r → ring_02_r` segment, clamps it to 0.035–0.065 local units, uses a 16% band thickness, and aligns the torus axis to the finger. Tests assert plausible local/world bounds and capture actual Bilbo/Frodo hand close-ups.
+- Ownership remains derived exclusively from the canonical `ringPassed` story outcome. Bilbo owns the Ring before the F1-01 birthday departure; Frodo owns it after the party's irreversible outcome. No parallel story manager or save flag is added.
+- Each house retains one front/interior hull plus left, right and rear mound hulls. The front door approach, NPC roots, story landmarks and road anchors must remain clear. Collision-only meshes are budgeted separately from visible render meshes.
+- Current village geometry is a compact original game layout (17 homes / 12 roads), not yet a proven film/world-map match. The World Locations & Map PDF is present in the Library but its pages are not currently readable through extraction. Do not invent a canonical map scale or mark the route matched until its actual map image is inspected.
+- The readable Story & Timeline Bible defines 23 chapter IDs (F1-01 through F3-07), global and lane-local state, world-state variants, party roster, knowledge flags, canonical outcome flags, optional activity flags and extended-cut flags. After F1-08, Rohan, Ring-bearer and Gondor threads require synchronization barriers. Return of the King is marked master-summary/film-canon rather than screenplay-verified because no ROTK screenplay is in the supplied source set.
+
 # 0.9.2 production candidate — visible Ring and Hobbit-hole collision
 
 Base main/Pages: `3f54c8d4b889ce8537de0595d5f628f7a2db9bfd` (0.9.1). Draft candidate; not merged or published.

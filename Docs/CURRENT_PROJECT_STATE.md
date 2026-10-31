@@ -1,14 +1,14 @@
-# 0.9.2 production candidate — visible Ring and Hobbit-hole collision
+# Active project state — 0.9.2 candidate / 2026-10-31
 
-Base main/Pages: `3f54c8d4b889ce8537de0595d5f628f7a2db9bfd` (0.9.1). Draft candidate; not merged or published.
+- Published `main` and Pages remain 0.9.1 at `3f54c8d4b889ce8537de0595d5f628f7a2db9bfd`; permanent URL is unchanged.
+- Active draft PR #15: `production/0.9.2-visible-ring-house-hulls`. Previous candidate HEAD `ea89df746a0c2719aa7fb6e7a6b7795fea0d383f` passed Actions 41141449953: 56/56 Node tests, syntax checks, desktop/touch Chromium, opening playback and birthday playback.
+- Artifact 13019850582 contains actual screenshots and WebM recordings. CI SwiftShader measured desktop median 1 FPS and touch-emulation median 4 FPS; these are software-renderer results, not physical-device performance results.
+- The prior Ring test proved owner switching and bone attachment but did not sufficiently verify visual scale. The current candidate patch sizes the Ring from the imported finger segment and adds actual hand close-ups plus world-size assertions; this new patch still requires exact-head CI and visual review.
+- House collision candidate adds side/rear mound hulls and preserves Bag End's front approach. New NullEngine regression passed on the previous candidate HEAD; actual player walk-through screenshots remain a browser visual gate.
+- Current playable scope is F1-01 only. F1-02 through F3-07 are not implemented. Full story order and lane rules are documented in `MOBILE_PRODUCTION_ROADMAP.md` and the readable Story & Timeline Bible.
+- No target-PC/physical-phone 30 FPS result, no full-Shire map match, and no public deployment of PR #15 are claimed. The World Locations & Map PDF is present in Library but currently returns no readable pages through file extraction; do not mark route geography accepted until its map can be inspected.
 
-- A real Babylon gold torus attaches to the imported right ring-finger bone on Bilbo and Frodo. Existing `ringPassed` remains the only owner authority: Bilbo before birthday departure; Frodo after the canonical party outcome. No duplicate story state or save-schema change.
-- Every visible grass mound has front/interior, left, right and rear collision volumes. Bag End's front approach remains open. NullEngine regressions cover side/rear blocking and door access.
-- Browser QA checks actual WebGL Ring meshes and ownership before/after the birthday outcome.
-
-Exact-head source, desktop/touch browser, screenshots and CI are pending. Physical target-PC/phone 30 FPS remains NOT RUN. The full Ring investigation, packing, Shire-road pursuit and Bree remain unimplemented.
-
-# 0.9.1 measured quality response and saved device preference
+# Historical 0.9.1 measured quality response and saved device preference
 
 0.9.0 was merged through PR13 as `be008c5f833cdf1e6d6d10ff32bdebd290375862`, after exact-head Actions 41111878012 PASS. Its corrected original opening/party WebMs now visibly include return to the game interface; artifact 13004596236 ZIP SHA256 `5d473d2e81a3f20f1f824abda7d5396542f33d6a8a930cb1a56036fe98eac3f5`, downloaded and verified. The permanent public game remains the same Pages URL.
 

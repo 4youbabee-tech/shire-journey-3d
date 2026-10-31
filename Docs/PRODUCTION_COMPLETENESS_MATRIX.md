@@ -1,30 +1,37 @@
-# 0.9.2 production candidate — visible Ring and Hobbit-hole collision
+# Active production completeness matrix — 0.9.2 candidate / 2026-10-31
 
-Base main/Pages: `3f54c8d4b889ce8537de0595d5f628f7a2db9bfd` (0.9.1). Draft candidate; not merged or published.
-
-- A real Babylon gold torus attaches to the imported right ring-finger bone on Bilbo and Frodo. Existing `ringPassed` remains the only owner authority: Bilbo before birthday departure; Frodo after the canonical party outcome. No duplicate story state or save-schema change.
-- Every visible grass mound has front/interior, left, right and rear collision volumes. Bag End's front approach remains open. NullEngine regressions cover side/rear blocking and door access.
-- Browser QA checks actual WebGL Ring meshes and ownership before/after the birthday outcome.
-
-Exact-head source, desktop/touch browser, screenshots and CI are pending. Physical target-PC/phone 30 FPS remains NOT RUN. The full Ring investigation, packing, Shire-road pursuit and Bree remain unimplemented.
-
-# Active production map — 0.9.1 opening region
-
-0.9.1 adds earlier measured shadow relief and reload-safe manual quality; 54 local source tests PASS and exact-head browser/public checks gate release. The 0.9 art/story payload is unchanged.
-
-Application cohort `dda4170` passed exact-head Actions 41110116242 (53 source tests; desktop/touch gameplay; continuous opening; natural party). Full evidence and limitations are in [CURRENT_PROJECT_STATE.md](CURRENT_PROJECT_STATE.md). This table supersedes the historical checkpoints below.
-
-| Owner priority | Implemented and verified in this cohort | Next acceptance / scope boundary |
+| Area | Current verified state | Remaining acceptance |
 |---|---|---|
-| Frodo, Gandalf, Bilbo, Sam | Four distinct licensed natural-proportion GLBs; 65-bone rigs, 12 clips, textured facial anatomy, blink/gaze/expression, authored costume and bare feet | Physical-device appearance and performance review; background actors reuse Sam's base |
-| Opening under tree and arriving pony/cart | Real 27-second world scene, reading/rise/run/greeting/board/ride, harness/reins, distance-driven wheels, restored story positions and control | Continuous WebM reviewed; source-inspired original staging, not a shot-identical film reproduction |
-| Life in the existing Shire | Three staggered gardeners, five activity states, four hand-following tools, 16 moving imported trees, bounded shared foliage instances, birds/clouds | Richer social encounters, additional residents and schedules are subsequent content |
-| Sound and atmosphere | Original sampled 51-second score, four recorded footsteps, varied recorded forest excerpts, wind/cart fallback, gesture start and separate gains | Physical speaker/headphone review; recorded horse/cart/door/tool library not represented as complete |
-| Image and environment | Sage terrain bitmap, textured summer nature and roadside planting; face-visible desktop/phone conversation cameras | Existing houses/roads retain their procedural construction; architectural/detail expansion remains queued |
-| Story and play | Gandalf-first gate, optional original apple activity, Bag End interior, Arabic rule-based dialogue/memory, saved birthday and departure/Ring outcomes | Birthday remains a compact original vignette; F1-02 investigation onward is not implemented |
-| Functional / publication | Source, real WebGL desktop/touch, save/collision/quest, full opening, both birthday paths PASS | Merge and Pages SHA checked by main's public smoke; no physical target-PC/phone FPS claim |
+| Repository / release | main and public Pages at 0.9.1 / `3f54c8d4`; PR #15 is draft | Accept new exact-head tests and visual review before merge; then verify Pages merge SHA |
+| Source / regression | Previous candidate HEAD passed 56/56 Node tests and syntax checks (Actions 41141449953) | Re-run after current Ring-size and screenshot patch |
+| Browser / story | Desktop/touch WebGL, opening playback and party playback passed on previous candidate | Inspect new Ring close-ups and house mound walk-through; add chapter tests as chapters are built |
+| Ring | Real mesh attaches to Bilbo/Frodo ring-finger bones; owner follows canonical `ringPassed` | Finger-proportioned scale and close-up visual acceptance are pending for the current patch |
+| Hobbit-hole collision | Four hulls per home; side/rear NullEngine regression passed on previous candidate | WebGL walk-around and door/camera/NPC visual review |
+| Characters | Four authored CC0 hero GLBs, 65-bone rigs, 12 clips per role; eight actor instances | Distinct Merry/Pippin/Rosie and varied villagers; hero/cloth/face/hand visual acceptance |
+| Shire world | 17 homes, 12 roads, 16 animated trees, 300 nature patches, 220 roadside placements, 3 gardeners | Canon map reconciliation, distinct architecture, richer life, water/animals/weather, target-device performance |
+| Bag End | Functional interior; 102 decor objects and 2 lights in CI sample | Interior art pass, room identity, furniture interactions and physical-device review |
+| Audio | Original 51-second score, 4 CC0 footsteps, licensed forest excerpts; gesture-gated controls | Hooves/cart/doors/tools/stream/crowd spatial layers and physical listening review |
+| Story | F1-01 playable, birthday outcome and Ring transfer state implemented | F1-02 through F3-07 remain NOT IMPLEMENTED |
+| Hardware | No physical target PC/phone test recorded | 30 FPS at 720p measured on target hardware; report median/1% low/memory/thermal |
+| Map | Existing in-game schematic only | Inspect 03 World Locations & Map PDF and reconcile exact route/geography before route acceptance |
 
-## Historical acceptance checkpoints
+## Release vocabulary
+
+A phase can be source-tested, build-tested, WebGL-tested, visually accepted, device-tested and published-SHA-verified. These are separate statuses. No source test or SwiftShader frame rate is evidence of physical-device performance or final art acceptance.
+
+## Active production queue
+
+1. P00 close PR #15: correct Ring scale, prove hand attachment visually, and prove mound collisions in WebGL.
+2. P01 profile and optimize the existing runtime on the target PC/phone.
+3. P02 complete Bag End interior art and interactions.
+4. P03 finish F1-01 cinematic/story/party and Ring visual handoff.
+5. P04 distinct hero/supporting cast and animation acceptance.
+6. P05 living Shire, houses, map, routes, nature and spatial audio.
+7. P06 F1-02; P07 F1-03; P08 F1-04.
+8. P09 F1-05 through F3-07 in chapter order and parallel-lane synchronization.
+9. P10 full-campaign, hardware, public deployment and final release gates.
+
+Historical checkpoint records below are retained for provenance; the active table above supersedes stale pending/accepted labels from earlier versions.
 
 The records below are chronological evidence, not a second current queue. Earlier HOLD labels, pending tests and rejected assets retain their original meaning and are superseded by the active table where explicitly resolved.
 
