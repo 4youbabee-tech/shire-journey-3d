@@ -1,7 +1,8 @@
+import {dressWizardBeard} from './beard-art.mjs';
 import {createGardenToolRig} from './garden-tools.mjs';
 import {addActorCollision} from './actor-collision.mjs';
 // Authored Shire cast, based on reviewed Quaternius CC0 humanoids.
-export const CHARACTER_HEIGHTS=Object.freeze({player:1.48,bilbo:1.36,sam:1.48,frodo:1.42,gandalf:3.12});
+export const CHARACTER_HEIGHTS=Object.freeze({player:1.48,bilbo:1.36,sam:1.48,frodo:1.42,gandalf:2.5});
 export function blinkAmount(seconds,seed=0){const period=3.7+(seed%5)*.21,t=((seconds+seed*.137)%period+period)%period;return t<.17?Math.sin(t/.17*Math.PI)**2:0;}
 const roleFor=id=>['frodo','sam','bilbo','gandalf'].includes(id)?id:'sam';
 const seedFor=id=>[...id].reduce((n,c)=>((n*31+c.charCodeAt(0))%997),1);
@@ -40,6 +41,7 @@ export async function loadCharacters(B,scene,world){
   if(role==='sam'&&c.id!=='sam')for(const material of new Set(meshes.map(m=>m.material).filter(m=>m?.name.includes('waistcoat')))){
    const copy=material.clone(c.id+' waistcoat');copy.albedoColor=new B.Color3(...(c.id==='player'?[.65,.9,.7]:c.id==='farmer-berin'?[.9,.68,.55]:[.75,.8,.65]));for(const m of meshes)if(m.material===material)m.material=copy;
   }
+  if(role==='gandalf')dressWizardBeard(B,scene,meshes);
   for(const g of instance.animationGroups){g.stop();g.enableBlending=false;}
   const find=n=>instance.animationGroups.find(g=>g.name.endsWith(n));
   const clips={Idle:find('Idle'),Walk:find('Walking_A'),Run:find('Running_A'),Talk:find('Interact'),Cheer:find('Cheer'),Work:find('PickUp'),Sit:find('Sit_Floor_Idle'),Rise:find('Sit_Floor_StandUp'),Ride:find('Sit_Chair_Idle'),RideTalk:find('Sit_Chair_Talk'),Board:find('Board')};
@@ -91,7 +93,8 @@ export async function loadCharacters(B,scene,world){
  world.stats.gardenToolRigs=actors.filter(c=>c.imported.gardenTool).length;world.stats.colliders=world.colliders.length;world.stats.importedCharacters=actors.length;world.stats.characterAssets='Quaternius CC0; authored natural Shire cast';world.stats.naturalCastRoles=4;world.stats.eyelidRigs=actors.filter(c=>c.imported.morphs.blink.length>=2).length;
  const focus=B.Vector3.Zero();
  return {actors,update(dt,activeNPC,party,cinema=null){for(const c of actors){let pose=null,target=null;
-  if(cinema){pose=c.id==='frodo'?cinema.frodoMode:c.id==='gandalf'?(['Talk','Board'].includes(cinema.frodoMode)?'RideTalk':'Ride'):null;if(['Talk','Board'].includes(cinema.frodoMode)&&['frodo','gandalf'].includes(c.id)){const other=actors.find(a=>a.id===(c.id==='frodo'?'gandalf':'frodo'));other.imported.head.computeWorldMatrix(true);target=other.imported.head.getAbsolutePosition().add(new B.Vector3(0,CHARACTER_HEIGHTS[other.id]*.06,0));}}
+  if(cinema?.actorModes){pose=cinema.actorModes[c.id]||'Idle';target=cinema.actorTargets?.[c.id]||null;}
+  else if(cinema){pose=c.id==='frodo'?cinema.frodoMode:c.id==='gandalf'?(['Talk','Board'].includes(cinema.frodoMode)?'RideTalk':'Ride'):null;if(['Talk','Board'].includes(cinema.frodoMode)&&['frodo','gandalf'].includes(c.id)){const other=actors.find(a=>a.id===(c.id==='frodo'?'gandalf':'frodo'));other.imported.head.computeWorldMatrix(true);target=other.imported.head.getAbsolutePosition().add(new B.Vector3(0,CHARACTER_HEIGHTS[other.id]*.06,0));}}
   else if(c.id!=='player'&&B.Vector3.DistanceSquared(c.root.getAbsolutePosition(),world.body.position)<64){focus.copyFrom(world.body.position);focus.y+=.55;target=focus;}
   c.imported.update(dt,{speaking:c.id===activeNPC,celebrating:party,pose,seatY:cinema?.seatY??null,lookTarget:target?.clone()||null});
  }},dispose(){scene.onBeforeAnimationsObservable.remove(before);scene.onAfterAnimationsObservable.remove(after);}};

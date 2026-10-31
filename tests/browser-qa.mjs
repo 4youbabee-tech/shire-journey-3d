@@ -31,7 +31,7 @@ const still=async(page,name)=>{const result=await page.screenshot({path:resolve(
 async function assertFaceVisible(page,id){
  try{await page.waitForFunction(id=>{
   const B=window.BABYLON,s=B.Engine.LastCreatedScene,head=s.getTransformNodeByName(id+' Head');if(!head)return false;
-  const h={gandalf:3.12,bilbo:1.36,sam:1.48,frodo:1.42}[id];head.computeWorldMatrix(true);const face=head.getAbsolutePosition().add(new B.Vector3(0,h*.06,0));
+  const h={gandalf:2.5,bilbo:1.36,sam:1.48,frodo:1.42}[id];head.computeWorldMatrix(true);const face=head.getAbsolutePosition().add(new B.Vector3(0,h*.06,0));
   const p=B.Vector3.Project(face,B.Matrix.Identity(),s.getTransformMatrix(),s.activeCamera.viewport.toGlobal(s.getEngine().getRenderWidth(),s.getEngine().getRenderHeight()));
   const canvas=document.querySelector('#game').getBoundingClientRect(),dialog=document.querySelector('#dialogue').getBoundingClientRect(),x=p.x/s.getEngine().getRenderWidth()*canvas.width,y=p.y/s.getEngine().getRenderHeight()*canvas.height;
   return p.z>0&&p.z<1&&x>20&&x<canvas.width-20&&y>20&&y<dialog.top-(id==='gandalf'?90:45)&&B.Vector3.Distance(face,s.activeCamera.position)>1.1;
@@ -88,7 +88,7 @@ try{
  const walkEvidence=await realWalk(page);await still(page,'desktop-moving.png');assert.equal((await snap(page)).state.gandalfMet,true);await qaReposition(page,8,5.5);
  await still(page,'desktop-arrived.png');await still(page,'desktop-enhanced-hero-0.6.png');
  // Enter the real Babylon room using the gameplay key, inspect the 3D interior and exit.
- await qaReposition(page,11,8.2);
+ await qaReposition(page,11,8.2);await page.waitForTimeout(1000);await still(page,'desktop-home-frontage.png');
  await page.locator('#interaction:not([hidden])').waitFor({timeout:20000});
  await page.keyboard.press('e');
  await page.waitForFunction(()=>window.__SHIRE__.snapshot().inside,{timeout:25000});

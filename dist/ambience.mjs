@@ -2,14 +2,14 @@
 import {pastoralPhrase} from './score.mjs';
 export function createShireAmbience(AudioContextConstructor){
  const context=new AudioContextConstructor(),master=context.createGain();master.gain.value=.22;master.connect(context.destination);
- const music=context.createGain(),effects=context.createGain();music.connect(master);effects.connect(master);
+ const nature=context.createGain(),music=context.createGain(),effects=context.createGain();nature.connect(effects);music.connect(master);effects.connect(master);
  const levels={master:1,music:.65,effects:1};
  function setVolume(channel,value){if(!(channel in levels)||!Number.isFinite(value))return;levels[channel]=Math.max(0,Math.min(1,value));const node=channel==='master'?master:channel==='music'?music:effects;node.gain.setValueAtTime(levels[channel]*(channel==='master'?.22:1),context.currentTime);}
  for(const key of Object.keys(levels))setVolume(key,levels[key]);
  // A four-second looping filtered-noise bed: wind through leaves with soft air movement.
  const buffer=context.createBuffer(1,context.sampleRate*4,context.sampleRate),samples=buffer.getChannelData(0);let last=0;
  for(let i=0;i<samples.length;i++){last=(last+.025*(Math.random()*2-1))/1.025;samples[i]=last*2.25;}
- const wind=context.createBufferSource(),windGain=context.createGain();wind.buffer=buffer;wind.loop=true;windGain.gain.value=.08;wind.connect(windGain);windGain.connect(effects);let windStarted=false;
+ const wind=context.createBufferSource(),windGain=context.createGain();wind.buffer=buffer;wind.loop=true;windGain.gain.value=.08;wind.connect(windGain);windGain.connect(nature);let windStarted=false;
  let timer=null,phrase=0,birdTick=0,scoreBuffer=null,scoreSource=null,scorePromise=null,scoreStatus='unloaded',scoreError=null,footClock=0,cartClock=0,foleyBuffers=[],foleyStatus='unloaded',lastFoot=-1,foleyPromise=null,forestBuffer=null;
  async function loadScore(){
   if(!context.decodeAudioData||typeof fetch!=='function')return;
@@ -21,6 +21,10 @@ export function createShireAmbience(AudioContextConstructor){
   if(!foleyPromise)foleyPromise=(async()=>{foleyStatus='loading';const results=await Promise.allSettled(['footstep-00','footstep-02','footstep-06','footstep-09','forest-birds'].map(async name=>{const response=await fetch(new URL('./assets/audio/'+name+'.mp3',import.meta.url));if(!response.ok)throw Error('Foley HTTP '+response.status);return context.decodeAudioData(await response.arrayBuffer());}));foleyBuffers=results.slice(0,4).filter(r=>r.status==='fulfilled').map(r=>r.value);forestBuffer=results[4]?.status==='fulfilled'?results[4].value:null;foleyStatus=foleyBuffers.length===4?'decoded':foleyBuffers.length?'partial':'fallback';})();
   await foleyPromise;
  }
+ const ringImpact=context.createBuffer(1,Math.floor(context.sampleRate*.65),context.sampleRate),metal=ringImpact.getChannelData(0);
+ for(let i=0;i<metal.length;i++){const t=i/context.sampleRate;metal[i]=(.35*Math.sin(t*2*Math.PI*1720)+.19*Math.sin(t*2*Math.PI*2387)+.11*Math.sin(t*2*Math.PI*3671))*Math.exp(-t*13)*Math.min(1,t*2500);}
+ function ringDrop(){if(context.state!=='running')return;const source=context.createBufferSource(),gain=context.createGain();source.buffer=ringImpact;gain.gain.value=.5;source.connect(gain);gain.connect(effects);source.onended=()=>{source.disconnect?.();gain.disconnect?.();};source.start();}
+ function setInterior(on){const value=on?.12:1;if(nature.gain.setTargetAtTime)nature.gain.setTargetAtTime(value,context.currentTime,.4);else nature.gain.setValueAtTime(value,context.currentTime);}
  function beginScore(){if(!scoreBuffer||scoreSource)return;scoreSource=context.createBufferSource();scoreSource.buffer=scoreBuffer;scoreSource.loop=true;scoreSource.connect(music);scoreSource.start();}
  const impact=context.createBuffer(1,Math.floor(context.sampleRate*.22),context.sampleRate);
  const impactData=impact.getChannelData(0);let rseed=4831;
@@ -45,19 +49,20 @@ export function createShireAmbience(AudioContextConstructor){
   if(forestBuffer&&forestBuffer.duration>.6){
    const source=context.createBufferSource(),gain=context.createGain(),duration=Math.min(3.4,forestBuffer.duration-.1),offset=(i*1.713)%Math.max(.1,forestBuffer.duration-duration-.05);source.buffer=forestBuffer;source.playbackRate.value=.97+(i%4)*.02;
    gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.08,now+.18);gain.gain.setValueAtTime(.08,now+duration-.3);gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
-   const pan=context.createStereoPanner?.();source.connect(gain);if(pan){pan.pan.setValueAtTime(Math.sin(i*2.399)*.5,now);gain.connect(pan);pan.connect(effects);}else gain.connect(effects);
+   const pan=context.createStereoPanner?.();source.connect(gain);if(pan){pan.pan.setValueAtTime(Math.sin(i*2.399)*.5,now);gain.connect(pan);pan.connect(nature);}else gain.connect(nature);
    source.onended=()=>{source.disconnect?.();gain.disconnect?.();pan?.disconnect();};source.start(now,offset,duration);source.stop?.(now+duration+.05);windGain.gain.setValueAtTime(.07,now);return;
   }
 
   // Two separated whistles with pitch curves feel less electronic than fixed beeps.
   const base=1050+(i%5)*90;
-  osc(base,now,.19,.028,'sine',base*1.36);
-  osc(base*1.4,now+.27,.24,.020,'sine',base*.91);
+  osc(base,now,.19,.028,'sine',base*1.36,nature);
+  osc(base*1.4,now+.27,.24,.020,'sine',base*.91,nature);
   windGain.gain.setValueAtTime(.06+.035*Math.sin(i*.41),now);
  }
  function song(now){for(const n of pastoralPhrase(phrase++))osc(n.frequency,now+n.at,n.duration,n.volume,n.wave,n.frequency*.997,music);}
  function cycle(){if(context.state!=='running')return;const now=context.currentTime+.07;birds(now);if(!scoreBuffer&&(birdTick-1)%2===0)song(now+.12);}
  return {
+  ringDrop,setInterior,
   get foley(){return {status:foleyStatus,decoded:foleyBuffers.length,forestDecoded:!!forestBuffer};},
   get score(){return {status:scoreStatus,duration:scoreBuffer?.duration||0,error:scoreError};},
   update(dt,{moving=false,wood=false,cart=false,cartDistance=30}={}){
