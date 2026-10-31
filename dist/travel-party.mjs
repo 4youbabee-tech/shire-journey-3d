@@ -18,5 +18,5 @@ export function createTravelParty(B,scene,world){
   if(B.Vector3.DistanceSquared(proxy.position,target)<.35*.35){trail.shift();target=trail[0]||p;}
   const delta=target.subtract(proxy.position);delta.y=0;const distance=delta.length();if(distance<.08){sam.activity='Idle';return;}delta.scaleInPlace(1/distance);const step=Math.min(distance,(remaining>4?2.5:1.65)*dt);proxy.moveWithCollisions(new B.Vector3(delta.x*step,-.12,delta.z*step));proxy.position.y=.72+terrainHeightAt(proxy.position.x,proxy.position.z);sam.root.position.set(proxy.position.x,terrainHeightAt(proxy.position.x,proxy.position.z),proxy.position.z);sam.root.rotation.y=Math.atan2(delta.x,delta.z)+Math.PI;sam.activity='Walk';
  }
- return {setActive,update,showPacks,resetFollower:placeFollower,get active(){return active;},dispose(){proxy.dispose();}};
+ return {setActive,update,showPacks,resetFollower(){if(active)placeFollower();},get active(){return active;},dispose(){proxy.dispose();}};
 }
