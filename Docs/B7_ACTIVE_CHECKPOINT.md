@@ -1,12 +1,18 @@
-# B7 visual quality checkpoint — 2026-11-02
+# B7 checkpoint — 2026-11-02, species meshes and twilight QA
 
-Latest candidate source: 2bc306063858036fb3c46929a9a000b724e3aea9
+Latest source commit: 18202141c882ee243fa1ef35dae15f7d7081c5c3
 PR #29: https://github.com/4youbabee-tech/shire-journey-3d/pull/29
+Exact-head CI: run 41362014872 is in progress.
 
-Performance issue from exact-head CI: individual animal child meshes pushed scene.meshes above the existing strict budget. A first repair reduced each animal to one mesh, but it did not yet satisfy the shared-scene budget. The current implementation consolidates the four animals into one shared thin-instanced mesh, retaining species scale, bounded movement, grazing/hopping/rest and per-instance transforms. This is the candidate intended for validation; do not assume the fix passes until exact-head source and WebGL CI finish.
+Changes since previous B7 candidate:
+- Replaced generic shared animal silhouette with separate sheep and rabbit low-poly silhouettes.
+- Each species uses one shared thin-instanced mesh for two animals; only two animal draw calls total.
+- Moved the meadow animals to a clearer west meadow patch for visual review.
+- Extended the twilight daylight curve so sunset retains more light before night.
+- Updated native and desktop/mobile browser QA assertions to validate the two species batches and the clearer meadow.
 
-B7 also includes a smooth day/night sky/fog/sun/ambient/exposure controller and daylight-aware ambient audio. Exact-head desktop/mobile browser evidence must be inspected before merge.
+Do not merge B7 until run 41362014872 is fully green and its screenshot/video artifacts are reviewed. Earlier exact-head attempts exposed the scene mesh budget and a sunset-to-night assertion; both were addressed but need current-head confirmation.
+B6 Ring inspection is merged in main at 1322214233dd98e73efb6c1e7b657ea374825fef. B5 Bree and road/ferry remain in main.
+Permanent Pages URL: https://4youbabee-tech.github.io/shire-journey-3d/
 
-B6 is merged and its exact-head suite passed. The original Pages URL remains https://4youbabee-tech.github.io/shire-journey-3d/
-
-Remaining scope: B6 hero visual acceptance; B8 Weathertop; B9 Rivendell; B10 onward; story/campaign continuity; target-phone and low-end-PC performance. No claim of full campaign completion until playable tests and publication verification pass.
+Not yet delivered: full B6 hero art acceptance, B8 Weathertop, B9 Rivendell, B10 later campaign, full-campaign end-to-end acceptance and physical low-end device FPS. These remain open; do not label the game final until playable and validated.
