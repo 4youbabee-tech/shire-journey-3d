@@ -45,6 +45,7 @@ export function createAmbientFauna(B,scene,{heightAt=(x,z)=>0,shadows=null,patch
  mesh.name='single draw-call Shire meadow fauna';mesh.material=material;mesh.isPickable=false;mesh.receiveShadows=true;mesh.alwaysSelectAsActiveMesh=true;shadows?.addShadowCaster(mesh);
  const basePositions=mesh.getVerticesData(B.VertexBuffer.PositionKind).slice(),baseNormals=mesh.getVerticesData(B.VertexBuffer.NormalKind).slice();
  const positions=basePositions.slice(),normals=baseNormals.slice();
+ mesh.setVerticesData(B.VertexBuffer.PositionKind,positions,true,false);mesh.setVerticesData(B.VertexBuffer.NormalKind,normals,true,false);
  function update(poses){
   for(const animal of animals){
    const pose=poses.get(animal.id);if(!pose)continue;
