@@ -1,3 +1,13 @@
+# Latest execution checkpoint — connected B5 candidate
+
+B4 PR #26 at `650529eea2d8cc558f3ecd7afb7b661cd7207ded` remains under exact-head CI run `41351147934`; source, road and golden jobs passed, full Chromium result still pending at this write.
+
+B5 active branch: `production/b5-bree-pony-01`, prior saved source `df2f6981c95873a475cc59bfee86a84688c9700c`. Bree gate, town, Pony, dialogue tasks, party transitions, map, location and save restoration are now integrated as a 0.16.0 candidate. 89 native tests PASS; first Chromium desktop/mobile full Bree traversal PASS; final art/camera rerun and exact-head CI remain required. See [B5 active checkpoint](B5_ACTIVE_CHECKPOINT.md) and [owner art references](OWNER_VISUAL_REFERENCES.md). B5 is not declared completed or published. B6–B10 remain open.
+
+---
+
+## Earlier receipts
+
 # Active execution receipt — B4 repair candidate
 
 Base: `2fae96ee1ee7afeef2a6a48f92eac0995e7c90a4`, PR #26. Exact-head Actions `41348030595`: source, Chromium, road and golden evidence PASS. Browser artifact `13099743980` downloaded and actual desktop/mobile Green Dragon images inspected. Camera-edge mound occlusion and unarticulated single-mesh resident movement found; no merge acceptance granted.

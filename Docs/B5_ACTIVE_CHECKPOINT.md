@@ -1,9 +1,17 @@
-# B5 implementation checkpoint
+# B5 active checkpoint — connected Bree candidate
 
-Base: B4 candidate `650529eea2d8cc558f3ecd7afb7b661cd7207ded`, PR #26; exact-head run `41351147934` still awaiting full Chromium completion at this receipt. B1–B3 merged. B4 native tests, road playback and paired golden CI passed; do not merge until remaining Chromium and visual review pass.
+Base B5 source checkpoint: `df2f6981c95873a475cc59bfee86a84688c9700c`. B4 PR #26 head remains `650529eea2d8cc558f3ecd7afb7b661cd7207ded`; run `41351147934` awaiting its full Chromium result at this receipt. Never merge on an older successful run.
 
-New B5 source modules: `dist/bree.mjs`, `dist/bree-state.mjs`, `dist/town-resident.mjs`. Original 13-building town, square, gates, market, well, lamps; Prancing Pony exterior emblem and furnished interior with hearth, pantry, tables, chairs, wash basin and two bedrooms; six independent low-cost articulated residents; range-gated lodging/warning/rest progression. Three native tests pass, including actual collision walking along the town street to the inn, interior/exterior switching and resumed location.
+## Implemented integration
 
-These modules are NOT yet connected to the live road controller or save schema. They are source work in progress, not an accepted B5 release. Next: connect closed Bree gate to lazy region activation; restore road/Bree location and task with migration; reset travelling companions and camera on transitions; map and interior audio; Chromium recordings on both viewports; full earlier regression suite; review lighting, materials, collisions and budgets. Verify disposal and repeat transition stability.
+The existing road gate now lazily activates Bree. Road encounters, ferry, world geography and original saves remain intact. `road.bree` stores location (town/inn) and task (arrival/lodging/warning/rested), validated on restore only after the ferry. Original dialogue and range gates require the innkeeper, Strider and safe room in sequence. Town/inn/road transitions preserve the party, swap collision and ground authority, reset camera/follower trails, update map and location text, and attenuate outdoor audio indoors. Return visits reuse resources.
 
-The three new owner images are approximate direction documented in OWNER_VISUAL_REFERENCES.md. No exact recreation or real-device performance acceptance is implied. B6–B10 remain open.
+13 town buildings, six articulated residents, gate, market, well, lanterns; Pony exterior and originally drawn sign; furnished hall, pantry, hearth, washbasin and two rooms. Shared existing surface tiles add wood/plaster/linen grain. B6 must improve the cast and Ring story staging; primitive residents are not accepted film likenesses.
+
+## Evidence
+
+89 source tests pass locally. Native regression enters from the actual road gate, changes interiors, round-trips the save, resumes the interior and returns to the Shire; repeated entry keeps mesh counts stable. First Chromium desktop and mobile runs PASS: actual keyboard walking through town/interior, innkeeper and Strider interaction, rest, real reload and saved position/quest restoration; no browser errors. `/tmp/bree-first-browser/report.json` is local evidence only, not a durable CI receipt. Later texture/sign/camera improvements require the current rerun and review. CI has a dedicated Bree walkthrough job and artifact upload.
+
+## Open acceptance
+
+Review final browser captures, complete CI on the actual new head, inspect previous chapters, review budgets and repeated transitions, merge B4 only after its own gates, then rebase/merge accepted B5 and verify the original Pages URL. No physical GPU/phone FPS acceptance is asserted. B8–B10 remain unbuilt; the east exit explicitly reports this. Continue B6/B7 and later chapters after this candidate passes. Owner references are approximate and documented in OWNER_VISUAL_REFERENCES.md.
