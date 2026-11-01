@@ -139,11 +139,11 @@ try{
  await still(page,'desktop-after-birthday.png');
  await still(page,'desktop-completed.png');
  // Capture the actual B4 Green Dragon at its shipped Bywater Road coordinates.
- await qaReposition(page,29,-35);await page.waitForTimeout(900);
+ await qaReposition(page,29,-35);await page.evaluate(()=>window.__SHIRE__.qaView(0,.28,5.6));await page.waitForTimeout(900);await page.locator('#qa-diagnostics').evaluate(el=>el.hidden=true);
  const innSnapshot=await snap(page),inn=innSnapshot.world.bywaterDetails;
  assert.equal(inn.inn,'Green Dragon');assert.equal(inn.signs,1);assert.equal(inn.lanterns,2);
- assert.equal(inn.barrels,2);assert.equal(inn.seats,2);assert.equal(inn.flowerBoxes,2);
- await still(page,'desktop-green-dragon-inn.png');
+ assert.equal(inn.barrels,2);assert.equal(inn.seats,2);assert.equal(inn.flowerBoxes,2);assert.equal(inn.residents,2);assert.equal(innSnapshot.world.backgroundVillagers,5);
+ await still(page,'desktop-green-dragon-inn.png');await page.locator('#qa-diagnostics').evaluate(el=>el.hidden=false);await page.evaluate(()=>window.__SHIRE__.qaView(0,.44,7.8));
  await qaReposition(page,-12,-5);await page.waitForTimeout(300);await still(page,'desktop-garden-life.png');
  report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,roomWalkEvidence:{from:roomFrom.position,forward:roomForward.position,returned:roomReturn.position,realKeyboard:true},hillWalkEvidence:{from:hillFrom.position,arrival:hillArrival.position,returned:hillReturn.position,realKeyboard:true},qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
  // Inspect the real asset at its existing world position; no character teleport.
@@ -177,10 +177,10 @@ try{
  assert.ok(moved.position.z-before.position.z>.1,'Touch joystick must move character forward');
  await still(touch,'mobile-joystick.png');await still(touch,'mobile-natural-meadow-0.7.png');
  // Check the B4 inn from a narrow touch viewport as well.
- await qaReposition(touch,29,-35);await touch.waitForTimeout(900);
+ await qaReposition(touch,29,-35);await touch.evaluate(()=>window.__SHIRE__.qaView(0,.28,5.6));await touch.waitForTimeout(900);await touch.locator('#qa-diagnostics').evaluate(el=>el.hidden=true);
  const mobileInn=(await snap(touch)).world.bywaterDetails;
- assert.equal(mobileInn.inn,'Green Dragon');assert.equal(mobileInn.signs,1);assert.equal(mobileInn.lanterns,2);
- await still(touch,'mobile-green-dragon-inn.png');
+ assert.equal(mobileInn.inn,'Green Dragon');assert.equal(mobileInn.signs,1);assert.equal(mobileInn.lanterns,2);assert.equal(mobileInn.residents,2);
+ await still(touch,'mobile-green-dragon-inn.png');await touch.locator('#qa-diagnostics').evaluate(el=>el.hidden=false);await touch.evaluate(()=>window.__SHIRE__.qaView(0,.44,7.8));
  // QA-only move after the independently verified real touch walking smoke.
  await qaReposition(touch,11,8.2);
  await touch.locator('#interact').waitFor({state:'visible',timeout:20000});
