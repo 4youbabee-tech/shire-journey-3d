@@ -1,3 +1,5 @@
+import {applyVillageLook,softenMound} from './visual-direction.mjs';
+import {createVillageDetails} from './village-details.mjs';
 import {terrainHeightAt,shapeTerrain} from './terrain.mjs';
 // All art here is original procedural stylized geometry, not imported film assets.
 import {HOMES,ROADS,MAP_BOUNDS} from './village-layout.mjs';
@@ -15,7 +17,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  scene.clearColor=B.Color4.FromHexString('#bcd9dfff');scene.fogMode=B.Scene.FOGMODE_LINEAR;scene.fogStart=70;scene.fogEnd=190;scene.fogColor=B.Color3.FromHexString('#bcd9df');scene.ambientColor=new B.Color3(.12,.11,.09);scene.imageProcessingConfiguration.contrast=1.09;scene.imageProcessingConfiguration.exposure=1.005;scene.collisionsEnabled=true;scene.skipPointerMovePicking=true;
  const shadow=shadows?new B.ShadowGenerator(1024,sun):null;if(shadow){shadow.usePercentageCloserFiltering=true;shadow.filteringQuality=B.ShadowGenerator.QUALITY_LOW;shadow.bias=.005;shadow.normalBias=.3;shadow.darkness=.22;}
  function finish(mesh,material,x,y,z,staticMesh=true,parent=null){mesh.material=material;mesh.position.set(x,y+(parent?0:elevation(x,z)),z);mesh.isPickable=false;if(parent)mesh.parent=parent;else if(staticMesh)statics.push(mesh);mesh.receiveShadows=true;return mesh;}
- function sphere(name,x,y,z,sx,sy,sz,material,staticMesh=true,parent=null,segments=10){const m=M.CreateSphere(name,{diameter:1,segments},scene);m.scaling.set(sx,sy,sz);return finish(m,material,x,y,z,staticMesh,parent);}
+ function sphere(name,x,y,z,sx,sy,sz,material,staticMesh=true,parent=null,segments=10){const m=M.CreateSphere(name,{diameter:1,segments},scene);m.scaling.set(sx,sy,sz);if(/mound|roof edge|distant hill/.test(name))softenMound(B,m,x*.17+z*.13);return finish(m,material,x,y,z,staticMesh,parent);}
  function cyl(name,x,y,z,diameter,height,material,staticMesh=true,parent=null,top=null,tessellation=12){const m=M.CreateCylinder(name,{diameter,height,diameterTop:top??diameter,tessellation},scene);return finish(m,material,x,y,z,staticMesh,parent);}
  function beam(a,b,r,material,name='timber',staticMesh=true,parent=null){const av=new V(...a),bv=new V(...b);if(!parent){av.y+=elevation(av.x,av.z);bv.y+=elevation(bv.x,bv.z);}const mid=av.add(bv).scale(.5),delta=bv.subtract(av);const m=cyl(name,mid.x,mid.y-(parent?0:elevation(mid.x,mid.z)),mid.z,r,delta.length(),material,staticMesh,parent);m.rotationQuaternion=B.Quaternion.FromUnitVectorsToRef(V.Up(),delta.normalize(),new B.Quaternion());return m;}
  function ring(name,x,y,z,d,t,material){const m=M.CreateTorus(name,{diameter:d,thickness:t,tessellation:28},scene);m.rotation.x=Math.PI/2;return finish(m,material,x,y,z);}
@@ -69,7 +71,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  fence([[-15,0],[-13,0],[-11,0],[-9,0],[-8,-1]]);fence([[-17,8],[-19,8],[-21,8],[-23,8],[-25,10],[-25,12]]);fence([[15,7],[17,7],[19,7],[21,7]]);fence([[-7,25],[-7,27],[-7,29]]);
  // Village dressing uses shared materials and static batching; no moving story anchors.
  function bench(x,z,angle=0){
-  const group=new B.TransformNode('village bench frame',scene);group.position.set(x,0,z);group.rotation.y=angle;
+  const group=new B.TransformNode('village bench frame',scene);group.position.set(x,terrainHeightAt(x,z),z);group.rotation.y=angle;
   for(const dx of [-.7,.7]){const leg=cyl('bench supports',dx,.36,0,.12,.72,wood,false,group);statics.push(leg);}
   const seat=M.CreateBox('oak bench seat',{width:1.85,height:.15,depth:.56},scene);finish(seat,wood,0,.75,0,false,group);statics.push(seat);
   const back=M.CreateBox('oak bench back',{width:1.85,height:.65,depth:.13},scene);finish(back,wood,0,1.12,.25,false,group);statics.push(back);
@@ -169,9 +171,10 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
   for(const [id,x,z,material,range,phase] of [['farmer-ada',-12,-3,samvest,1.2,0],['farmer-berin',17,-7,vest,1.5,2],['gardener-nell',-16,23,frodoVest,1,4]]){const v=character(id,x,z,{waistcoat:material});v.home={x,z};v.range=range;v.phase=phase;v.root.rotation.y=.3+phase;workers.push(v);}
  const applePositions=[[-18,12],[-17,17],[-21,15]];for(let i=0;i<3;i++){const [x,z]=applePositions[i];const root=new B.TransformNode('collectible apple '+i,scene);root.position.set(x,.4,z);sphere('collectible red apple',0,0,0,.42,.4,.42,applemat,false,root);cyl('apple stalk',0,.22,0,.035,.13,bark,false,root);sphere('apple leaf',.11,.24,0,.22,.05,.1,leaf2,false,root);const halo=M.CreateTorus('apple glow',{diameter:.75,thickness:.035,tessellation:20},scene);halo.material=brass;halo.parent=root;halo.position.y=-.22;apples.push({id:'apple-'+i,root,halo});}
  // Merge static geometry by material: a few dozen draws, rather than hundreds.
+ statics.push(...createVillageDetails(B,scene,{homes:HOMES,heightAt:terrainHeightAt,materials:{wood,dark,stone,cream,white,red,blue,yellow,green:leaf3}}));
  const groups=new Map();for(const mesh of statics){const key=mesh.material.uniqueId;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(mesh);}let mergedCount=0;for(const group of groups.values()){const m=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);if(m){m.name='batched '+m.material.name;m.receiveShadows=true;m.freezeWorldMatrix();if(shadow&& !['warm gravel','clouds','pond water'].includes(m.material.name))shadow.addShadowCaster(m);mergedCount++;}}
  const body=M.CreateSphere('player collision ellipsoid',{diameter:1,segments:6},scene);body.position.set(0,.72,-15);body.isVisible=false;body.isPickable=false;body.ellipsoid=new V(.32,.7,.32);body.checkCollisions=true;
- dressMaterials(B,scene,Object.values(mats));
+ dressMaterials(B,scene,Object.values(mats));applyVillageLook(B,scene,{sun,hemi,shadow});
  return {player,body,characters,workers,leaves,treeAnchors,hedgeAnchors,apples,birds,sun,hemi,shadow,colliders,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,roads:ROADS.length,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,animatedCanopies:leaves.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
 }
 

@@ -44,7 +44,7 @@ async function ready(page){
  assert.equal((await snap(page)).world.eyelidRigs,8,'Every role has real eyelid morph deformation');
  assert.equal((await snap(page)).world.naturalCastRoles,4,'Four independently authored natural humanoid roles');
  assert.equal((await snap(page)).world.gardenToolRigs,4,'Gardening tools must follow four real imported hand rigs');
- assert.equal((await snap(page)).world.importedCharacters,8,'All eight visible roles use imported GLB rigs');
+ assert.equal((await snap(page)).world.importedCharacters,10,'Eight existing roles and two new household neighbours use independent imported rigs');
  if(process.env.GITHUB_ACTIONS)assert.equal((await snap(page)).commit,checkoutSha,'Published build identity matches tested checkout');
  assert.ok(await page.evaluate(()=>!!document.getElementById('game').getContext('webgl2')||!!document.getElementById('game').getContext('webgl')),'A real WebGL canvas must be created');
 }
@@ -110,7 +110,7 @@ try{
  await page.keyboard.down('s');try{await page.waitForFunction(()=>window.__SHIRE__.snapshot().position.z<=-3,null,{timeout:90000});}finally{await page.keyboard.up('s');}const hillReturn=await snap(page);
  await qaReposition(page,8,5.5);
  await talk(page);assert.equal(await page.locator('#portrait svg').count(),1,'Bilbo SVG portrait visible');assert.ok(await page.locator('#npc-voice').isVisible(),'Browser narration button present');await assertFaceVisible(page,'bilbo');await still(page,'desktop-dialogue.png');
- await page.locator('#npc-chat-input').fill('من أنت؟');await page.locator('#npc-chat-send').click();
+ await page.locator('#extra-talk summary').click();await page.locator('#npc-chat-input').fill('من أنت؟');await page.locator('#npc-chat-send').click();
  assert.match(await page.locator('#chat-log').innerText(),/بيلبو/,'Free-text Arabic contextual dialogue must respond');
  await still(page,'desktop-arabic-chat.png');await chooseFirst(page);
  assert.equal((await snap(page)).state.stage,1,'Bilbo dialogue advances quest');
@@ -184,6 +184,7 @@ try{
  assert.ok(await touch.locator('#interact').isVisible(),'Mobile interaction button should appear near Sam');
  await touch.locator('#interact').tap();await touch.locator('#dialogue:not([hidden])').waitFor({timeout:5000});assert.equal(await touch.locator('#portrait svg').count(),1,'Sam SVG portrait visible on emulated mobile');
  assert.equal(await touch.locator('#toast').isVisible(),false,'Transient notices must not cover the face during dialogue');await assertFaceVisible(touch,'sam');await still(touch,'mobile-dialogue.png');
+ await touch.locator('#extra-talk summary').tap();
  const boxes=await touch.evaluate(()=>({w:window.innerWidth,dialogue:document.querySelector('#dialogue').getBoundingClientRect().toJSON(),chat:document.querySelector('#npc-chat-input').getBoundingClientRect().toJSON(),send:document.querySelector('#npc-chat-send').getBoundingClientRect().toJSON()}));
  for(const key of ['dialogue','chat','send']){const r=boxes[key];assert.ok(r.left>=-2&&r.right<=boxes.w+2&&r.width>25,'Mobile '+key+' stays inside viewport');}
  assert.ok(boxes.dialogue.width>boxes.w*.75,'Mobile dialogue is legible');

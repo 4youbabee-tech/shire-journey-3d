@@ -45,3 +45,14 @@ export function drawVillageMap(canvas,player,stage,apples=[]){
  }
  ctx.font='bold 18px Georgia,serif';ctx.fillStyle='#45563b';ctx.textAlign='center';ctx.fillText('N',w/2,23);
 }
+// A genuine live minimap, using the same roads, homes and player coordinates.
+export function drawMiniMap(canvas,player,{yaw=0,road=false}={}){
+ const c=canvas.getContext('2d');if(!c)return;const w=canvas.width,h=canvas.height,scale=w/110,px=x=>w/2+x*scale,py=z=>h/2-(z-2.5)*scale;
+ c.clearRect(0,0,w,h);c.fillStyle=road?'#536653':'#778157';c.fillRect(0,0,w,h);c.lineWidth=3;c.strokeStyle='#c7b487';c.lineCap='round';
+ const routes=road?[{points:[[-27,-36],[-24,-19],[-13,-9],[-7,1],[0,10],[10,23],[10,35],[10,45]]}]:ROADS;
+ for(const r of routes){c.beginPath();r.points.forEach(([x,z],i)=>i?c.lineTo(px(x),py(z)):c.moveTo(px(x),py(z)));c.stroke();}
+ if(!road)for(const home of HOMES){c.fillStyle='#e3cd94';c.beginPath();c.arc(px(home.x),py(home.z),3,0,Math.PI*2);c.fill();}
+ else{c.fillStyle='#7aabaa';c.fillRect(0,py(34),w,9*scale);}
+ if(player){c.save();c.translate(px(player.x),py(player.z));c.rotate(yaw);c.fillStyle='#ffe2a0';c.strokeStyle='#514323';c.lineWidth=1.5;c.beginPath();c.moveTo(0,-8);c.lineTo(5.5,5);c.lineTo(0,2);c.lineTo(-5.5,5);c.closePath();c.fill();c.stroke();c.restore();}
+ c.fillStyle='#fae1a5';c.font='bold 12px Georgia';c.textAlign='center';c.fillText('N',w/2,14);
+}

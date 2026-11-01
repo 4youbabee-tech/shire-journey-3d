@@ -6,7 +6,7 @@ export async function loadNature(B,scene,world){
  for(const name of ['maple-a','maple-b','grass','flowers']){
   const source=await B.SceneLoader.LoadAssetContainerAsync('./assets/environment/',name+'.glb',scene);
   sources[name]=source;
-  for(const m of source.materials){m.environmentIntensity=.65;m.backFaceCulling=false;}
+  for(const m of source.materials){m.environmentIntensity=.75;m.backFaceCulling=false;if(m.albedoColor&&/Leaves|Grass/i.test(m.name))m.albedoColor.set(.81,.92,.73);m.roughness=1;}
  }
  let trees=0,patches=0;
  function plant(name,x,z,height,yaw,label,lift=0){
