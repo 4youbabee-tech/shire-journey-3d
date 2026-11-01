@@ -40,7 +40,7 @@ test('B3 Hobbiton homes gain distinct facade, threshold and garden art without c
  assert.equal(art.doorHardware,51,'existing doors gain two hinges and one escutcheon');
  assert.equal(art.gardenBeds,34,'two garden beds per home stay clear of the entrance');
  assert.equal(art.steppingStones,51,'three walk stones per threshold');
- assert.ok(art.roofAccents>=14,'roof accents and Bag End lintel remain present');
+ assert.equal(art.roofAccents,1,'Bag End keeps its oak lintel without floating roof shrubs');
  assert.equal(world.stats.houses,17);
  assert.equal(world.stats.treeAnchors,28,'B2 tree layout remains untouched');
  assert.equal(world.colliders.filter(c=>c.name==='tree trunk collision').length,28);
