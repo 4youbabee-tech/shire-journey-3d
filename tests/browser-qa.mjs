@@ -137,7 +137,14 @@ try{
  assert.equal((await snap(page)).state.ringPassed,true,'Bilbo leaves the Ring to Frodo');
  assert.equal((await snap(page)).state.bilboGone,true,'Bilbo departs after the celebration');
  await still(page,'desktop-after-birthday.png');
- await still(page,'desktop-completed.png');await qaReposition(page,-12,-5);await still(page,'desktop-garden-life.png');
+ await still(page,'desktop-completed.png');
+ // Capture the actual B4 Green Dragon at its shipped Bywater Road coordinates.
+ await qaReposition(page,29,-35);await page.waitForTimeout(900);
+ const innSnapshot=await snap(page),inn=innSnapshot.world.bywaterDetails;
+ assert.equal(inn.inn,'Green Dragon');assert.equal(inn.signs,1);assert.equal(inn.lanterns,2);
+ assert.equal(inn.barrels,2);assert.equal(inn.seats,2);assert.equal(inn.flowerBoxes,2);
+ await still(page,'desktop-green-dragon-inn.png');
+ await qaReposition(page,-12,-5);await page.waitForTimeout(300);await still(page,'desktop-garden-life.png');
  report.desktop={status:'PASS',finishedQuest:true,reloadedSave:true,renderedWebGL:true,realWalkingSmoke:true,walkEvidence,roomWalkEvidence:{from:roomFrom.position,forward:roomForward.position,returned:roomReturn.position,realKeyboard:true},hillWalkEvidence:{from:hillFrom.position,arrival:hillArrival.position,returned:hillReturn.position,realKeyboard:true},qaRepositionBetweenEncounters:true,arabicChat:true,performance:await sampleFps(page),snapshot:await snap(page)};
  // Inspect the real asset at its existing world position; no character teleport.
  report.desktop.characterRig=await page.evaluate(()=>{
@@ -169,6 +176,11 @@ try{
  const before=await snap(touch);assert.equal(before.quality.mode,'auto');assert.ok(before.renderSize.scale>=1&&before.renderSize.scale<=2.25,'High-first quality stays within safe adaptive bounds');await mobileHold(cdp,cx,cy,0,-32,2400);const moved=await snap(touch);
  assert.ok(moved.position.z-before.position.z>.1,'Touch joystick must move character forward');
  await still(touch,'mobile-joystick.png');await still(touch,'mobile-natural-meadow-0.7.png');
+ // Check the B4 inn from a narrow touch viewport as well.
+ await qaReposition(touch,29,-35);await touch.waitForTimeout(900);
+ const mobileInn=(await snap(touch)).world.bywaterDetails;
+ assert.equal(mobileInn.inn,'Green Dragon');assert.equal(mobileInn.signs,1);assert.equal(mobileInn.lanterns,2);
+ await still(touch,'mobile-green-dragon-inn.png');
  // QA-only move after the independently verified real touch walking smoke.
  await qaReposition(touch,11,8.2);
  await touch.locator('#interact').waitFor({state:'visible',timeout:20000});
