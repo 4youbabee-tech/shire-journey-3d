@@ -16,36 +16,50 @@ function paint(B,mesh,hex){const c=B.Color3.FromHexString(hex),count=mesh.getTot
 export function createAmbientFauna(B,scene,{heightAt=(x,z)=>0,shadows=null,patches=PATCHES}={}){
  const material=new B.StandardMaterial('Shire fauna vertex colours',scene);
  material.diffuseColor=B.Color3.White();material.specularColor=new B.Color3(.025,.025,.025);material.useVertexColors=true;
- function build(kind){
-  const parts=[],add=(name,pos,scale,color)=>{const m=B.MeshBuilder.CreateSphere(name,{diameter:1,segments:8},scene);m.position.set(...pos);m.scaling.set(...scale);m.material=material;m.isPickable=false;paint(B,m,color);parts.push(m);};
-  const leg=(name,pos,diameter,height,color)=>{const m=B.MeshBuilder.CreateCylinder(name,{diameter,height,tessellation:6},scene);m.position.set(...pos);m.material=material;m.isPickable=false;paint(B,m,color);parts.push(m);};
-  if(kind==='sheep'){
-   add('sheep fleece body',[0,.47,0],[.88,.58,.62],'#e7dfca');
-   for(const [x,y,z] of [[-.34,.68,0],[-.12,.79,-.12],[.15,.78,-.1],[.36,.68,.02],[0,.72,.2],[-.2,.57,-.25]])add('sheep wool curl',[x,y,z],[.32,.3,.32],'#f0e8d6');
-   add('sheep head',[.43,.68,0],[.28,.3,.25],'#51473d');add('sheep muzzle',[.56,.57,-.13],[.17,.13,.15],'#8c7964');
-   add('sheep ear left',[.29,.77,-.2],[.17,.075,.09],'#51473d');add('sheep ear right',[.29,.77,.2],[.17,.075,.09],'#51473d');
-   add('sheep tail',[-.5,.52,0],[.18,.18,.18],'#e7dfca');
-   for(const [x,z] of [[-.28,-.2],[-.28,.2],[.28,-.2],[.28,.2]])leg('sheep leg',[x,.16,z],.075,.32,'#51473d');
+ const sourceParts=[],animals=[];
+ function primitive(name,position,scale,color,kindParts){const m=B.MeshBuilder.CreateSphere(name,{diameter:1,segments:8},scene);m.position.set(...position);m.scaling.set(...scale);m.material=material;m.isPickable=false;paint(B,m,color);kindParts.push(m);sourceParts.push(m);}
+ function cylinder(name,position,diameter,height,color,kindParts){const m=B.MeshBuilder.CreateCylinder(name,{diameter,height,tessellation:6},scene);m.position.set(...position);m.material=material;m.isPickable=false;paint(B,m,color);kindParts.push(m);sourceParts.push(m);}
+ for(const p of patches){
+  const groupParts=[],baseY=heightAt(p.x,p.z);
+  const add=(name,pos,scale,color)=>primitive(p.id+' '+name,[p.x+pos[0],baseY+pos[1],p.z+pos[2]],scale,color,groupParts);
+  const leg=(name,pos,diameter,height,color)=>cylinder(p.id+' '+name,[p.x+pos[0],baseY+pos[1],p.z+pos[2]],diameter,height,color,groupParts);
+  if(p.kind==='sheep'){
+   add('fleece body',[0,.47,0],[.88,.58,.62],'#e7dfca');
+   for(const [x,y,z] of [[-.34,.68,0],[-.12,.79,-.12],[.15,.78,-.1],[.36,.68,.02],[0,.72,.2],[-.2,.57,-.25]])add('wool curl',[x,y,z],[.32,.3,.32],'#f0e8d6');
+   add('head',[.43,.68,0],[.28,.3,.25],'#51473d');add('muzzle',[.56,.57,-.13],[.17,.13,.15],'#8c7964');
+   add('ear left',[.29,.77,-.2],[.17,.075,.09],'#51473d');add('ear right',[.29,.77,.2],[.17,.075,.09],'#51473d');
+   add('tail',[-.5,.52,0],[.18,.18,.18],'#e7dfca');
+   for(const [x,z] of [[-.28,-.2],[-.28,.2],[.28,-.2],[.28,.2]])leg('leg',[x,.16,z],.075,.32,'#51473d');
   }else{
-   add('rabbit body',[0,.35,0],[.56,.33,.38],'#96714d');add('rabbit hind haunch',[-.2,.39,.02],[.34,.31,.34],'#a9825b');
-   add('rabbit head',[.28,.63,0],[.25,.24,.23],'#96714d');add('rabbit muzzle',[.4,.55,-.12],[.13,.1,.13],'#c4a47c');
-   add('rabbit left ear',[.19,.93,-.08],[.09,.36,.075],'#96714d');add('rabbit right ear',[.35,.93,.08],[.09,.36,.075],'#96714d');
-   add('rabbit tail',[-.37,.46,0],[.16,.16,.16],'#e7dfca');
-   for(const [x,z] of [[-.19,-.15],[-.19,.15],[.2,-.13],[.2,.13]])leg('rabbit leg',[x,.13,z],.07,.24,'#6c503b');
+   add('body',[0,.35,0],[.56,.33,.38],'#96714d');add('hind haunch',[-.2,.39,.02],[.34,.31,.34],'#a9825b');
+   add('head',[.28,.63,0],[.25,.24,.23],'#96714d');add('muzzle',[.4,.55,-.12],[.13,.1,.13],'#c4a47c');
+   add('left ear',[.19,.93,-.08],[.09,.36,.075],'#96714d');add('right ear',[.35,.93,.08],[.09,.36,.075],'#96714d');
+   add('tail',[-.37,.46,0],[.16,.16,.16],'#e7dfca');
+   for(const [x,z] of [[-.19,-.15],[-.19,.15],[.2,-.13],[.2,.13]])leg('leg',[x,.13,z],.07,.24,'#6c503b');
   }
-  const mesh=B.Mesh.MergeMeshes(parts,true,true,undefined,false,false);
-  if(!mesh)throw Error('Unable to assemble '+kind+' meadow mesh');
-  mesh.name='shared '+kind+' meadow mesh';mesh.material=material;mesh.isPickable=false;mesh.receiveShadows=true;mesh.alwaysSelectAsActiveMesh=true;
-  return mesh;
+  const vertexCount=groupParts.reduce((n,m)=>n+m.getTotalVertices(),0);
+  animals.push({...p,home:{x:p.x,z:p.z},baseY,startVertex:sourceParts.slice(0,-groupParts.length).reduce((n,m)=>n+m.getTotalVertices(),0),vertexCount,activity:'Idle'});
  }
- const meshes={sheep:build('sheep'),rabbit:build('rabbit')},groups={sheep:[],rabbit:[]};
- for(const patch of patches)groups[patch.kind].push({...patch,scale:patch.kind==='sheep'?1:.78});
- const animals=[];
- for(const kind of ['sheep','rabbit']){
-  const group=groups[kind],mesh=meshes[kind],matrices=new Float32Array(group.length*16);
-  group.forEach((p,index)=>{const position=new B.Vector3(p.x,heightAt(p.x,p.z),p.z),matrix=B.Matrix.Compose(new B.Vector3(p.scale,p.scale,p.scale),B.Quaternion.Identity(),position);matrix.copyToArray(matrices,index*16);animals.push({...p,index,mesh,home:{x:p.x,z:p.z},activity:'Idle'});});
-  mesh.thinInstanceSetBuffer('matrix',matrices,16,true);mesh.thinInstanceCount=group.length;shadows?.addShadowCaster(mesh);
+ const mesh=B.Mesh.MergeMeshes(sourceParts,true,true,undefined,false,false);
+ if(!mesh)throw Error('Unable to merge Shire fauna into one draw call');
+ mesh.name='single draw-call Shire meadow fauna';mesh.material=material;mesh.isPickable=false;mesh.receiveShadows=true;mesh.alwaysSelectAsActiveMesh=true;shadows?.addShadowCaster(mesh);
+ const basePositions=mesh.getVerticesData(B.VertexBuffer.PositionKind).slice(),baseNormals=mesh.getVerticesData(B.VertexBuffer.NormalKind).slice();
+ const positions=basePositions.slice(),normals=baseNormals.slice();
+ function update(poses){
+  for(const animal of animals){
+   const pose=poses.get(animal.id);if(!pose)continue;
+   const x=animal.home.x+pose.offsetX,z=animal.home.z+pose.offsetZ,y=heightAt(x,z)+pose.bodyBob+pose.hop;
+   const c=Math.cos(pose.heading),s=Math.sin(pose.heading),scale=animal.kind==='sheep'?1:.78;
+   const start=animal.startVertex,end=start+animal.vertexCount;
+   for(let i=start;i<end;i++){
+    const k=i*3,bx=basePositions[k]-animal.home.x,bz=basePositions[k+2]-animal.home.z,by=basePositions[k+1]-animal.baseY;
+    positions[k]=x+(bx*c+bz*s)*scale;positions[k+1]=y+by*scale;positions[k+2]=z+(-bx*s+bz*c)*scale;
+    const nx=baseNormals[k],nz=baseNormals[k+2];normals[k]=nx*c+nz*s;normals[k+1]=baseNormals[k+1];normals[k+2]=-nx*s+nz*c;
+   }
+   animal.activity=pose.activity;
+  }
+  mesh.updateVerticesData(B.VertexBuffer.PositionKind,positions,false,false);
+  mesh.updateVerticesData(B.VertexBuffer.NormalKind,normals,false,false);
  }
- function update(poses){for(const animal of animals){const pose=poses.get(animal.id);if(!pose)continue;const x=animal.home.x+pose.offsetX,z=animal.home.z+pose.offsetZ,position=new B.Vector3(x,heightAt(x,z)+pose.bodyBob+pose.hop,z),rotation=B.Quaternion.RotationYawPitchRoll(pose.heading,animal.kind==='sheep'?pose.grazing*.035:pose.hop*.12,0),matrix=B.Matrix.Compose(new B.Vector3(animal.scale,animal.scale,animal.scale),rotation,position);animal.mesh.thinInstanceSetMatrixAt(animal.index,matrix,false);animal.activity=pose.activity;}for(const mesh of Object.values(meshes))mesh.thinInstanceBufferUpdated('matrix');}
- return {meshes:Object.values(meshes),animals,update,dispose(){for(const mesh of Object.values(meshes))mesh.dispose();material.dispose();}};
+ return {mesh,animals,update,dispose(){mesh.dispose();material.dispose();}};
 }
