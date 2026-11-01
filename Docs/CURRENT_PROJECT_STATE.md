@@ -1,3 +1,9 @@
+# B6 feature candidate 0.16.1 — Ring inspection
+
+B5 is merged and 0.16.0 was independently fetched on the original Pages URL. Nine original owner references are preserved under Docs/References and indexed in OWNER_VISUAL_REFERENCES.md. B6 now includes optional hand-tracked Ring inspection, explicit keyboard/touch controls, cancellation, movement pause, close framing and saved journal count. 91 local source tests and desktop/mobile Chromium interaction playback pass after size/palm/camera refinement. Exact-head CI and full B6 hero-art/story acceptance remain pending. See B6_ACTIVE_CHECKPOINT.md. This is not completion of B6–B10.
+
+---
+
 # B5 merged — B6 active
 
 B5 PR #27 merged as `de1df1859c6cc75aa7dfb04753f6525b079193dd`. Source head `da60df5845641d30c0ea4f0d073aadac6d65436a` passed all jobs in Actions `41353017080`: 89 source tests, full desktop/mobile Bree walkthrough, previous road, Bywater, opening, party, revelation and paired golden checks. Exact-head Bree artifact `13102017444` downloaded and SHA256 verified as `d589d73e295561d0e16c9d073c9f8fe786954a064ff7ed6bfb664c670b3824c7`; actual images reviewed. Real keyboard walking, innkeeper/Strider tasks, resting and restored indoor save passed on both viewports. Interior has 35 active regional meshes. Publication of 0.16.0 is tracked separately; do not infer it solely from merge.
