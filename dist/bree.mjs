@@ -2,7 +2,7 @@ import {dressMaterials} from './surface-art.mjs';
 import {BREE_POINTS as P,breeInteraction,actBree,breeObjective} from './bree-state.mjs';
 import {createTownResident} from './town-resident.mjs';
 // Streamed compact Bree: all architecture and dialogue are originally authored.
-export function createBree(B,scene,world,{onChange=()=>{},onMessage=()=>{},onGate=()=>{},onInterior=()=>{}}={}){
+export function createBree(B,scene,world,{onChange=()=>{},onMessage=()=>{},onGate=()=>{},onInterior=()=>{},onTransition=()=>{}}={}){
  const V=B.Vector3,M=B.MeshBuilder,town=new B.TransformNode('Bree town',scene),inn=new B.TransformNode('Prancing Pony rooms',scene),materials=[],actors=[],lights=[],cameraMeshes=[],batches=new Map(),townColliders=[],innColliders=[];
  let state=null,active=false,clock=0,current=null;
  const mat=(name,color,emissive=false)=>{const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(color);m.specularColor.set(.03,.03,.03);if(emissive)m.emissiveColor=m.diffuseColor.scale(.55);materials.push(m);return m;};
@@ -44,7 +44,7 @@ export function createBree(B,scene,world,{onChange=()=>{},onMessage=()=>{},onGat
  dressMaterials(B,scene,materials);
  for(const {parent,meshes}of batches.values()){const mesh=B.Mesh.MergeMeshes(meshes,true,true);if(mesh){mesh.parent=parent;mesh.name='Bree static '+mesh.material.name;if([roof,timber].includes(mesh.material)){cameraMeshes.push(mesh);(world.cameraBlockers??=[]).push(mesh);}mesh.isPickable=false;mesh.receiveShadows=true;}}
  town.setEnabled(false);inn.setEnabled(false);
- function switchPlace({resume=false}={}){current=state.location==='inn'?inn:town;town.setEnabled(current===town);inn.setEnabled(current===inn);world.colliders=current===town?townColliders:innColliders;world.ground=current===town?townGround:innGround;if(!resume){const p=current===inn?P.exit:P.inn;world.body.position.set(p.x,.72,p.z+(current===inn?1:-1));}onInterior(current===inn);onChange();}
+ function switchPlace({resume=false}={}){current=state.location==='inn'?inn:town;town.setEnabled(current===town);inn.setEnabled(current===inn);world.colliders=current===town?townColliders:innColliders;world.ground=current===town?townGround:innGround;if(!resume){const p=current===inn?P.exit:P.inn;world.body.position.set(p.x,.72,p.z+(current===inn?1:-1));}onInterior(current===inn);onTransition();onChange();}
  function activate(s,{resume=false,fromGate=false}={}){state=s;active=true;switchPlace({resume});if(fromGate)world.body.position.set(P.gate.x,.72,P.gate.z+2);onChange();}
  function interact(){const item=breeInteraction(state,world.body.position);if(!item)return false;if(item.id==='bree-gate'){onGate();return true;}const previous=state.location,changed=actBree(state,item.id,world.body.position);if(previous!==state.location){switchPlace();return true;}
  const lines={

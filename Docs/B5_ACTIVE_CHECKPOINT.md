@@ -1,3 +1,7 @@
+# Follow-up: B4 accepted; B5 camera/party refinement
+
+B4 merged at 6613a74a114f83ebe3dd6ed37e78abd51d4116ff and publication identity verified as 0.15.0. B5 full local Chromium desktop/mobile walkthrough also passed after original material/sign improvements, with no browser errors. The current follow-up reserves camera/party reset for transitions only and adjusts indoor/outdoor framing; source tests and final browser rerun gate this head. Both canonical status documents contain the accepted B4 receipt.
+
 # B5 active checkpoint — connected Bree candidate
 
 Base B5 source checkpoint: `df2f6981c95873a475cc59bfee86a84688c9700c`. B4 PR #26 head remains `650529eea2d8cc558f3ecd7afb7b661cd7207ded`; run `41351147934` awaiting its full Chromium result at this receipt. Never merge on an older successful run.

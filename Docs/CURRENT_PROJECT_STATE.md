@@ -1,3 +1,15 @@
+# B4 merged and published — B5 in CI
+
+B4 PR #26 merged as `6613a74a114f83ebe3dd6ed37e78abd51d4116ff`. Exact source head `650529eea2d8cc558f3ecd7afb7b661cd7207ded` passed run `41351147934` (85 native tests, desktop/mobile Chromium, Bywater walkthrough, opening, party, revelation, road and golden evidence). Browser artifact `13101404657` was downloaded, SHA256 verified and actual desktop/mobile inn images reviewed. Digest: `a33e1e8ad550f0b70513b59dfe45ae8cc1a71d8bde88d17a3ead3552061aae90`.
+
+Pages run `41352500004` succeeded. The original public `build-info.mjs` was independently fetched and serves version `0.15.0`, commit `6613a74a114f83ebe3dd6ed37e78abd51d4116ff`. Public rendered-game smoke is tracked separately in main run `41352500052`; hardware FPS remains unmeasured.
+
+B5 PR #27 is the active candidate on `production/b5-bree-pony-01`; saved integration head `77ebf243a5b6e8ac54b6ea11f1c574b49147cc50`, run `41352380871`. 89 local source tests and full desktop/mobile Bree walking, lodging and save/reload passed. B5 is not yet merged or published. Current follow-up limits camera/party reset to real transitions and improves regional framing; it needs its own final validation. B6–B10 remain open. Owner images are approximate direction, not accepted game captures. Never call the entire requested game complete at this checkpoint.
+
+---
+
+## Historical receipts
+
 # Latest execution checkpoint — connected B5 candidate
 
 B4 PR #26 at `650529eea2d8cc558f3ecd7afb7b661cd7207ded` remains under exact-head CI run `41351147934`; source, road and golden jobs passed, full Chromium result still pending at this write.
