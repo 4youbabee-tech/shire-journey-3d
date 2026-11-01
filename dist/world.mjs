@@ -67,7 +67,55 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
   cyl('stone doorstep',x,.09,z-1.1*s,2.5*s,.18,stone);cyl('chimney',x+1.7*s,4.6*s,z+2*s,.7*s,2*s,stone,true,null,.65*s,6);cyl('chimney cap',x+1.7*s,5.6*s,z+2*s,1*s,.2*s,cream);
   colliders.push(addHomeCollision(B,scene,{x,z,s,y:houseBase}));houseBase=null;
  }
- for(const home of HOMES)house(home.x,home.z,home.s,home.color==='rust'?red:home.color==='blue'?blue:door);
+ // B3 / architecture pass: each home keeps its surveyed position, collision hull,
+ // round-door interaction and save identity. Only lightweight decorative art changes.
+ // The four coherent facade treatments reuse existing materials and static batching.
+ const homesteadStyles=['bag-end','orchard','flower','woodland'];
+ const homesteadDetails={homes:0,shutters:0,doorHardware:0,gardenBeds:0,steppingStones:0,roofAccents:0,styles:homesteadStyles};
+ function homesteadArt(home,index){
+  const {x,z,s}=home,style=index===0?0:1+(index%3),accent=[door,red,blue,wood][style];
+  homesteadDetails.homes++;
+  // Paired oak shutters sit *outside* the glazed round windows.
+  for(const side of [-1,1])for(const outer of [-1,1]){
+   const wx=x+side*1.92*s+outer*.63*s;
+   const plank=M.CreateBox('B3 cottage timber window shutter',{width:.17*s,height:.82*s,depth:.12*s},scene);
+   finish(plank,style===2?red:wood,wx,1.9*s,z-.49*s);homesteadDetails.shutters++;
+  }
+  // Raised hardware and varied painted wood give the round entrances identity.
+  for(const y of [.9,1.8]){
+   sphere('B3 door forged hinge',x-.92*s,y*s,z-.53*s,.13*s,.075*s,.075*s,dark,true,null,6);
+   homesteadDetails.doorHardware++;
+  }
+  sphere('B3 door brass escutcheon',x+.13*s,1.35*s,z-.58*s,.24*s,.24*s,.07*s,brass,true,null,8);
+  homesteadDetails.doorHardware++;
+  // Garden beds are set to either side of the threshold, not across the path.
+  for(const side of [-1,1]){
+   const gx=x+side*2.78*s,gz=z-1.42*s;
+   const border=M.CreateBox('B3 raised herb bed',{width:.9*s,height:.2*s,depth:.75*s},scene);
+   finish(border,style===3?stone:wood,gx,.14*s,gz);
+   homesteadDetails.gardenBeds++;
+   for(let j=0;j<2;j++){
+    const fx=gx+(j? .18:-.18)*s,fz=gz+(j?-.12:.12)*s;
+    sphere('B3 kitchen garden herb',fx,.42*s,fz,.33*s,.36*s,.3*s,j%2?leaf2:leaf3,true,null,6);
+    sphere('B3 cottage flower',fx,.69*s,fz,.15*s,.11*s,.15*s,style===2?pink:style===1?yellow:white,true,null,6);
+   }
+  }
+  // Flat stepping stones visually join existing walkable roads without new collision.
+  for(let j=0;j<3;j++){
+   const slab=M.CreateBox('B3 front walk stepping stone',{width:(1.05+j*.09)*s,height:.055*s,depth:.36*s},scene);
+   finish(slab,stone,x,.035*s,z-(1.48+j*.44)*s);
+   homesteadDetails.steppingStones++;
+  }
+  if(index===0){
+   // Bag End's warm, recognisable front entrance has a hand-crafted oak lintel.
+   beam([x-1.55*s,2.9*s,z-.63*s],[x+1.55*s,2.9*s,z-.63*s],.09*s,wood,'B3 Bag End carved oak lintel');
+   homesteadDetails.roofAccents++;
+  }
+ }
+ for(const [index,home] of HOMES.entries()){
+  house(home.x,home.z,home.s,home.color==='rust'?red:home.color==='blue'?blue:door);
+  homesteadArt(home,index);
+ }
  function fence(points){for(let i=0;i<points.length;i++){const [x,z]=points[i];cyl('fence post',x,.55,z,.16,1.1,wood,true,null,.1,6);if(i){const [px,pz]=points[i-1];beam([x,.4,z],[px,.4,pz],.09,wood);beam([x,.8,z],[px,.8,pz],.09,wood);}}}
  fence([[-15,0],[-13,0],[-11,0],[-9,0],[-8,-1]]);fence([[-17,8],[-19,8],[-21,8],[-23,8],[-25,10],[-25,12]]);fence([[15,7],[17,7],[19,7],[21,7]]);fence([[-7,25],[-7,27],[-7,29]]);
  // Village dressing uses shared materials and static batching; no moving story anchors.
@@ -175,7 +223,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  const groups=new Map();for(const mesh of statics){const key=mesh.material.uniqueId;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(mesh);}let mergedCount=0;for(const group of groups.values()){const m=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);if(m){m.name='batched '+m.material.name;m.receiveShadows=true;m.freezeWorldMatrix();if(shadow&& !['warm gravel','clouds','pond water'].includes(m.material.name))shadow.addShadowCaster(m);mergedCount++;}}
  const body=M.CreateSphere('player collision ellipsoid',{diameter:1,segments:6},scene);body.position.set(0,.72,-15);body.isVisible=false;body.isPickable=false;body.ellipsoid=new V(.32,.7,.32);body.checkCollisions=true;
  dressMaterials(B,scene,Object.values(mats));
- return {player,body,characters,workers,leaves,treeAnchors,hedgeAnchors,apples,birds,sun,hemi,shadow,colliders,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,roads:ROADS.length,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,animatedCanopies:leaves.length,treeAnchors:treeAnchors.length,hedgeAnchors:hedgeAnchors.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
+ return {player,body,characters,workers,leaves,treeAnchors,hedgeAnchors,apples,birds,sun,hemi,shadow,colliders,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,homesteadDetails,roads:ROADS.length,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,animatedCanopies:leaves.length,treeAnchors:treeAnchors.length,hedgeAnchors:hedgeAnchors.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
 }
 
 
