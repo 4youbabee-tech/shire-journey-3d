@@ -139,7 +139,7 @@ try{
  await still(page,'desktop-after-birthday.png');
  await still(page,'desktop-completed.png');
  // Capture the actual B4 Green Dragon at its shipped Bywater Road coordinates.
- await qaReposition(page,29,-35);await page.evaluate(()=>window.__SHIRE__.qaView(0,.28,5.6));await page.waitForTimeout(900);await page.locator('#qa-diagnostics').evaluate(el=>el.hidden=true);
+ await qaReposition(page,29,-35);await page.evaluate(()=>window.__SHIRE__.qaView(0,.32,7.0));await page.waitForTimeout(900);await page.locator('#qa-diagnostics').evaluate(el=>el.hidden=true);
  const innSnapshot=await snap(page),inn=innSnapshot.world.bywaterDetails;
  assert.equal(inn.inn,'Green Dragon');assert.equal(inn.signs,1);assert.equal(inn.lanterns,2);
  assert.equal(inn.barrels,2);assert.equal(inn.seats,2);assert.equal(inn.flowerBoxes,2);assert.equal(inn.residents,2);assert.equal(innSnapshot.world.backgroundVillagers,5);

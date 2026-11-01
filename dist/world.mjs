@@ -121,11 +121,11 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  const bywaterDetails={inn:'Green Dragon',home:'Bywater Road',signs:0,lanterns:0,barrels:0,seats:0,flowerBoxes:0,residents:0};
  const inn=HOMES.find(h=>h.name==='Bywater Road');
  if(inn){
-  const ix=inn.x,iz=inn.z,is=inn.s,signX=ix+2.9*is,signY=2.45*is,signZ=iz-2.9*is;
+  const ix=inn.x,iz=inn.z,is=inn.s,signX=ix,signY=3.15*is,signZ=iz-.95*is;
   // Readable timber sign, original dragon silhouette and raised gold lettering.
-  cyl('B4 inn sign post',ix+3.8*is,1.5*is,iz-2.9*is,.18*is,3*is,wood);
-  beam([ix+3.8*is,2.82*is,iz-2.9*is],[ix+2.4*is,2.82*is,iz-2.9*is],.11*is,wood,'B4 hanging sign arm');
-  const sign=M.CreateBox('B4 Green Dragon hanging sign',{width:2.4*is,height:1.15*is,depth:.13*is},scene);
+  beam([ix-.95*is,3.62*is,signZ+.08*is],[ix-.95*is,3.18*is,signZ+.08*is],.08*is,wood,'B4 left sign bracket');
+  beam([ix+.95*is,3.62*is,signZ+.08*is],[ix+.95*is,3.18*is,signZ+.08*is],.08*is,wood,'B4 right sign bracket');
+  const sign=M.CreateBox('B4 Green Dragon wall sign',{width:2.5*is,height:.95*is,depth:.13*is},scene);
   finish(sign,door,signX,signY,signZ);
   sphere('B4 green dragon body',signX-.68*is,signY,signZ-.09*is,.56*is,.22*is,.065*is,leaf2,true,null,6);
   sphere('B4 green dragon head',signX-.34*is,signY+.11*is,signZ-.105*is,.2*is,.18*is,.07*is,leaf2,true,null,6);
@@ -254,15 +254,15 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
   function tint(mesh,color,px,py,pz){const c=B.Color3.FromHexString(color),count=mesh.getTotalVertices(),colors=new Float32Array(count*4);for(let i=0;i<count;i++){colors[i*4]=c.r;colors[i*4+1]=c.g;colors[i*4+2]=c.b;colors[i*4+3]=1;}mesh.material=residentMaterial;mesh.setVerticesData(B.VertexBuffer.ColorKind,colors,false,4);mesh.position.set(px,py,pz);mesh.isPickable=false;mesh.receiveShadows=true;source.push(mesh);}
   const box=(name,w,h,d,px,py,pz,color)=>{const mesh=M.CreateBox(name,{width:w,height:h,depth:d},scene);tint(mesh,color,px,py,pz);};
   const ball=(name,sx,sy,sz,px,py,pz,color)=>{const mesh=M.CreateSphere(name,{diameter:1,segments:8},scene);mesh.scaling.set(sx,sy,sz);tint(mesh,color,px,py,pz);};
-  box(id+' tunic',.58,.76,.36,0,.98,0,coat);box(id+' apron',.38,.53,.035,0,.92,-.2,apron);ball(id+' face',.33,.4,.33,0,1.58,0,skinColor);ball(id+' hair',.38,.19,.37,0,1.77,.015,hairColor);
+  box(id+' tunic',.58,.76,.36,0,.98,0,coat);box(id+' apron',.38,.53,.035,0,.92,-.2,apron);ball(id+' face',.33,.4,.33,0,1.58,0,skinColor);ball(id+' hair',.38,.19,.37,0,1.77,.015,hairColor);ball(id+' left eye',.04,.04,.025,-.07,1.61,-.17,'#35271f');ball(id+' right eye',.04,.04,.025,.07,1.61,-.17,'#35271f');
   box(id+' shirt sleeve left',.18,.62,.19,-.38,1.02,0,shirtColor);box(id+' shirt sleeve right',.18,.62,.19,.38,1.02,0,shirtColor);box(id+' trousers left',.21,.68,.22,-.16,.37,0,trouserColor);box(id+' trousers right',.21,.68,.22,.16,.37,0,trouserColor);box(id+' boots left',.23,.12,.34,-.16,.055,-.07,bootColor);box(id+' boots right',.23,.12,.34,.16,.055,-.07,bootColor);
   const bodyMesh=B.Mesh.MergeMeshes(source,true,true,undefined,false,false);if(!bodyMesh)throw new Error('Unable to merge low-cost Bywater resident: '+id);bodyMesh.name=id+' single-mesh resident';bodyMesh.parent=root;bodyMesh.position.set(0,0,0);bodyMesh.isPickable=false;bodyMesh.receiveShadows=true;if(shadow)shadow.addShadowCaster(bodyMesh);
   const joint=(name,px,py,pz)=>{const node=new B.TransformNode(id+' '+name,scene);node.parent=root;node.position.set(px,py,pz);return node;};
   const resident={id,root,left:joint('left arm pivot',-.36,1.05,0),right:joint('right arm pivot',.36,1.05,0),head:joint('head pivot',0,1.58,0),leftLeg:joint('left leg pivot',-.16,.37,0),rightLeg:joint('right leg pivot',.16,.37,0),parts:[bodyMesh],bodyMesh,simple:true,visualArt:{detailTag:'bywater-single-mesh-v1'},home:{x,z},range,phase,activity:'Idle',routineTime:0};
-  root.rotation.y=.3+phase;characters.push(resident);workers.push(resident);bywaterDetails.residents++;return resident;
+  root.rotation.y=0;root.scaling.setAll(.78);characters.push(resident);workers.push(resident);bywaterDetails.residents++;return resident;
  }
- bywaterResident('bywater-innkeeper',34,-26,{coat:'#4d684d',apron:'#d6c7a6',shirt:'#f5e6bc',skin:'#e5b18a',hair:'#47372c',trousers:'#685a3b',boots:'#493d2c',range:.65,phase:1});
- bywaterResident('bywater-baker',24,-26,{coat:'#a9664b',apron:'#eee3c0',shirt:'#f5e6bc',skin:'#d7a18b',hair:'#65412b',trousers:'#685a3b',boots:'#493d2c',range:.72,phase:3});
+ bywaterResident('bywater-innkeeper',26.6,-33.2,{coat:'#4d684d',apron:'#d6c7a6',shirt:'#f5e6bc',skin:'#e5b18a',hair:'#47372c',trousers:'#685a3b',boots:'#493d2c',range:.45,phase:1});
+ bywaterResident('bywater-baker',31.4,-33.2,{coat:'#a9664b',apron:'#eee3c0',shirt:'#f5e6bc',skin:'#d7a18b',hair:'#65412b',trousers:'#685a3b',boots:'#493d2c',range:.45,phase:3});
  const applePositions=[[-18,12],[-17,17],[-21,15]];for(let i=0;i<3;i++){const [x,z]=applePositions[i];const root=new B.TransformNode('collectible apple '+i,scene);root.position.set(x,.4,z);sphere('collectible red apple',0,0,0,.42,.4,.42,applemat,false,root);cyl('apple stalk',0,.22,0,.035,.13,bark,false,root);sphere('apple leaf',.11,.24,0,.22,.05,.1,leaf2,false,root);const halo=M.CreateTorus('apple glow',{diameter:.75,thickness:.035,tessellation:20},scene);halo.material=brass;halo.parent=root;halo.position.y=-.22;apples.push({id:'apple-'+i,root,halo});}
  // Merge static geometry by material: a few dozen draws, rather than hundreds.
  const groups=new Map();for(const mesh of statics){const key=mesh.material.uniqueId;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(mesh);}let mergedCount=0;for(const group of groups.values()){const m=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);if(m){m.name='batched '+m.material.name;m.receiveShadows=true;m.freezeWorldMatrix();if(shadow&& !['warm gravel','clouds','pond water'].includes(m.material.name))shadow.addShadowCaster(m);mergedCount++;}}
