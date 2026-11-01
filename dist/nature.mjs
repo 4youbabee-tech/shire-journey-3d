@@ -23,7 +23,7 @@ export async function loadNature(B,scene,world){
   // Small asymmetric sway uses the existing world leaf updater, not a second loop.
   world.leaves.push({root,phase:i*1.73,amplitude:.004+(i%3)*.001});trees++;
   // Sparse understory remains within existing tree bounds, away from village routes.
-  for(let j=0;j<5;j++){const angle=j*2.399+i,r=1.1+(j%3)*.32;plant(j%3?'grass':'flowers',a.x+Math.cos(angle)*r,a.z+Math.sin(angle)*r,j%3?.28:.34,angle,'understory '+i+' '+j);patches++;}
+  for(let j=0;j<3;j++){const angle=j*2.399+i,r=1.1+(j%3)*.32;plant(j%3?'grass':'flowers',a.x+Math.cos(angle)*r,a.z+Math.sin(angle)*r,j%3?.28:.34,angle,'understory '+i+' '+j);patches++;}
  }
  // Real textured leaf/flower clusters replace the former smooth green balls.
  for(const [i,a]of (world.hedgeAnchors||[]).entries())for(let j=0;j<3;j++){

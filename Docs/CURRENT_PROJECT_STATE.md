@@ -1,3 +1,32 @@
+# Active checkpoint — 2026-11-01 B1 merged / B2 in development
+
+B1 evidence baseline was merged to main as eeaf9f09e0899f464197088f2a0c53167ad33c96 (PR #23). Exact-head Actions run 41256482254, attempt 2: source validation, b1-evidence and Shire road jobs PASS; Chromium WebGL job PASS after retry. The first attempt exposed an opening-animation assertion mismatch; the second exact-head attempt passed opening, party, revelation and browser QA. Golden capture report contains all 12 fixed cameras on immutable 0.14.1 and candidate; hashes match byte-for-byte because B1 deliberately changes no game visuals. Functional perf exporter check PASS only as a partial SwiftShader test; it is not a five-minute phone measurement and not G4/G5. Artifacts: 13063093276 (B1 paired baseline/candidate), 13063053146 (road playback), 13062989060 (browser evidence). SwiftShader reports 1 FPS desktop / 4-5 FPS mobile emulation; this is not target hardware acceptance.
+
+B1 merged but owner review is still open for the 12-image contact sheet. PROJECT_GOVERNOR is not present in the repository; AGENTS.md was followed, and the missing governor has not been invented. The Story Bible PDFs are registered in FILM_MATCH_MATRIX; the full screenplay/book order reconciliation is explicitly incomplete. Owner physical-phone G4/G5 recording and G6 acceptance remain pending.
+
+## B2 candidate — greener, fuller Shire
+
+Branch: production/b2-green-shire-checkpoint. This candidate changes only world palette, lighting/fog/tone mapping and adds 12 perimeter tree anchors using the already licensed Quaternius maple GLBs. Understory per tree is reduced from five to three to balance draw/asset count; existing roadside planting remains capped. Tree trunk colliders are retained. No new external asset, licence, story state, save schema, route or UI changes. Target is the supplied warm, lush Shire reference, not pixel imitation.
+
+Acceptance required before merge: npm ci, npm run check, full tests, exact-head Chromium golden captures and opening/party/revelation/road playback; inspect actual game screenshots/contact sheet and compare against B1; verify triangle/draw/mesh budgets and no blocker overlap. B2 is not accepted until these finish. Physical phone performance still requires owner export.
+
+## Canonical production checkpoints
+
+| Checkpoint | Scope | Status | Evidence / gate |
+|---|---|---|---|
+| B1 | Golden cameras, immutable 0.14.1 before/after, opt-in 5-minute perf JSON, story matrix | MERGED; owner review pending | PR23, Actions 41256482254 attempt 2, artifacts above |
+| B2 | Warm lush Shire palette, lighting, fog and 28 tree anchors | IN PROGRESS | branch above; exact-head browser review pending |
+| B3 | Hobbiton house architecture, garden props, paths and interiors | NOT STARTED | film-map locations must be grounded in source map; asset budgets and interior walk |
+| B4 | Bywater / Green Dragon / Gamgee homestead and lived-in village loops | NOT STARTED | map continuity, NPC schedule and A/V evidence |
+| B5 | Shire-to-Bree continuous route, Bree interior and Prancing Pony | PARTIAL | fields, rider cover, ferry and Bree exterior exist; Bree interior not built |
+| B6 | Original high-quality Frodo, Sam, Bilbo and Gandalf models, facial closeups and four Ring moments | PARTIAL | current licensed/authored GLBs exist; style/visual owner acceptance and full G6 evidence pending |
+| B7 | Day cycle, 20+ residents, animals, work/social/rest loops, layered ambience | PARTIAL | three background villagers and limited activity/audio exist; full population and day cycle pending |
+| B8 | Weathertop and wound sequence | NOT STARTED | gated on B5 and B6 |
+| B9 | Rivendell, council and Fellowship formation | NOT STARTED | gated on B8 |
+| B10 | Moria, Lothlórien, Amon Hen and onward expansion | NOT STARTED | separate chapter-level acceptance |
+
+Never describe the complete requested game as finished while B3-B10 remain open. The public Pages URL remains unchanged. CI/SwiftShader is not physical-device FPS.
+
 # 0.14.0 road candidate: active production
 
 Streamed F1-03 fields, Merry/Pippin meeting, mounted rider cover, working Buckleberry ferry and exterior Bree approach. Native source suite: 76 PASS. Road WebGL at a9ae0b7a2f70bbe7e529013a2cb5f603020049ee PASS, Actions 41247921085 / road job 124675114536, artifact 13060650861 (SHA256 6b6210e2405c7a40fea577ed9d7ba2dbcecba68e49df879b18ba5111b95c513b). Real entry/WASD, cover/pause, natural crossing, map and saved reload covered; QA relocation explicitly used between encounters. Actual captures reviewed. Midstream foliage blocked the camera: final refinement clears the wharf corridor and adds gradual night arrival plus lanterns; requires new exact-head images. Existing full opening/touch/revelation checks still gate merge. This is not a finished full-world release; see SHIRE_ROAD_PRODUCTION.md.
