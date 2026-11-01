@@ -96,3 +96,39 @@ jobs:
           name: shire-published-playback
           path: qa-evidence/published/
           retention-days: 90
+
+  b1-evidence:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci && npm run check && npm test
+      - run: npm install --no-save --no-package-lock --ignore-scripts playwright@1.56.1 && npx playwright install --with-deps chromium
+      - uses: actions/checkout@v4
+        with:
+          ref: 9779857b1a7d802980056ecff3ed4048954e7881
+          path: b1-baseline
+      - name: Reconstruct immutable 0.14.1 reference
+        working-directory: b1-baseline
+        run: npm ci
+      - name: Capture reference and candidate with identical cameras
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          QA_DIST=b1-baseline/dist QA_OUT=qa-evidence/before-0.14.1 EXPECTED_COMMIT_SHA=9779857b1a7d802980056ecff3ed4048954e7881 node tests/golden-shots.mjs
+          QA_OUT=qa-evidence/golden node tests/golden-shots.mjs
+          node tests/perf-playback.mjs
+          python3 -m pip install Pillow==11.3.0
+          python3 tests/golden-contact-sheet.py qa-evidence/before-0.14.1 qa-evidence/golden qa-evidence/b1-comparison.png
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shire-b1-evidence
+          path: qa-evidence/
+          retention-days: 90
