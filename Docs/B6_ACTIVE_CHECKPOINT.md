@@ -1,3 +1,14 @@
+# Latest checkpoint — 2026-11-02, B6 Ring interaction camera refinement
+
+Active branch: `production/b6-ring-interaction-01`
+Latest source commit: `3c963aa61f60b62816dd7af431569fc0570b07e1`
+PR: [#28](https://github.com/4youbabee-tech/shire-journey-3d/pull/28) — still Draft; do not merge until exact-head validation and publication gates pass.
+Latest workflow queued at checkpoint: [41357123713](https://github.com/4youbabee-tech/shire-journey-3d/actions/runs/41357123713). Previous exact-head workflow 41356248289 passed source, Bree, road and B1 jobs but the stricter Ring camera convergence test failed at 15 seconds. The failure is recorded, not waived.
+Latest change narrows the camera field of view during Ring inspection, exposes FOV in QA snapshots, checks the close-up FOV and restoration, and uses the visible touch/UI control for the second trigger. Re-run full checks on the new SHA before acceptance.
+Original owner images: nine reference files preserved under `Docs/References`; latest newly supplied reference set includes Hobbiton/Bag End, Bilbo's party, Gandalf, the four hobbits, Black Rider, Bucklebury ferry, Bree, Prancing Pony and mobile HUD compositions. Use as approximate direction, not as runtime textures.
+Current production scope: B5 accepted/merged; B6 remains partial. Remaining B6 work includes hero differentiation/expression, animation continuity and full Ring/story visual acceptance. B7–B10 remain open. Physical phone FPS and owner-device review are still not proven.
+Preserve the permanent Pages URL: https://4youbabee-tech.github.io/shire-journey-3d/
+
 # B6 active — optional Ring interaction candidate 0.16.1
 
 B5 accepted and merged through PR #27 as de1df1859c6cc75aa7dfb04753f6525b079193dd; all exact-head CI passed in 41353017080. Main receipts include that acceptance. B6 branch production/b6-ring-interaction-01 preserves nine original owner reference images in Docs/References, indexed in OWNER_VISUAL_REFERENCES.md; reference checkpoint db0aba4c5b0a7fa6f60588b1833083610951dc08.
