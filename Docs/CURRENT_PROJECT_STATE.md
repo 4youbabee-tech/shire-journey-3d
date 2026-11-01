@@ -1,25 +1,24 @@
-# Active checkpoint — 2026-11-01: B1–B3 merged; B4 repair candidate
+# Active checkpoint — B4 camera and resident animation repair
 
-GitHub `4youbabee-tech/shire-journey-3d` remains the sole source of truth. The permanent game URL is https://4youbabee-tech.github.io/shire-journey-3d/ and must not change.
+B1–B3 are merged. B4 remains the active PR #26 on `production/b4-bywater-green-dragon-01`. Preserve the original Pages URL: https://4youbabee-tech.github.io/shire-journey-3d/ .
 
-## Verified production position
+## Verified base and discovered blockers
 
-- B1 evidence and measurement system: merged.
-- B2 cinematic green Shire: merged.
-- B3 Hobbiton architecture: PR #25 merged at `45f1d6bea0444d71bf353a9c657ea2339f841901`; 17 hobbit homes; 82 tests and Chromium checks passed as reported in the production handoff. Further art polish may still be needed.
-- B4 Bywater / Green Dragon: not merged. PR #26 remains the active candidate on `production/b4-bywater-green-dragon-01`; its current head before this receipt is `a0d62d6321d7528f8b3fc102b01b3d9731b2be00`, based on the B3 merge above.
+- PR head `2fae96ee1ee7afeef2a6a48f92eac0995e7c90a4`: Actions `41348030595` completed successfully for source, Chromium, road and paired evidence jobs. This is an exact-head result, not the older a4634ba result.
+- Downloaded browser artifact `13099743980`; actual desktop and mobile Green Dragon PNGs reviewed. A neighbouring mound obscures the camera. The original two single-mesh residents have disconnected transform pivots and translate/bob without visible limb articulation. Successful CI did not catch these visual defects; this head was NOT merged.
+- All Green Dragon geometry, sign, emblem, lanterns, barrels, seats, flowers, 17 homes and five workers are retained.
 
-## B4 source and regression status
+## Current source repair (0.15.0 candidate)
 
-The existing Bywater Road home is dressed as the Green Dragon with a hanging sign and original dragon emblem, two amber lanterns, two barrels, two porch seats and two flower boxes. The patch does not move the existing houses, roads, player spawn, story triggers or collision hulls.
+- Camera clearance now samples a small volume rather than a center ray and resolves the final smoothed position, avoiding interpolation back inside a roof.
+- Each Bywater resident retains ONE mesh, with six rigid skinning bones linked to the existing independent joint transforms. Existing activity loop now drives real arms and legs.
+- Native regressions exercise independent left/right skinning and edge-of-camera obstruction with disabled-region exclusion. Source suite: 85 tests PASS locally before release metadata changes.
+- Dedicated Chromium desktop/mobile Bywater playback captures the inn and real keyboard walking, records videos, and inspects the live skinning rigs. It runs in CI in addition to existing full source, opening, birthday, revelation, road and golden evidence gates.
+- Exact-head CI and visual acceptance of this repair are pending. Do not merge until these pass. Hardware FPS remains unmeasured.
 
-The five-worker experiment failed Actions run `41343685566` at commit `4b6d431d0c301e085f2dbafec2e5cd22ad7545f9`: 81/83 tests passed; one test found 10 scene characters instead of the expected 8, and another exceeded the strict `scene.meshes.length < 240` budget. Chromium browser playback was skipped after the source suite failed. The failing run therefore is not evidence about the later PR head.
+## Next work
 
-The later candidate removes the two additional Bywater workers, leaving three background villagers and eight total character roots; the associated tests now expect three background villagers. Green Dragon art remains in the world source. This corrective candidate has not yet passed exact-head CI at this recorded point. Do not merge or call B4 accepted until the exact PR head passes source checks and all Chromium playback jobs, its captures are reviewed, and scene mesh/triangle budgets are confirmed.
-
-## Remaining scope and non-claims
-
-B5 still needs the complete continuous route and Bree / Prancing Pony interior. B6 still needs complete hero/Ring story continuity and visual acceptance. B7 needs the larger population, animals, daily schedules, weather/day cycle and audio review. B8 Weathertop, B9 Rivendell/Council, and B10 Moria, Lothlórien and Amon Hen remain unbuilt acceptance stages. No physical-phone or target-PC 30 FPS claim is made from CI software rendering; owner-device measurement remains outstanding.
+Finish B4 visual/playback review and merge only a passing candidate. Continue B5 Bree and Prancing Pony, B6 hero/Ring development, B7 living-world systems, B8 Weathertop, B9 Rivendell/Council and B10 Moria/Lothlórien/Amon Hen. None of those stages is declared complete. The current road still ends at the closed Bree gate.
 
 ---
 
