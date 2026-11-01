@@ -94,8 +94,8 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
    const border=M.CreateBox('B3 raised herb bed',{width:.9*s,height:.2*s,depth:.75*s},scene);
    finish(border,style===3?stone:wood,gx,.14*s,gz);
    homesteadDetails.gardenBeds++;
-   for(let j=0;j<3;j++){
-    const fx=gx+(j-1)*.23*s,fz=gz+((j%2)?-.12:.12)*s;
+   for(let j=0;j<2;j++){
+    const fx=gx+(j? .18:-.18)*s,fz=gz+(j?-.12:.12)*s;
     sphere('B3 kitchen garden herb',fx,.42*s,fz,.33*s,.36*s,.3*s,j%2?leaf2:leaf3,true,null,6);
     sphere('B3 cottage flower',fx,.69*s,fz,.15*s,.11*s,.15*s,style===2?pink:style===1?yellow:white,true,null,6);
    }
@@ -106,16 +106,10 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
    finish(slab,stone,x,.035*s,z-(1.48+j*.44)*s);
    homesteadDetails.steppingStones++;
   }
-  // A single low roof planting group changes the silhouette without a new draw call.
-  if(style!==3){
-   sphere('B3 living turf roof accent',x+(style===1?-1.4:1.4)*s,3.25*s,z+1.25*s,.75*s,.33*s,.6*s,style===2?leaf2:leaf3,true,null,8);
-   homesteadDetails.roofAccents++;
-  }
   if(index===0){
    // Bag End's warm, recognisable front entrance has a hand-crafted oak lintel.
-   beam([x-1.55*s,2.9*s,z-.63*s],[x+1.55*s,2.9*s,z-.63*s],.13*s,wood,'B3 Bag End carved oak lintel');
-   for(const side of [-1,1])sphere('B3 Bag End climbing ivy',x+side*1.52*s,2.7*s,z-.65*s,.32*s,.45*s,.3*s,leaf3,true,null,7);
-   homesteadDetails.roofAccents+=3;
+   beam([x-1.55*s,2.9*s,z-.63*s],[x+1.55*s,2.9*s,z-.63*s],.09*s,wood,'B3 Bag End carved oak lintel');
+   homesteadDetails.roofAccents++;
   }
  }
  for(const [index,home] of HOMES.entries()){
