@@ -9,7 +9,7 @@ test('mottled ground stays a real collision surface and stylized limbs use soft 
  const colors=world.ground.getVerticesData(B.VertexBuffer.ColorKind);
  assert.ok(colors?.length>8000,'procedural grass variation is applied to subdivided ground');
  assert.equal(world.ground.checkCollisions,true);
- assert.ok(world.stats.houses>=16&&world.stats.backgroundVillagers===3);
+ assert.ok(world.stats.houses>=16&&world.stats.backgroundVillagers===5);
  const player=world.player;
  assert.ok(player.parts.some(p=>(p.metadata?.sourceNames||[p.name]).includes('small leather travelling pack')));
  const names=player.parts.flatMap(p=>p.metadata?.sourceNames||[p.name]);
