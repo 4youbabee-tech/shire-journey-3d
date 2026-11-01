@@ -29,3 +29,22 @@ test('B2 green Shire palette and perimeter grove retain the mobile boot collider
  assert.equal(world.ground.checkCollisions,true);
  engine.dispose();
 });
+
+test('B3 Hobbiton homes gain distinct facade, threshold and garden art without changing collision budgets',()=>{
+ const engine=new B.NullEngine({renderWidth:720,renderHeight:480}),scene=new B.Scene(engine);
+ const world=createWorld(B,scene,{shadows:false,deferredNature:true,deferredCharacters:true});
+ const art=world.stats.homesteadDetails;
+ assert.equal(art.homes,17,'every original home is dressed in place');
+ assert.deepEqual(art.styles,['bag-end','orchard','flower','woodland']);
+ assert.equal(art.shutters,68,'four shutters per home frame existing round windows');
+ assert.equal(art.doorHardware,51,'existing doors gain two hinges and one escutcheon');
+ assert.equal(art.gardenBeds,34,'two garden beds per home stay clear of the entrance');
+ assert.equal(art.steppingStones,51,'three walk stones per threshold');
+ assert.ok(art.roofAccents>=14,'roof accents and Bag End lintel remain present');
+ assert.equal(world.stats.houses,17);
+ assert.equal(world.stats.treeAnchors,28,'B2 tree layout remains untouched');
+ assert.equal(world.colliders.filter(c=>c.name==='tree trunk collision').length,28);
+ assert.equal(world.stats.roads,12,'B3 must not move roads');
+ assert.ok(scene.meshes.length<240,'batched static art stays inside startup mesh budget');
+ engine.dispose();
+});
