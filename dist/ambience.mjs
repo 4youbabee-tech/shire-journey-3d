@@ -4,7 +4,7 @@ import {pastoralPhrase} from './score.mjs';
 export function createShireAmbience(AudioContextConstructor){
  const context=new AudioContextConstructor(),master=context.createGain();master.gain.value=.22;master.connect(context.destination);
  const nature=context.createGain(),music=context.createGain(),effects=context.createGain();nature.connect(effects);music.connect(master);effects.connect(master);const village=createVillageFoley(context,effects);let creakClock=0,leatherClock=0,loadClock=0,houseClock=0,houseEvent=0;
- let captureDestination=null,ringDrops=0;
+ let captureDestination=null,ringDrops=0,daylight=1;
  function captureStream(){if(!context.createMediaStreamDestination)return null;if(!captureDestination){captureDestination=context.createMediaStreamDestination();master.connect(captureDestination);}return captureDestination.stream;}
  const levels={master:1,music:.65,effects:1};
  function setVolume(channel,value){if(!(channel in levels)||!Number.isFinite(value))return;levels[channel]=Math.max(0,Math.min(1,value));const node=channel==='master'?master:channel==='music'?music:effects;node.gain.setValueAtTime(levels[channel]*(channel==='master'?.22:1),context.currentTime);}
@@ -63,9 +63,9 @@ export function createShireAmbience(AudioContextConstructor){
   windGain.gain.setValueAtTime(.06+.035*Math.sin(i*.41),now);
  }
  function song(now){for(const n of pastoralPhrase(phrase++))osc(n.frequency,now+n.at,n.duration,n.volume,n.wave,n.frequency*.997,music);}
- function cycle(){if(context.state!=='running')return;const now=context.currentTime+.07;birds(now);if(!scoreBuffer&&(birdTick-1)%2===0)song(now+.12);}
+ function cycle(){if(context.state!=='running')return;const now=context.currentTime+.07;if(daylight>.2)birds(now);else{const i=birdTick++;if(i%3===0)osc(420+(i%4)*24,now,.42,.008,'sine',365,nature);}if(!scoreBuffer&&(birdTick-1)%2===0)song(now+.12);}
  return {
-  captureStream,ringDrop,setInterior,cue:(name,options)=>village.cue(name,options),get worldFoley(){return {...village.snapshot,ringDrops};},
+  captureStream,ringDrop,setInterior,setDaylight(value){if(Number.isFinite(value))daylight=Math.max(0,Math.min(1,value));},cue:(name,options)=>village.cue(name,options),get worldFoley(){return {...village.snapshot,ringDrops};},
   get foley(){return {status:foleyStatus,decoded:foleyBuffers.length,forestDecoded:!!forestBuffer};},
   get score(){return {status:scoreStatus,duration:scoreBuffer?.duration||0,error:scoreError};},
   update(dt,{moving=false,wood=false,cart=false,cartDistance=30,houseDistance=Infinity,housePan=0}={}){
