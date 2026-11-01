@@ -22,7 +22,7 @@ test('B2 green Shire palette and perimeter grove retain the mobile boot collider
  const engine=new B.NullEngine({renderWidth:720,renderHeight:480}),scene=new B.Scene(engine);
  const world=createWorld(B,scene,{shadows:false,deferredNature:true,deferredCharacters:true});
  assert.equal(world.stats.treeAnchors,28,'four landmark trees plus twelve original and twelve perimeter grove anchors');
- assert.ok(world.colliders.length>=59,'each additional tree keeps its collision trunk');
+ assert.equal(world.colliders.filter(c=>c.name==='tree trunk collision').length,28,'all 28 tree anchors retain their collision trunks');
  assert.ok(scene.meshes.length<240,'deferred imported foliage does not inflate startup mesh count');
  const meadow=scene.materials.find(m=>m.name==='meadow');
  assert.ok(meadow.diffuseColor.g>meadow.diffuseColor.r*.95,'meadow palette stays green-forward');
