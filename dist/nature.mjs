@@ -23,7 +23,7 @@ export async function loadNature(B,scene,world){
   // Small asymmetric sway uses the existing world leaf updater, not a second loop.
   world.leaves.push({root,phase:i*1.73,amplitude:.004+(i%3)*.001});trees++;
   // Sparse understory remains within existing tree bounds, away from village routes.
-  for(let j=0;j<5;j++){const angle=j*2.399+i,r=1.1+(j%3)*.32;plant(j%3?'grass':'flowers',a.x+Math.cos(angle)*r,a.z+Math.sin(angle)*r,j%3?.28:.34,angle,'understory '+i+' '+j);patches++;}
+  for(let j=0;j<3;j++){const angle=j*2.399+i,r=1.1+(j%3)*.32;plant(j%3?'grass':'flowers',a.x+Math.cos(angle)*r,a.z+Math.sin(angle)*r,j%3?.28:.34,angle,'understory '+i+' '+j);patches++;}
  }
  // Real textured leaf/flower clusters replace the former smooth green balls.
  for(const [i,a]of (world.hedgeAnchors||[]).entries())for(let j=0;j<3;j++){
@@ -38,8 +38,8 @@ export async function loadNature(B,scene,world){
  let roadside=0;
  for(const [ri,road]of ROADS.entries()){
   const points=B.Curve3.CreateCatmullRomSpline(road.points.map(([x,z])=>new B.Vector3(x,0,z)),10,false).getPoints();
-  for(let i=2;i<points.length-2&&roadside<220;i+=2)for(const side of [-1,1]){
-   if(roadside>=220)break;
+  for(let i=2;i<points.length-2&&roadside<260;i+=2)for(const side of [-1,1]){
+   if(roadside>=260)break;
    const tangent=points[i+1].subtract(points[i-1]).normalize(),normal=new B.Vector3(tangent.z,0,-tangent.x),seed=ri*173+i*29+side*7;
    const distance=road.width/2+.36+(Math.sin(seed*1.73)+1)*.22,p=points[i].add(normal.scale(distance*side));
    if(world.characters.some(c=>B.Vector3.DistanceSquared(c.root.position,p)<2.25))continue;
