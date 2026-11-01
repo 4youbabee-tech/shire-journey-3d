@@ -1,3 +1,11 @@
+# Latest checkpoint — 2026-11-02, Ring close-up and completion instrumentation
+
+Active branch: `production/b6-ring-interaction-01`
+Latest source commit: `87c35ab4ee881bddb6be596fe57dc865cd1fa524`
+PR #28 remains Draft; main and the original Pages publication are unchanged.
+The previous exact-head browser run exposed two issues in the acceptance harness: the Ring close-up was not close enough to the hand, and the natural-completion wait did not leave enough diagnostic state when it timed out. The latest change moves the camera nearer to the Ring, narrows the FOV, reduces obstruction sweep margins for the close-up, and records a bounded timeline of Ring beat/visibility/save state if playback does not finish. Screenshot QA now restores its diagnostic overlay after each capture.
+Latest source-head CI must pass before accepting or merging this candidate. Do not infer completion from a queued or older run.
+
 # Latest checkpoint — 2026-11-02, B6 Ring interaction camera refinement
 
 Active branch: `production/b6-ring-interaction-01`
