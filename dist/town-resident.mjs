@@ -1,0 +1,15 @@
+// Original compact residents: shared palette, one mesh/draw and six rigid bones.
+export function createTownResident(B,scene,{id,x,z,coat='#655847',skin='#d5a17c',hair='#473c31',scale=1,hood=false,shadow=null}){
+ const root=new B.TransformNode(id,scene);root.position.set(x,0,z);root.scaling.setAll(scale);
+ const material=new B.StandardMaterial(id+' colours',scene);material.diffuseColor=B.Color3.White();material.specularColor.set(.02,.02,.02);
+ const parts=[],groups=[];
+ const add=(name,shape,size,pos,color,bone=0)=>{const m=shape==='sphere'?B.MeshBuilder.CreateSphere(name,{diameter:1,segments:8},scene):B.MeshBuilder.CreateBox(name,{size:1},scene);m.scaling.set(...size);m.position.set(...pos);const c=B.Color3.FromHexString(color),count=m.getTotalVertices(),colors=new Float32Array(count*4);for(let i=0;i<count;i++)colors.set([c.r,c.g,c.b,1],i*4);m.material=material;m.setVerticesData(B.VertexBuffer.ColorKind,colors);parts.push(m);groups.push({count,bone});};
+ add('tunic','box',[.58,.73,.36],[0,1,0],coat);add('shirt collar','box',[.26,.12,.05],[0,1.35,-.2],'#d5c8a4');add('belt','box',[.6,.07,.39],[0,.78,0],'#493d30');
+ add('head','sphere',[.34,.43,.34],[0,1.6,0],skin,1);add('hair','sphere',[.37,hood?.48:.19,.38],[0,hood?1.64:1.79,.07],hair,1);for(const side of [-1,1])add('eye','sphere',[.035,.04,.03],[side*.07,1.63,-.17],'#302c25',1);
+ for(const [side,arm,leg]of [[-1,2,4],[1,3,5]]){add('sleeve','box',[.18,.5,.2],[side*.38,1.09,0],coat,arm);add('hand','sphere',[.16,.21,.17],[side*.38,.77,0],skin,arm);add('trouser','box',[.22,.65,.24],[side*.16,.4,0],'#4b493d',leg);add('boot','box',[.25,.15,.38],[side*.16,.1,-.07],'#382f27',leg);}
+ const mesh=B.Mesh.MergeMeshes(parts,true,true);mesh.name=id+' body';mesh.parent=root;mesh.isPickable=false;mesh.receiveShadows=true;shadow?.addShadowCaster(mesh);
+ const skeleton=new B.Skeleton(id+' rig',id+' rig',scene),base=new B.Bone('torso',skeleton,null,B.Matrix.Identity()),joints=[];
+ for(const [name,pos]of [['head',[0,1.42,0]],['left arm',[-.38,1.32,0]],['right arm',[.38,1.32,0]],['left leg',[-.16,.72,0]],['right leg',[.16,.72,0]]]){const n=new B.TransformNode(id+' '+name,scene);n.parent=root;n.position.set(...pos);const bone=new B.Bone(name,skeleton,base,B.Matrix.Translation(...pos));bone.linkTransformNode(n);joints.push(n);}
+ const indices=new Float32Array(mesh.getTotalVertices()*4),weights=new Float32Array(indices.length);let v=0;for(const g of groups)for(let i=0;i<g.count;i++,v++){indices[v*4]=g.bone;weights[v*4]=1;}mesh.setVerticesData(B.VertexBuffer.MatricesIndicesKind,indices);mesh.setVerticesData(B.VertexBuffer.MatricesWeightsKind,weights);mesh.skeleton=skeleton;mesh.numBoneInfluencers=1;
+ return {root,mesh,update(t,{walk=false,work=false}={}){const gait=walk?Math.sin(t*7)*.38:0;joints[0].rotation.y=Math.sin(t*.8)*.08;joints[1].rotation.x=gait+(work?Math.sin(t*2)*.35:0);joints[2].rotation.x=-gait;joints[3].rotation.x=-gait;joints[4].rotation.x=gait;},dispose(){shadow?.removeShadowCaster(mesh);root.dispose(false);skeleton.dispose();material.dispose();}};
+}
