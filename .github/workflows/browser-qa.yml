@@ -183,3 +183,28 @@ jobs:
           name: shire-ring-inspection
           path: qa-evidence/ring-inspection/
           retention-days: 90
+
+  living-world:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci && npm run check && node --check dist/day-cycle.mjs && node --check dist/fauna.mjs && node --check tests/living-world-playback.mjs && npm test
+      - run: npm install --no-save --no-package-lock --ignore-scripts playwright@1.56.1 && npx playwright install --with-deps chromium
+      - name: Render morning, sunset and night with meadow animals on desktop and touch mobile
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          QA_OUT: qa-evidence/living-world
+        run: node tests/living-world-playback.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shire-living-world
+          path: qa-evidence/living-world/
+          retention-days: 90

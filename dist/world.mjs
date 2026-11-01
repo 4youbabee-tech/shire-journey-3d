@@ -4,6 +4,7 @@ import {HOMES,ROADS,MAP_BOUNDS} from './village-layout.mjs';
 import {addHomeCollision} from './home-collision.mjs';
 import {enhanceHero} from './hero-art.mjs';
 import {dressMaterials} from './surface-art.mjs';
+import {createAmbientFauna} from './fauna.mjs';
 export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredCharacters=false}={}){
  const V=B.Vector3, M=B.MeshBuilder;let seed=7349;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
  let houseBase=null;const elevation=(x,z)=>houseBase??terrainHeightAt(x,z);
@@ -272,12 +273,13 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  }
  bywaterResident('bywater-innkeeper',26.6,-33.2,{coat:'#4d684d',apron:'#d6c7a6',shirt:'#f5e6bc',skin:'#e5b18a',hair:'#47372c',trousers:'#685a3b',boots:'#493d2c',range:.45,phase:1});
  bywaterResident('bywater-baker',31.4,-33.2,{coat:'#a9664b',apron:'#eee3c0',shirt:'#f5e6bc',skin:'#d7a18b',hair:'#65412b',trousers:'#685a3b',boots:'#493d2c',range:.45,phase:3});
+ const fauna=createAmbientFauna(B,scene,{heightAt:terrainHeightAt,shadows:shadow});
  const applePositions=[[-18,12],[-17,17],[-21,15]];for(let i=0;i<3;i++){const [x,z]=applePositions[i];const root=new B.TransformNode('collectible apple '+i,scene);root.position.set(x,.4,z);sphere('collectible red apple',0,0,0,.42,.4,.42,applemat,false,root);cyl('apple stalk',0,.22,0,.035,.13,bark,false,root);sphere('apple leaf',.11,.24,0,.22,.05,.1,leaf2,false,root);const halo=M.CreateTorus('apple glow',{diameter:.75,thickness:.035,tessellation:20},scene);halo.material=brass;halo.parent=root;halo.position.y=-.22;apples.push({id:'apple-'+i,root,halo});}
  // Merge static geometry by material: a few dozen draws, rather than hundreds.
  const groups=new Map();for(const mesh of statics){const key=mesh.material.uniqueId;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(mesh);}let mergedCount=0;for(const group of groups.values()){const m=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);if(m){m.name='batched '+m.material.name;if([hill,hill2,turf].includes(m.material))cameraBlockers.push(m);m.receiveShadows=true;m.freezeWorldMatrix();if(shadow&& !['warm gravel','clouds','pond water'].includes(m.material.name))shadow.addShadowCaster(m);mergedCount++;}}
  const body=M.CreateSphere('player collision ellipsoid',{diameter:1,segments:6},scene);body.position.set(0,.72,-15);body.isVisible=false;body.isPickable=false;body.ellipsoid=new V(.32,.7,.32);body.checkCollisions=true;
  dressMaterials(B,scene,Object.values(mats));
- return {player,body,characters,workers,leaves,treeAnchors,hedgeAnchors,apples,birds,sun,hemi,shadow,colliders,cameraBlockers,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,homesteadDetails,bywaterDetails,roads:ROADS.length,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,simpleResidents:workers.filter(c=>c.simple).length,animatedCanopies:leaves.length,treeAnchors:treeAnchors.length,hedgeAnchors:hedgeAnchors.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
+ return {player,body,characters,workers,animals:fauna.animals,leaves,treeAnchors,hedgeAnchors,apples,birds,sun,hemi,shadow,colliders,cameraBlockers,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,homesteadDetails,bywaterDetails,roads:ROADS.length,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,simpleResidents:workers.filter(c=>c.simple).length,fauna:fauna.animals.length,animatedCanopies:leaves.length,treeAnchors:treeAnchors.length,hedgeAnchors:hedgeAnchors.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
 }
 
 
