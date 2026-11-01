@@ -1,9 +1,12 @@
-# B7 checkpoint — 2026-11-02, animal draw-budget repair
+# B7 visual quality checkpoint — 2026-11-02
 
-Branch: production/b7-living-world-02
-Latest source commit: 9ca4af794af21dc78d0f806d21af085c8640907a
+Latest candidate source: 2bc306063858036fb3c46929a9a000b724e3aea9
+PR #29: https://github.com/4youbabee-tech/shire-journey-3d/pull/29
 
-Exact-head run 41360364410 exposed two budget regressions: scene.meshes >= 240 and rigid character batching budget. The four animals originally used three child meshes each. The repair consolidates each animal to one vertex-coloured mesh and updates the native regression to enforce one mesh per animal. These budget assertions must pass on the new head before merge or publication.
-B7 scope: four meadow animals, bounded routines/night rest, day-night lighting and sound variation, native and desktop/mobile browser tests.
-B6 merge remains main SHA 1322214233dd98e73efb6c1e7b657ea374825fef. Permanent Pages URL unchanged: https://4youbabee-tech.github.io/shire-journey-3d/
-B8 Weathertop, B9 Rivendell, B10 later campaign, complete B6 hero art and physical-device performance remain open.
+Performance issue from exact-head CI: individual animal child meshes pushed scene.meshes above the existing strict budget. A first repair reduced each animal to one mesh, but it did not yet satisfy the shared-scene budget. The current implementation consolidates the four animals into one shared thin-instanced mesh, retaining species scale, bounded movement, grazing/hopping/rest and per-instance transforms. This is the candidate intended for validation; do not assume the fix passes until exact-head source and WebGL CI finish.
+
+B7 also includes a smooth day/night sky/fog/sun/ambient/exposure controller and daylight-aware ambient audio. Exact-head desktop/mobile browser evidence must be inspected before merge.
+
+B6 is merged and its exact-head suite passed. The original Pages URL remains https://4youbabee-tech.github.io/shire-journey-3d/
+
+Remaining scope: B6 hero visual acceptance; B8 Weathertop; B9 Rivendell; B10 onward; story/campaign continuity; target-phone and low-end-PC performance. No claim of full campaign completion until playable tests and publication verification pass.
