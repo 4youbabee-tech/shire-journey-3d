@@ -1,4 +1,29 @@
-# Active checkpoint — 2026-11-01 B1 merged / B2 in development
+# Active checkpoint — 2026-11-01: B1–B3 merged; B4 repair candidate
+
+GitHub `4youbabee-tech/shire-journey-3d` remains the sole source of truth. The permanent game URL is https://4youbabee-tech.github.io/shire-journey-3d/ and must not change.
+
+## Verified production position
+
+- B1 evidence and measurement system: merged.
+- B2 cinematic green Shire: merged.
+- B3 Hobbiton architecture: PR #25 merged at `45f1d6bea0444d71bf353a9c657ea2339f841901`; 17 hobbit homes; 82 tests and Chromium checks passed as reported in the production handoff. Further art polish may still be needed.
+- B4 Bywater / Green Dragon: not merged. PR #26 remains the active candidate on `production/b4-bywater-green-dragon-01`; its current head before this receipt is `a0d62d6321d7528f8b3fc102b01b3d9731b2be00`, based on the B3 merge above.
+
+## B4 source and regression status
+
+The existing Bywater Road home is dressed as the Green Dragon with a hanging sign and original dragon emblem, two amber lanterns, two barrels, two porch seats and two flower boxes. The patch does not move the existing houses, roads, player spawn, story triggers or collision hulls.
+
+The five-worker experiment failed Actions run `41343685566` at commit `4b6d431d0c301e085f2dbafec2e5cd22ad7545f9`: 81/83 tests passed; one test found 10 scene characters instead of the expected 8, and another exceeded the strict `scene.meshes.length < 240` budget. Chromium browser playback was skipped after the source suite failed. The failing run therefore is not evidence about the later PR head.
+
+The later candidate removes the two additional Bywater workers, leaving three background villagers and eight total character roots; the associated tests now expect three background villagers. Green Dragon art remains in the world source. This corrective candidate has not yet passed exact-head CI at this recorded point. Do not merge or call B4 accepted until the exact PR head passes source checks and all Chromium playback jobs, its captures are reviewed, and scene mesh/triangle budgets are confirmed.
+
+## Remaining scope and non-claims
+
+B5 still needs the complete continuous route and Bree / Prancing Pony interior. B6 still needs complete hero/Ring story continuity and visual acceptance. B7 needs the larger population, animals, daily schedules, weather/day cycle and audio review. B8 Weathertop, B9 Rivendell/Council, and B10 Moria, Lothlórien and Amon Hen remain unbuilt acceptance stages. No physical-phone or target-PC 30 FPS claim is made from CI software rendering; owner-device measurement remains outstanding.
+
+---
+
+## Historical status snapshot — superseded by the active checkpoint above
 
 B1 evidence baseline was merged to main as eeaf9f09e0899f464197088f2a0c53167ad33c96 (PR #23). Exact-head Actions run 41256482254, attempt 2: source validation, b1-evidence and Shire road jobs PASS; Chromium WebGL job PASS after retry. The first attempt exposed an opening-animation assertion mismatch; the second exact-head attempt passed opening, party, revelation and browser QA. Golden capture report contains all 12 fixed cameras on immutable 0.14.1 and candidate; hashes match byte-for-byte because B1 deliberately changes no game visuals. Functional perf exporter check PASS only as a partial SwiftShader test; it is not a five-minute phone measurement and not G4/G5. Artifacts: 13063093276 (B1 paired baseline/candidate), 13063053146 (road playback), 13062989060 (browser evidence). SwiftShader reports 1 FPS desktop / 4-5 FPS mobile emulation; this is not target hardware acceptance.
 
