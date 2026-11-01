@@ -8,6 +8,8 @@ test('Bywater single-mesh residents have independent visible limb skinning',()=>
  const engine=new B.NullEngine(),scene=new B.Scene(engine);new B.UniversalCamera('camera',new B.Vector3(0,4,-10),scene);
  const world=createWorld(B,scene,{shadows:false,deferredNature:true,deferredCharacters:true});
  assert.ok(world.cameraBlockers.some(m=>m.name==='batched hill'),'decorative hills also obstruct the camera');
+ const eye=new B.Vector3(29,4.252,-42),target=new B.Vector3(29,1.25,-35);
+ const clear=resolveCameraObstruction(B,scene,[...world.colliders,...world.cameraBlockers],target,eye);assert.ok(B.Vector3.Distance(clear,eye)<.01,'Bywater approach has full camera clearance without a horizon hill inside the playable lane');
  const villagers=world.workers.filter(v=>v.simple);assert.equal(villagers.length,2);
  for(const actor of villagers){
   assert.equal(actor.parts.length,1);assert.equal(actor.skeleton.bones.length,6);

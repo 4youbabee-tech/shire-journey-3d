@@ -15,9 +15,11 @@ try{
   await context.addInitScript(({key,state})=>localStorage.setItem(key,JSON.stringify(state)),{key:SAVE_KEY,state:saved});
   const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));
   await page.goto('http://127.0.0.1:'+server.address().port+'/?qa=1');await page.locator('#start').waitFor({state:'visible',timeout:90000});await page.locator('#start').click();
-  await page.evaluate(()=>window.__SHIRE__.qaView(0,.32,7));await page.waitForTimeout(2000);
+  await page.evaluate(()=>window.__SHIRE__.qaView(0,.2,8.8));await page.waitForTimeout(2500);await page.locator('#toast').waitFor({state:'hidden',timeout:15000});await page.locator('#qa-diagnostics').evaluate(el=>el.hidden=true);
   const before=await page.evaluate(()=>window.__SHIRE__.snapshot());assert.equal(before.cinematic.active,false);if(process.env.GITHUB_ACTIONS)assert.equal(before.commit,checkoutSha);
   await page.screenshot({path:resolve(out,name+'-inn.png')});
+  report.views.push({name,occlusion:await page.evaluate(()=>{const s=BABYLON.Engine.LastCreatedScene,e=s.getEngine();return [[.7,.5],[.5,.75],[.9,.3]].map(([x,y])=>{const h=s.pick(x*e.getRenderWidth(),y*e.getRenderHeight(),m=>m.isEnabled()&&m.isVisible&&m.visibility>0);return {x,y,name:h?.pickedMesh?.name,material:h?.pickedMesh?.material?.name,distance:h?.distance};});})});
+  for(const hit of report.views.at(-1).occlusion)assert.ok(!(hit.material==='hill'&&hit.distance<1),'Horizon mound must not cover the camera near plane');
   const skin=await page.evaluate(()=>{const s=BABYLON.Engine.LastCreatedScene;return ['bywater-innkeeper','bywater-baker'].map(id=>{const m=s.getMeshByName(id+' single-mesh resident');return {id,vertices:m.getTotalVertices(),bones:m.skeleton.bones.length,matrices:Array.from(m.skeleton.getTransformMatrices(m)),enabled:m.isEnabled()};});});
   await page.keyboard.down('a');await page.waitForTimeout(1800);await page.keyboard.up('a');await page.waitForTimeout(700);
   const after=await page.evaluate(()=>window.__SHIRE__.snapshot());assert.ok(Math.hypot(after.position.x-before.position.x,after.position.z-before.position.z)>.15,'Natural input walks through inn approach');

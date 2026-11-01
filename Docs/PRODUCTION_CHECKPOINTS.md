@@ -2,7 +2,7 @@
 
 Base: `2fae96ee1ee7afeef2a6a48f92eac0995e7c90a4`, PR #26. Exact-head Actions `41348030595`: source, Chromium, road and golden evidence PASS. Browser artifact `13099743980` downloaded and actual desktop/mobile Green Dragon images inspected. Camera-edge mound occlusion and unarticulated single-mesh resident movement found; no merge acceptance granted.
 
-0.15.0 source candidate preserves all inn details and residents while adding volume-based final camera clearance and six-bone single-mesh resident skinning. 85 native tests PASS locally. New Bywater browser playback records actual approach movement and live rigs on both viewports. Final exact-head CI, screenshot/video review and public deployment verification remain required. No target-device FPS claim.
+0.15.0 source candidate preserves all inn details and residents while adding perimeter horizon placement, volume-based final camera clearance and six-bone single-mesh resident skinning. 85 native tests PASS locally. New Bywater browser playback records actual approach movement and live rigs on both viewports. Final exact-head CI, screenshot/video review and public deployment verification remain required. No target-device FPS claim.
 
 B1–B3 merged; B4 active; B5 partial road only; B6–B7 partial; B8–B10 unbuilt. Continue the requested sequence after B4 acceptance. Historical receipts below retain their original status and do not override this receipt.
 

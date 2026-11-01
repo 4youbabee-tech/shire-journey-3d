@@ -10,7 +10,7 @@ B1–B3 are merged. B4 remains the active PR #26 on `production/b4-bywater-green
 
 ## Current source repair (0.15.0 candidate)
 
-- Camera clearance now samples a small volume rather than a center ray and resolves the final smoothed position, avoiding interpolation back inside a roof.
+- Horizon hills previously intruded into the Bywater camera lane; their 16 existing meshes are placed beyond the playable boundary (same geometry and batching). Camera clearance now samples a small volume rather than a center ray and resolves the final smoothed position, avoiding interpolation back inside a roof.
 - Each Bywater resident retains ONE mesh, with six rigid skinning bones linked to the existing independent joint transforms. Existing activity loop now drives real arms and legs.
 - Native regressions exercise independent left/right skinning and edge-of-camera obstruction with disabled-region exclusion. Source suite: 85 tests PASS locally before release metadata changes.
 - Dedicated Chromium desktop/mobile Bywater playback captures the inn and real keyboard walking, records videos, and inspects the live skinning rigs. It runs in CI in addition to existing full source, opening, birthday, revelation, road and golden evidence gates.

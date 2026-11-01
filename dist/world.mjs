@@ -30,7 +30,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  }
  ground.setVerticesData(B.VertexBuffer.ColorKind,new Float32Array(terrainColors));
  // A broad, quiet horizon gives the village a real landscape silhouette.
- for(let i=0;i<16;i++){const angle=i/16*Math.PI*2;const r=64+random()*20;sphere('rolling distant hill',Math.cos(angle)*r,-3+random()*2,Math.sin(angle)*r,37+random()*20,14+random()*16,35+random()*18,i%2?hill2:hill);}
+ for(let i=0;i<16;i++){const angle=i/16*Math.PI*2;const r=110+random()*20;sphere('rolling distant hill',Math.cos(angle)*r,-3+random()*2,Math.sin(angle)*r,37+random()*20,14+random()*16,35+random()*18,i%2?hill2:hill);}
  function path(points,width=2.5){const p=B.Curve3.CreateCatmullRomSpline(points.map(([x,z])=>new V(x,.035,z)),10,false).getPoints();const left=[],right=[];for(let i=0;i<p.length;i++){const t=p[Math.min(i+1,p.length-1)].subtract(p[Math.max(i-1,0)]).normalize(),n=new V(t.z,0,-t.x);const l=p[i].add(n.scale(width/2)),r=p[i].subtract(n.scale(width/2));l.y=terrainHeightAt(l.x,l.z)+.065;r.y=terrainHeightAt(r.x,r.z)+.065;left.push(l);right.push(r);}const m=M.CreateRibbon('winding village path',{pathArray:[left,right],sideOrientation:B.Mesh.DOUBLESIDE},scene);m.material=pathmat;m.receiveShadows=true;statics.push(m);}
  for(const road of ROADS)path(road.points,road.width);
  function tree(x,z,s=1,kind='normal'){
