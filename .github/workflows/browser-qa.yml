@@ -133,3 +133,28 @@ jobs:
           name: shire-b1-evidence
           path: qa-evidence/
           retention-days: 90
+
+  bree-playback:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci && npm run check && npm test
+      - run: npm install --no-save --no-package-lock --ignore-scripts playwright@1.56.1 && npx playwright install --with-deps chromium
+      - name: Walk through Bree, meet the innkeeper and Strider, rest and reload
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          QA_OUT: qa-evidence/bree
+        run: node tests/bree-playback.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shire-bree-playback
+          path: qa-evidence/bree/
+          retention-days: 90

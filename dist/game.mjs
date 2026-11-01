@@ -35,7 +35,7 @@ function readSave(){try{return restoreState(localStorage.getItem(SAVE_KEY));}cat
 function save(){state.position=inside?{...returnPosition}:{x:world.body.position.x,z:world.body.position.z};try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));telemetry.saves++;}catch{notify('الحفظ غير متاح في هذا المتصفّح');}}
 function notify(text){if(activeNPC){$('#toast').hidden=true;return;}$('#toast').textContent=text;$('#toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').hidden=true,3500);}
 function nearWorld(){if(roadRegion?.active)return roadRegion.interactable(world.body.position);return nearestInteractable(state,world.body.position,NPCS.map(n=>{const c=world.characters.find(c=>c.id===n.id);return {...n,x:c.root.position.x,z:c.root.position.z};}));}
-function refresh(){ $('#objective').textContent=objective(state);
+function refresh(){ $('#objective').textContent=objective(state);if(roadRegion?.active)$('#location>div').firstChild.textContent=state.road.bree?(state.road.bree.location==='inn'?'بري · الحصان الجامح':'بري · ساحة البلدة'):'دروب الشاير · برانديواين';
  const milestones=[state.gandalfMet,state.stage>=1,state.stage>=2,state.apples.length===3,state.stage>=5,state.partyCompleted];$('#quest-progress').querySelectorAll('i').forEach((e,i)=>e.classList.toggle('done',milestones[i]));
  for(const a of world.apples)a.root.setEnabled(!state.apples.includes(a.id));
  $('#replay-legacy').hidden=!state.partyCompleted;$('.brand small').textContent=['departure','roads'].includes(state.journeyPhase)?'فرودو وسام · أول الطريق':state.journeyPhase==='investigation'?'سرّ الخاتم':state.partyCompleted?'صباح بعد الحفل':'صباح في الشاير';
@@ -140,7 +140,7 @@ function finishRevelation(){
 }
 function beginRoad(resume=false){
  if(!resume&&!act(state,'leave-village'))return;
- if(!roadRegion)roadRegion=createShireRoad(window.BABYLON,scene,world,{nature:natureLibrary,createHorse:()=>arrival.createTravelHorse(),onMessage:notify,onChange:()=>{if(roadRegion?.active&&!roadRegion.busy)travelParty.resetFollower();refresh();save();}});
+ if(!roadRegion)roadRegion=createShireRoad(window.BABYLON,scene,world,{nature:natureLibrary,createHorse:()=>arrival.createTravelHorse(),onMessage:notify,onInterior:value=>audio?.setInterior(value),onTransition:location=>{travelParty.resetFollower();pitch=.22;zoom=location==='inn'?6.5:9;const B=window.BABYLON;scene.activeCamera.position.set(world.body.position.x,world.body.position.y+Math.sin(pitch)*zoom+.8,world.body.position.z-zoom);scene.activeCamera.setTarget(world.body.position.add(new B.Vector3(0,.53,0)));},onChange:()=>{if(roadRegion?.active&&!roadRegion.busy)travelParty.resetFollower();refresh();save();}});
  roadRegion.activate(state.road,{resume});travelParty.resetFollower();yaw=0;zoom=7.1;destination=null;keys.clear();$('#location>div').firstChild.textContent='دروب الشاير · برانديواين';refresh();save();
 }
 function applyQuality(){if(!qualityControl)return;const {scale,shadows,mode}=qualityControl.snapshot();if(engine.getHardwareScalingLevel()!==scale)engine.setHardwareScalingLevel(scale);scene.shadowsEnabled=shadows;if(world.shadow)world.shadow.getShadowMap().refreshRate=shadows?1:0;$('#quality').textContent=mode==='auto'?'جودة تلقائية':mode==='quality'?'جودة عالية':'جودة خفيفة';engine.resize();}

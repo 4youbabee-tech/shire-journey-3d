@@ -1,0 +1,24 @@
+// Exact-head WebGL evidence: real region entry/input; QA relocation between encounters.
+import assert from 'node:assert/strict';import {createServer} from 'node:http';import {mkdir,readFile,writeFile} from 'node:fs/promises';import {resolve,extname,sep} from 'node:path';import {chromium} from 'playwright';import {freshState,act,SAVE_KEY} from '../dist/simulation.mjs';
+const root=resolve(process.env.QA_DIST||'dist'),out=resolve(process.env.QA_OUT||'qa-evidence/bree');await mkdir(out,{recursive:true});
+const server=createServer(async(req,res)=>{try{const u=new URL(req.url,'http://localhost'),p=resolve(root,'.'+(u.pathname==='/'?'/index.html':u.pathname));if(!p.startsWith(root+sep))throw Error();res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css'})[extname(p)]||'application/octet-stream');res.end(await readFile(p));}catch{res.writeHead(404);res.end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));
+const report={status:'NOT RUN',environment:'Chromium SwiftShader; not target-device performance',errors:[],views:[]};let browser;
+try{
+ browser=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
+ for(const [name,width,height]of [['desktop',1280,720],['mobile',390,844]]){
+  const saved=freshState();for(const a of ['greet-wizard','accept','skip-apples','finish','start-party','party-finalize','research-ring','begin-revelation','finish-revelation','leave-village'])assert.equal(act(saved,a),true);saved.road={step:'bree'};saved.position={x:10,z:43};
+  const context=await browser.newContext({viewport:{width,height},hasTouch:name==='mobile',isMobile:name==='mobile',recordVideo:{dir:out,size:{width,height}}});await context.addInitScript(({key,state})=>{if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(state));},{key:SAVE_KEY,state:saved});const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));const snap=()=>page.evaluate(()=>window.__SHIRE__.snapshot());
+  const ready=async()=>{await page.locator('#start').waitFor({state:'visible',timeout:120000});await page.locator('#start').click();};
+  const still=async label=>{const f=(await snap()).telemetry.frames;await page.waitForFunction(n=>window.__SHIRE__.snapshot().telemetry.frames>n+2,f,{timeout:60000});await page.locator('#qa-diagnostics').evaluate(el=>el.hidden=true);await page.screenshot({path:resolve(out,name+'-'+label+'.png'),timeout:90000});};
+  const walkTo=async(x,z)=>{const start=Date.now();while(Date.now()-start<150000){const p=(await snap()).position,dx=x-p.x,dz=z-p.z;if(Math.hypot(dx,dz)<.7)return;const key=Math.abs(dx)>Math.abs(dz)?(dx>0?'d':'a'):(dz>0?'w':'s');await page.keyboard.down('Shift');await page.keyboard.down(key);await page.waitForTimeout(Math.min(700,Math.max(100,Math.max(Math.abs(dx),Math.abs(dz))*200)));await page.keyboard.up(key);await page.keyboard.up('Shift');}await still('walk-failure');throw Error('Natural walk failed '+JSON.stringify({x,z,at:(await snap()).position}));};
+  await page.goto('http://127.0.0.1:'+server.address().port+'/?qa=1');await ready();if(process.env.EXPECTED_COMMIT_SHA)assert.equal((await snap()).commit,process.env.EXPECTED_COMMIT_SHA);
+  await page.keyboard.press('KeyE');await page.waitForFunction(()=>window.__SHIRE__.snapshot().road.bree?.location==='town');await still('town-entry');
+  await walkTo(0,11.5);await still('pony-exterior');await page.keyboard.press('KeyE');await page.waitForFunction(()=>window.__SHIRE__.snapshot().road.bree?.location==='inn');await still('pony-interior');
+  await walkTo(0,3.5);await walkTo(-3.8,3.5);await page.keyboard.press('KeyE');assert.equal((await snap()).state.road.bree.task,'lodging');
+  // Navigate around the actual table rather than relocating between NPCs.
+  await walkTo(-4,0);await walkTo(5,0);await walkTo(5,5);await page.keyboard.press('KeyE');assert.equal((await snap()).state.road.bree.task,'warning');
+  await walkTo(5,8);await walkTo(0,8);await walkTo(-4,8);await walkTo(-4,12);await page.keyboard.press('KeyE');assert.equal((await snap()).state.road.bree.task,'rested');await still('guest-room');
+  const before=await snap();await page.reload();await ready();const restored=await snap();assert.equal(restored.state.road.bree.task,'rested');assert.equal(restored.road.bree.location,'inn');assert.ok(Math.hypot(restored.position.x-before.position.x,restored.position.z-before.position.z)<1);assert.equal(restored.journey.controlled,'frodo');await still('saved-room');report.views.push({name,before,restored,naturalWalking:true});await context.close();
+ }
+ assert.deepEqual(report.errors,[]);report.status='PASS';
+}finally{await writeFile(resolve(out,'report.json'),JSON.stringify(report,null,2));await browser?.close();server.close();}

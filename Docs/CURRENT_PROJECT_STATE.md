@@ -10,6 +10,16 @@ B5 PR #27 is the active candidate on `production/b5-bree-pony-01`; saved integra
 
 ## Historical receipts
 
+# Latest execution checkpoint — connected B5 candidate
+
+B4 PR #26 at `650529eea2d8cc558f3ecd7afb7b661cd7207ded` remains under exact-head CI run `41351147934`; source, road and golden jobs passed, full Chromium result still pending at this write.
+
+B5 active branch: `production/b5-bree-pony-01`, prior saved source `df2f6981c95873a475cc59bfee86a84688c9700c`. Bree gate, town, Pony, dialogue tasks, party transitions, map, location and save restoration are now integrated as a 0.16.0 candidate. 89 native tests PASS; first Chromium desktop/mobile full Bree traversal PASS; final art/camera rerun and exact-head CI remain required. See [B5 active checkpoint](B5_ACTIVE_CHECKPOINT.md) and [owner art references](OWNER_VISUAL_REFERENCES.md). B5 is not declared completed or published. B6–B10 remain open.
+
+---
+
+## Earlier receipts
+
 # Active checkpoint — B4 camera and resident animation repair
 
 B1–B3 are merged. B4 remains the active PR #26 on `production/b4-bywater-green-dragon-01`. Preserve the original Pages URL: https://4youbabee-tech.github.io/shire-journey-3d/ .
