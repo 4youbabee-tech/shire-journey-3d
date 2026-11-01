@@ -20,5 +20,5 @@ export function createRingInspection(B,scene,{onFinish=()=>{}}={}){
   mesh.rotation.set(Math.PI/2,elapsed*.35,0);const beat=ringInspectionBeat(elapsed);mesh.setEnabled(beat.id!=='stow');actor.imported.lookTarget=mesh.position.clone();actor.imported.reading=true;
   if(elapsed>=RING_INSPECTION_DURATION)finish(false);
  }
- return {begin,update,cancel:()=>finish(true),get active(){return active;},get mesh(){return mesh;},get pose(){return active?'Talk':null;},snapshot(){return {active,actor:actor?.id||null,elapsed,beat:active?ringInspectionBeat(elapsed):null};},dispose(){finish(true);scene.onAfterAnimationsObservable.remove(observer);mesh.dispose();material.dispose();}};
+ return {begin,update,cancel:()=>finish(true),get active(){return active;},get mesh(){return mesh;},get pose(){return active?'Talk':null;},snapshot(){return {active,actor:actor?.id||null,elapsed,beat:active?ringInspectionBeat(elapsed):null,visible:mesh.isEnabled()};},dispose(){finish(true);scene.onAfterAnimationsObservable.remove(observer);mesh.dispose();material.dispose();}};
 }
