@@ -48,3 +48,19 @@ test('B3 Hobbiton homes gain distinct facade, threshold and garden art without c
  assert.ok(scene.meshes.length<240,'batched static art stays inside startup mesh budget');
  engine.dispose();
 });
+
+test('B4 Bywater Green Dragon uses the existing house and retains the route',()=>{
+ const engine=new B.NullEngine({renderWidth:720,renderHeight:480}),scene=new B.Scene(engine);
+ const world=createWorld(B,scene,{shadows:false,deferredNature:true,deferredCharacters:true});
+ assert.equal(world.stats.bywaterDetails.inn,'Green Dragon');
+ assert.equal(world.stats.bywaterDetails.signs,1);
+ assert.equal(world.stats.bywaterDetails.lanterns,2);
+ assert.equal(world.stats.bywaterDetails.barrels,2);
+ assert.equal(world.stats.bywaterDetails.seats,2);
+ assert.equal(world.stats.bywaterDetails.flowerBoxes,2);
+ assert.equal(world.stats.backgroundVillagers,5);
+ assert.equal(world.stats.houses,17);
+ assert.equal(world.stats.roads,12);
+ assert.equal(world.stats.treeAnchors,28);
+ engine.dispose();
+});
