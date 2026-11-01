@@ -7,7 +7,7 @@ import {dressMaterials} from './surface-art.mjs';
 export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredCharacters=false}={}){
  const V=B.Vector3, M=B.MeshBuilder;let seed=7349;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
  let houseBase=null;const elevation=(x,z)=>houseBase??terrainHeightAt(x,z);
- const mats={},statics=[],colliders=[],characters=[],apples=[],birds=[],leaves=[],workers=[],treeAnchors=[],hedgeAnchors=[];
+ const mats={},statics=[],colliders=[],characters=[],apples=[],birds=[],leaves=[],workers=[],treeAnchors=[],hedgeAnchors=[],cameraBlockers=[];
  function mat(name,hex,emission=0){const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(hex);m.specularColor=new B.Color3(.03,.03,.03);if(emission)m.emissiveColor=m.diffuseColor.scale(emission);mats[name]=m;return m;}
  const grass=mat('meadow','#739b51'),hill=mat('hill','#638b4a'),hill2=mat('distant hills','#8eae78'),cream=mat('lime plaster','#e8d3a0'),wood=mat('oak timber','#715034'),dark=mat('dark timber','#493d2c'),pathmat=mat('warm gravel','#b7a27a'),bark=mat('bark','#6d5338'),leaf=mat('summer leaves','#719d50'),leaf2=mat('sunlit leaves','#b2ca78'),leaf3=mat('deep leaves','#456f43'),door=mat('bag end green','#355f47'),brass=mat('warm brass','#dcac4e'),glass=mat('warm windows','#f4ca75',.3),stone=mat('path stone','#9d9a7b'),white=mat('cream cloth','#eee3c0'),red=mat('rust bunting','#b97151'),blue=mat('sky bunting','#7a9a9b'),yellow=mat('wildflower gold','#e8bc53'),pink=mat('wildflower pink','#d48c8f'),skin=mat('hobbit skin','#e5b18a'),hair=mat('brown curls','#65412b'),bilboHair=mat('Bilbo silver-brown hair','#76634d'),samHair=mat('Sam sandy curls','#8b693e'),frodoHair=mat('Frodo dark curls','#47372c'),bookLeather=mat('Bilbo book leather','#54382d'),trousers=mat('trousers','#685a3b'),feetmat=mat('bare feet','#dca77c'),eye=mat('eyes','#27372b'),rosy=mat('warm skin midtones','#d7a18b'),lip=mat('soft lip shadow','#a86d60'),shirt=mat('cream shirt','#f5e6bc'),vest=mat('player vest','#99704a'),cloak=mat('green cloak','#506950'),samvest=mat('sam waistcoat','#a78e56'),bilbovest=mat('bilbo waistcoat','#a9664b'),bilboCoat=mat('Bilbo burgundy coat','#663c4e'),frodoVest=mat('Frodo blue waistcoat','#426b70'),grey=mat('grey robes','#969e9a'),hatmat=mat('blue grey hat','#7c8f94'),beard=mat('grey beard','#d8d9cb'),applemat=mat('red apples','#ce6941');
  const turf=mat('mossy turf roof','#7e985c');
@@ -30,7 +30,7 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  }
  ground.setVerticesData(B.VertexBuffer.ColorKind,new Float32Array(terrainColors));
  // A broad, quiet horizon gives the village a real landscape silhouette.
- for(let i=0;i<16;i++){const angle=i/16*Math.PI*2;const r=64+random()*20;sphere('rolling distant hill',Math.cos(angle)*r,-3+random()*2,Math.sin(angle)*r,37+random()*20,14+random()*16,35+random()*18,i%2?hill2:hill);}
+ for(let i=0;i<16;i++){const angle=i/16*Math.PI*2;const r=110+random()*20;sphere('rolling distant hill',Math.cos(angle)*r,-3+random()*2,Math.sin(angle)*r,37+random()*20,14+random()*16,35+random()*18,i%2?hill2:hill);}
  function path(points,width=2.5){const p=B.Curve3.CreateCatmullRomSpline(points.map(([x,z])=>new V(x,.035,z)),10,false).getPoints();const left=[],right=[];for(let i=0;i<p.length;i++){const t=p[Math.min(i+1,p.length-1)].subtract(p[Math.max(i-1,0)]).normalize(),n=new V(t.z,0,-t.x);const l=p[i].add(n.scale(width/2)),r=p[i].subtract(n.scale(width/2));l.y=terrainHeightAt(l.x,l.z)+.065;r.y=terrainHeightAt(r.x,r.z)+.065;left.push(l);right.push(r);}const m=M.CreateRibbon('winding village path',{pathArray:[left,right],sideOrientation:B.Mesh.DOUBLESIDE},scene);m.material=pathmat;m.receiveShadows=true;statics.push(m);}
  for(const road of ROADS)path(road.points,road.width);
  function tree(x,z,s=1,kind='normal'){
@@ -115,6 +115,35 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  for(const [index,home] of HOMES.entries()){
   house(home.x,home.z,home.s,home.color==='rust'?red:home.color==='blue'?blue:door);
   homesteadArt(home,index);
+ }
+ // B4 / Bywater: make the existing southern home a recognisable village inn.
+ // No house/road positions, player spawn, story triggers or collision hulls change.
+ const bywaterDetails={inn:'Green Dragon',home:'Bywater Road',signs:0,lanterns:0,barrels:0,seats:0,flowerBoxes:0,residents:0};
+ const inn=HOMES.find(h=>h.name==='Bywater Road');
+ if(inn){
+  const ix=inn.x,iz=inn.z,is=inn.s,signX=ix,signY=3.15*is,signZ=iz-.95*is;
+  // Readable timber sign, original dragon silhouette and raised gold lettering.
+  beam([ix-.95*is,3.62*is,signZ+.08*is],[ix-.95*is,3.18*is,signZ+.08*is],.08*is,wood,'B4 left sign bracket');
+  beam([ix+.95*is,3.62*is,signZ+.08*is],[ix+.95*is,3.18*is,signZ+.08*is],.08*is,wood,'B4 right sign bracket');
+  const sign=M.CreateBox('B4 Green Dragon wall sign',{width:2.5*is,height:.95*is,depth:.13*is},scene);
+  finish(sign,door,signX,signY,signZ);
+  sphere('B4 green dragon body',signX-.68*is,signY,signZ-.09*is,.56*is,.22*is,.065*is,leaf2,true,null,6);
+  sphere('B4 green dragon head',signX-.34*is,signY+.11*is,signZ-.105*is,.2*is,.18*is,.07*is,leaf2,true,null,6);
+  beam([signX-.91*is,signY-.02*is,signZ-.13*is],[signX-1.08*is,signY+.13*is,signZ-.13*is],.045*is,leaf2,'B4 dragon curled tail');
+  beam([signX-.43*is,signY+.19*is,signZ-.13*is],[signX-.38*is,signY+.31*is,signZ-.13*is],.035*is,leaf2,'B4 dragon horn');
+  beam([signX-.26*is,signY+.18*is,signZ-.13*is],[signX-.19*is,signY+.29*is,signZ-.13*is],.035*is,leaf2,'B4 dragon horn');
+  beam([signX-.75*is,signY-.12*is,signZ-.13*is],[signX-.78*is,signY-.27*is,signZ-.13*is],.045*is,leaf2,'B4 dragon hind leg');
+  beam([signX-.49*is,signY-.12*is,signZ-.13*is],[signX-.45*is,signY-.27*is,signZ-.13*is],.045*is,leaf2,'B4 dragon foreleg');
+  const wing=M.CreateDisc('B4 dragon wing',{radius:.28*is,tessellation:3,sideOrientation:B.Mesh.DOUBLESIDE},scene);
+  finish(wing,leaf2,signX-.76*is,signY+.17*is,signZ-.15*is);wing.rotation.z=-.38;
+  sphere('B4 dragon eye',signX-.27*is,signY+.13*is,signZ-.18*is,.055*is,.055*is,.035*is,brass,true,null,6);
+  const glyphs={G:['01110','10000','10000','10111','10001','10001','01110'],R:['11110','10001','10001','11110','10100','10010','10001'],E:['11111','10000','10000','11110','10000','10000','11111'],N:['10001','11001','10101','10011','10001','10001','10001'],D:['11110','10001','10001','10001','10001','10001','11110'],A:['01110','10001','10001','11111','10001','10001','10001'],O:['01110','10001','10001','10001','10001','10001','01110']};
+  const drawSignWord=(word,centerY)=>{const cw=.03*is,ch=.05*is,gx=.005*is,gy=.008*is,gap=.012*is,letterWidth=5*cw+4*gx,total=word.length*letterWidth+(word.length-1)*gap;let cursor=signX+.58*is-total/2;for(const char of word){const pattern=glyphs[char];for(let row=0;row<7;row++)for(let col=0;col<5;col++)if(pattern[row][col]==='1'){const mark=M.CreateBox('B4 raised Green Dragon lettering',{width:cw*.9,height:ch*.9,depth:.035*is},scene);finish(mark,brass,cursor+col*(cw+gx)+cw/2,centerY+(3-row)*(ch+gy),signZ-.095*is);}cursor+=letterWidth+gap;}};
+  drawSignWord('GREEN',signY+.255*is);drawSignWord('DRAGON',signY-.255*is);bywaterDetails.signs++;
+  for(const dx of [-1.8,1.8]){const lx=ix+dx*is,lz=iz-1.45*is;cyl('B4 inn lantern bracket',lx,1.8*is,lz,.09,.48*is,dark);sphere('B4 inn amber lantern',lx,1.52*is,lz,.32*is,.42*is,.32*is,glass,true,null,6);bywaterDetails.lanterns++;}
+  for(const dx of [-2.65,2.65]){const bx=ix+dx*is,bz=iz-2.05*is;cyl('B4 tavern rain barrel',bx,.42*is,bz,.72*is,.84*is,wood,true,null,null,8);cyl('B4 barrel lid',bx,.86*is,bz,.78*is,.09*is,dark,true,null,null,8);bywaterDetails.barrels++;}
+  for(const dx of [-1.5,1.5]){const bx=ix+dx*is,bz=iz-2.65*is;const seat=M.CreateBox('B4 inn porch seat',{width:1.05*is,height:.16*is,depth:.42*is},scene);finish(seat,wood,bx,.55*is,bz);for(const offset of [-.38,.38])cyl('B4 porch bench leg',bx+offset*is,.27*is,bz,.11*is,.54*is,dark);bywaterDetails.seats++;}
+  for(const dx of [-1.95,1.95]){const bx=ix+dx*is,bz=iz-.9*is;const box=M.CreateBox('B4 tavern flower box',{width:.65*is,height:.27*is,depth:.38*is},scene);finish(box,wood,bx,.39*is,bz);for(const offset of [-.17,.17])sphere('B4 flower box bloom',bx+offset*is,.66*is,bz,.23*is,.25*is,.23*is,offset<0?yellow:pink,true,null,6);bywaterDetails.flowerBoxes++;}
  }
  function fence(points){for(let i=0;i<points.length;i++){const [x,z]=points[i];cyl('fence post',x,.55,z,.16,1.1,wood,true,null,.1,6);if(i){const [px,pz]=points[i-1];beam([x,.4,z],[px,.4,pz],.09,wood);beam([x,.8,z],[px,.8,pz],.09,wood);}}}
  fence([[-15,0],[-13,0],[-11,0],[-9,0],[-8,-1]]);fence([[-17,8],[-19,8],[-21,8],[-23,8],[-25,10],[-25,12]]);fence([[15,7],[17,7],[19,7],[21,7]]);fence([[-7,25],[-7,27],[-7,29]]);
@@ -218,12 +247,37 @@ export function createWorld(B,scene,{shadows=true,deferredNature=false,deferredC
  const player=character('player',0,-15,{waistcoat:frodoVest,player:true});character('bilbo',8,7,{waistcoat:bilbovest});character('sam',-6,1,{waistcoat:samvest});character('gandalf',-2,17,{wizard:true});character('frodo',3,-4,{waistcoat:frodoVest});
   // Background-only original villagers; they do not alter quests or NPC dialogue owners.
   for(const [id,x,z,material,range,phase] of [['farmer-ada',-12,-3,samvest,1.2,0],['farmer-berin',17,-7,vest,1.5,2],['gardener-nell',-16,23,frodoVest,1,4]]){const v=character(id,x,z,{waistcoat:material});v.home={x,z};v.range=range;v.phase=phase;v.root.rotation.y=.3+phase;workers.push(v);}
+ // Two Bywater residents share one vertex-coloured mesh each instead of a full 65-bone GLB rig.
+ const residentMaterial=new B.StandardMaterial('Bywater resident vertex colours',scene);residentMaterial.diffuseColor=B.Color3.White();residentMaterial.specularColor=new B.Color3(.025,.025,.025);residentMaterial.useVertexColors=true;
+ function bywaterResident(id,x,z,{coat,apron,shirt:shirtColor,skin:skinColor,hair:hairColor,trousers:trouserColor,boots:bootColor,range,phase}){
+  const root=new B.TransformNode(id,scene);root.position.set(x,terrainHeightAt(x,z),z);const source=[],skinGroups=[];
+  function tint(mesh,color,px,py,pz){const c=B.Color3.FromHexString(color),count=mesh.getTotalVertices(),colors=new Float32Array(count*4);for(let i=0;i<count;i++){colors[i*4]=c.r;colors[i*4+1]=c.g;colors[i*4+2]=c.b;colors[i*4+3]=1;}mesh.material=residentMaterial;mesh.setVerticesData(B.VertexBuffer.ColorKind,colors,false,4);mesh.position.set(px,py,pz);mesh.isPickable=false;mesh.receiveShadows=true;source.push(mesh);const part=mesh.name;skinGroups.push({count,bone:/face|hair|eye/.test(part)?1:/sleeve left/.test(part)?2:/sleeve right/.test(part)?3:/trousers left|boots left/.test(part)?4:/trousers right|boots right/.test(part)?5:0});}
+  const box=(name,w,h,d,px,py,pz,color)=>{const mesh=M.CreateBox(name,{width:w,height:h,depth:d},scene);tint(mesh,color,px,py,pz);};
+  const ball=(name,sx,sy,sz,px,py,pz,color)=>{const mesh=M.CreateSphere(name,{diameter:1,segments:8},scene);mesh.scaling.set(sx,sy,sz);tint(mesh,color,px,py,pz);};
+  box(id+' tunic',.58,.76,.36,0,.98,0,coat);box(id+' apron',.38,.53,.035,0,.92,-.2,apron);ball(id+' face',.33,.4,.33,0,1.58,0,skinColor);ball(id+' hair',.38,.19,.37,0,1.77,.015,hairColor);ball(id+' left eye',.04,.04,.025,-.07,1.61,-.17,'#35271f');ball(id+' right eye',.04,.04,.025,.07,1.61,-.17,'#35271f');
+  box(id+' shirt sleeve left',.18,.62,.19,-.38,1.02,0,shirtColor);box(id+' shirt sleeve right',.18,.62,.19,.38,1.02,0,shirtColor);box(id+' trousers left',.21,.68,.22,-.16,.37,0,trouserColor);box(id+' trousers right',.21,.68,.22,.16,.37,0,trouserColor);box(id+' boots left',.23,.12,.34,-.16,.055,-.07,bootColor);box(id+' boots right',.23,.12,.34,.16,.055,-.07,bootColor);
+  const bodyMesh=B.Mesh.MergeMeshes(source,true,true,undefined,false,false);if(!bodyMesh)throw new Error('Unable to merge low-cost Bywater resident: '+id);bodyMesh.name=id+' single-mesh resident';bodyMesh.parent=root;bodyMesh.position.set(0,0,0);bodyMesh.isPickable=false;bodyMesh.receiveShadows=true;if(shadow)shadow.addShadowCaster(bodyMesh);
+  const joint=(name,px,py,pz)=>{const node=new B.TransformNode(id+' '+name,scene);node.parent=root;node.position.set(px,py,pz);return node;};
+  const resident={id,root,left:joint('left arm pivot',-.36,1.05,0),right:joint('right arm pivot',.36,1.05,0),head:joint('head pivot',0,1.58,0),leftLeg:joint('left leg pivot',-.16,.37,0),rightLeg:joint('right leg pivot',.16,.37,0),parts:[bodyMesh],bodyMesh,simple:true,visualArt:{detailTag:'bywater-single-mesh-v1'},home:{x,z},range,phase,activity:'Idle',routineTime:0};
+  // Rigid skinning retains one draw/mesh while making the existing joints visible.
+  const skeleton=new B.Skeleton(id+' lightweight skeleton',id+' skeleton',scene);
+  const baseBone=new B.Bone(id+' torso',skeleton,null,B.Matrix.Identity());
+  for(const [name,node] of [['head',resident.head],['left arm',resident.left],['right arm',resident.right],['left leg',resident.leftLeg],['right leg',resident.rightLeg]]){
+   const bone=new B.Bone(id+' '+name,skeleton,baseBone,B.Matrix.Translation(node.position.x,node.position.y,node.position.z));bone.linkTransformNode(node);
+  }
+  const indices=new Float32Array(bodyMesh.getTotalVertices()*4),weights=new Float32Array(indices.length);let vertex=0;
+  for(const group of skinGroups)for(let i=0;i<group.count;i++,vertex++){indices[vertex*4]=group.bone;weights[vertex*4]=1;}
+  bodyMesh.setVerticesData(B.VertexBuffer.MatricesIndicesKind,indices);bodyMesh.setVerticesData(B.VertexBuffer.MatricesWeightsKind,weights);bodyMesh.skeleton=skeleton;bodyMesh.numBoneInfluencers=1;resident.skeleton=skeleton;
+  root.rotation.y=0;root.scaling.setAll(.78);characters.push(resident);workers.push(resident);bywaterDetails.residents++;return resident;
+ }
+ bywaterResident('bywater-innkeeper',26.6,-33.2,{coat:'#4d684d',apron:'#d6c7a6',shirt:'#f5e6bc',skin:'#e5b18a',hair:'#47372c',trousers:'#685a3b',boots:'#493d2c',range:.45,phase:1});
+ bywaterResident('bywater-baker',31.4,-33.2,{coat:'#a9664b',apron:'#eee3c0',shirt:'#f5e6bc',skin:'#d7a18b',hair:'#65412b',trousers:'#685a3b',boots:'#493d2c',range:.45,phase:3});
  const applePositions=[[-18,12],[-17,17],[-21,15]];for(let i=0;i<3;i++){const [x,z]=applePositions[i];const root=new B.TransformNode('collectible apple '+i,scene);root.position.set(x,.4,z);sphere('collectible red apple',0,0,0,.42,.4,.42,applemat,false,root);cyl('apple stalk',0,.22,0,.035,.13,bark,false,root);sphere('apple leaf',.11,.24,0,.22,.05,.1,leaf2,false,root);const halo=M.CreateTorus('apple glow',{diameter:.75,thickness:.035,tessellation:20},scene);halo.material=brass;halo.parent=root;halo.position.y=-.22;apples.push({id:'apple-'+i,root,halo});}
  // Merge static geometry by material: a few dozen draws, rather than hundreds.
- const groups=new Map();for(const mesh of statics){const key=mesh.material.uniqueId;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(mesh);}let mergedCount=0;for(const group of groups.values()){const m=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);if(m){m.name='batched '+m.material.name;m.receiveShadows=true;m.freezeWorldMatrix();if(shadow&& !['warm gravel','clouds','pond water'].includes(m.material.name))shadow.addShadowCaster(m);mergedCount++;}}
+ const groups=new Map();for(const mesh of statics){const key=mesh.material.uniqueId;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(mesh);}let mergedCount=0;for(const group of groups.values()){const m=B.Mesh.MergeMeshes(group,true,true,undefined,false,false);if(m){m.name='batched '+m.material.name;if([hill,hill2,turf].includes(m.material))cameraBlockers.push(m);m.receiveShadows=true;m.freezeWorldMatrix();if(shadow&& !['warm gravel','clouds','pond water'].includes(m.material.name))shadow.addShadowCaster(m);mergedCount++;}}
  const body=M.CreateSphere('player collision ellipsoid',{diameter:1,segments:6},scene);body.position.set(0,.72,-15);body.isVisible=false;body.isPickable=false;body.ellipsoid=new V(.32,.7,.32);body.checkCollisions=true;
  dressMaterials(B,scene,Object.values(mats));
- return {player,body,characters,workers,leaves,treeAnchors,hedgeAnchors,apples,birds,sun,hemi,shadow,colliders,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,homesteadDetails,roads:ROADS.length,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,animatedCanopies:leaves.length,treeAnchors:treeAnchors.length,hedgeAnchors:hedgeAnchors.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
+ return {player,body,characters,workers,leaves,treeAnchors,hedgeAnchors,apples,birds,sun,hemi,shadow,colliders,cameraBlockers,ground,water,stats:{staticBatches:mergedCount,houses:HOMES.length,homesteadDetails,bywaterDetails,roads:ROADS.length,colliders:colliders.length,characters:characters.length,backgroundVillagers:workers.length,simpleResidents:workers.filter(c=>c.simple).length,animatedCanopies:leaves.length,treeAnchors:treeAnchors.length,hedgeAnchors:hedgeAnchors.length,engine:'Babylon.js 9.32.1'},dispose(){scene.dispose();}};
 }
 
 

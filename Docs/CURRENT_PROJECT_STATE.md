@@ -1,4 +1,28 @@
-# Active checkpoint — 2026-11-01 B1 merged / B2 in development
+# Active checkpoint — B4 camera and resident animation repair
+
+B1–B3 are merged. B4 remains the active PR #26 on `production/b4-bywater-green-dragon-01`. Preserve the original Pages URL: https://4youbabee-tech.github.io/shire-journey-3d/ .
+
+## Verified base and discovered blockers
+
+- PR head `2fae96ee1ee7afeef2a6a48f92eac0995e7c90a4`: Actions `41348030595` completed successfully for source, Chromium, road and paired evidence jobs. This is an exact-head result, not the older a4634ba result.
+- Downloaded browser artifact `13099743980`; actual desktop and mobile Green Dragon PNGs reviewed. A neighbouring mound obscures the camera. The original two single-mesh residents have disconnected transform pivots and translate/bob without visible limb articulation. Successful CI did not catch these visual defects; this head was NOT merged.
+- All Green Dragon geometry, sign, emblem, lanterns, barrels, seats, flowers, 17 homes and five workers are retained.
+
+## Current source repair (0.15.0 candidate)
+
+- Horizon hills previously intruded into the Bywater camera lane; their 16 existing meshes are placed beyond the playable boundary (same geometry and batching). Camera clearance now samples a small volume rather than a center ray and resolves the final smoothed position, avoiding interpolation back inside a roof.
+- Each Bywater resident retains ONE mesh, with six rigid skinning bones linked to the existing independent joint transforms. Existing activity loop now drives real arms and legs.
+- Native regressions exercise independent left/right skinning and edge-of-camera obstruction with disabled-region exclusion. Source suite: 85 tests PASS locally before release metadata changes.
+- Dedicated Chromium desktop/mobile Bywater playback captures the inn and real keyboard walking, records videos, and inspects the live skinning rigs. It runs in CI in addition to existing full source, opening, birthday, revelation, road and golden evidence gates.
+- Exact-head CI and visual acceptance of this repair are pending. Do not merge until these pass. Hardware FPS remains unmeasured.
+
+## Next work
+
+Finish B4 visual/playback review and merge only a passing candidate. Continue B5 Bree and Prancing Pony, B6 hero/Ring development, B7 living-world systems, B8 Weathertop, B9 Rivendell/Council and B10 Moria/Lothlórien/Amon Hen. None of those stages is declared complete. The current road still ends at the closed Bree gate.
+
+---
+
+## Historical status snapshot — superseded by the active checkpoint above
 
 B1 evidence baseline was merged to main as eeaf9f09e0899f464197088f2a0c53167ad33c96 (PR #23). Exact-head Actions run 41256482254, attempt 2: source validation, b1-evidence and Shire road jobs PASS; Chromium WebGL job PASS after retry. The first attempt exposed an opening-animation assertion mismatch; the second exact-head attempt passed opening, party, revelation and browser QA. Golden capture report contains all 12 fixed cameras on immutable 0.14.1 and candidate; hashes match byte-for-byte because B1 deliberately changes no game visuals. Functional perf exporter check PASS only as a partial SwiftShader test; it is not a five-minute phone measurement and not G4/G5. Artifacts: 13063093276 (B1 paired baseline/candidate), 13063053146 (road playback), 13062989060 (browser evidence). SwiftShader reports 1 FPS desktop / 4-5 FPS mobile emulation; this is not target hardware acceptance.
 

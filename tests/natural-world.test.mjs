@@ -9,7 +9,7 @@ test('mottled ground stays a real collision surface and stylized limbs use soft 
  const colors=world.ground.getVerticesData(B.VertexBuffer.ColorKind);
  assert.ok(colors?.length>8000,'procedural grass variation is applied to subdivided ground');
  assert.equal(world.ground.checkCollisions,true);
- assert.ok(world.stats.houses>=16&&world.stats.backgroundVillagers===3);
+ assert.ok(world.stats.houses>=16&&world.stats.backgroundVillagers===5&&world.stats.simpleResidents===2);
  const player=world.player;
  assert.ok(player.parts.some(p=>(p.metadata?.sourceNames||[p.name]).includes('small leather travelling pack')));
  const names=player.parts.flatMap(p=>p.metadata?.sourceNames||[p.name]);
@@ -46,5 +46,21 @@ test('B3 Hobbiton homes gain distinct facade, threshold and garden art without c
  assert.equal(world.colliders.filter(c=>c.name==='tree trunk collision').length,28);
  assert.equal(world.stats.roads,12,'B3 must not move roads');
  assert.ok(scene.meshes.length<240,'batched static art stays inside startup mesh budget');
+ engine.dispose();
+});
+
+test('B4 Bywater Green Dragon uses the existing house and retains the route',()=>{
+ const engine=new B.NullEngine({renderWidth:720,renderHeight:480}),scene=new B.Scene(engine);
+ const world=createWorld(B,scene,{shadows:false,deferredNature:true,deferredCharacters:true});
+ assert.equal(world.stats.bywaterDetails.inn,'Green Dragon');
+ assert.equal(world.stats.bywaterDetails.signs,1);
+ assert.equal(world.stats.bywaterDetails.lanterns,2);
+ assert.equal(world.stats.bywaterDetails.barrels,2);
+ assert.equal(world.stats.bywaterDetails.seats,2);
+ assert.equal(world.stats.bywaterDetails.flowerBoxes,2);
+ assert.equal(world.stats.backgroundVillagers,5);assert.equal(world.stats.simpleResidents,2);assert.equal(world.stats.bywaterDetails.residents,2);
+ assert.equal(world.stats.houses,17);
+ assert.equal(world.stats.roads,12);
+ assert.equal(world.stats.treeAnchors,28);
  engine.dispose();
 });

@@ -30,6 +30,7 @@ export async function loadCharacters(B,scene,world){
  for(const role of ['frodo','sam','bilbo','gandalf']){const a=await B.SceneLoader.LoadAssetContainerAsync('./assets/characters/',role+'-natural.glb',scene);for(const g of a.animationGroups)g.stop();assets[role]=a;}
  const actors=[];
  for(const c of world.characters){
+  if(c.simple)continue;
   const terrainY=c.root.position.y;c.root.position.y=0;
   const role=roleFor(c.id),instance=assets[role].instantiateModelsToScene(n=>c.id+' '+n,false,{doNotInstantiate:true});
   const holder=new B.TransformNode(c.id+' imported rig',scene);holder.parent=c.root;for(const n of instance.rootNodes)n.parent=holder;
