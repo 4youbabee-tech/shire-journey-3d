@@ -1,3 +1,19 @@
+# B6 feature candidate 0.16.1 — Ring inspection
+
+B5 is merged and 0.16.0 was independently fetched on the original Pages URL. Nine original owner references are preserved under Docs/References and indexed in OWNER_VISUAL_REFERENCES.md. B6 now includes optional hand-tracked Ring inspection, explicit keyboard/touch controls, cancellation, movement pause, close framing and saved journal count. 91 local source tests and desktop/mobile Chromium interaction playback pass after size/palm/camera refinement. Exact-head CI and full B6 hero-art/story acceptance remain pending. See B6_ACTIVE_CHECKPOINT.md. This is not completion of B6–B10.
+
+---
+
+# B5 merged — B6 active
+
+B5 PR #27 merged as `de1df1859c6cc75aa7dfb04753f6525b079193dd`. Source head `da60df5845641d30c0ea4f0d073aadac6d65436a` passed all jobs in Actions `41353017080`: 89 source tests, full desktop/mobile Bree walkthrough, previous road, Bywater, opening, party, revelation and paired golden checks. Exact-head Bree artifact `13102017444` downloaded and SHA256 verified as `d589d73e295561d0e16c9d073c9f8fe786954a064ff7ed6bfb664c670b3824c7`; actual images reviewed. Real keyboard walking, innkeeper/Strider tasks, resting and restored indoor save passed on both viewports. Interior has 35 active regional meshes. Publication of 0.16.0 is tracked separately; do not infer it solely from merge.
+
+B4 is already merged and its 0.15.0 public build was verified. B6 is active on `production/b6-ring-interaction-01`; saved checkpoint `db0aba4c5b0a7fa6f60588b1833083610951dc08` preserves nine original owner reference images and a tested Ring interaction module. Integration and visual refinement are in development; B6 is not completed or merged. Original references live under Docs/References and are indexed in OWNER_VISUAL_REFERENCES.md on that branch. B7–B10 and physical-device FPS acceptance remain open.
+
+---
+
+## Previous receipts
+
 # B4 merged and published — B5 in CI
 
 B4 PR #26 merged as `6613a74a114f83ebe3dd6ed37e78abd51d4116ff`. Exact source head `650529eea2d8cc558f3ecd7afb7b661cd7207ded` passed run `41351147934` (85 native tests, desktop/mobile Chromium, Bywater walkthrough, opening, party, revelation, road and golden evidence). Browser artifact `13101404657` was downloaded, SHA256 verified and actual desktop/mobile inn images reviewed. Digest: `a33e1e8ad550f0b70513b59dfe45ae8cc1a71d8bde88d17a3ead3552061aae90`.

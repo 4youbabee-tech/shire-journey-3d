@@ -1,0 +1,24 @@
+// Exact-head WebGL evidence: real region entry/input; QA relocation between encounters.
+import assert from 'node:assert/strict';import {createServer} from 'node:http';import {mkdir,readFile,writeFile} from 'node:fs/promises';import {resolve,extname,sep} from 'node:path';import {chromium} from 'playwright';import {freshState,act,SAVE_KEY} from '../dist/simulation.mjs';
+const root=resolve(process.env.QA_DIST||'dist'),out=resolve(process.env.QA_OUT||'qa-evidence/ring-inspection');await mkdir(out,{recursive:true});
+const server=createServer(async(req,res)=>{try{const u=new URL(req.url,'http://localhost'),p=resolve(root,'.'+(u.pathname==='/'?'/index.html':u.pathname));if(!p.startsWith(root+sep))throw Error();res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css'})[extname(p)]||'application/octet-stream');res.end(await readFile(p));}catch{res.writeHead(404);res.end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));
+const report={status:'NOT RUN',environment:'Chromium SwiftShader; not target-device performance',errors:[],views:[]};let browser;
+try{
+ browser=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
+ for(const [name,width,height]of [['desktop',1280,720],['mobile',390,844]]){
+  const saved=freshState();for(const a of ['greet-wizard','accept','skip-apples','finish','start-party','party-finalize','research-ring','begin-revelation','finish-revelation','leave-village'])assert.equal(act(saved,a),true);saved.road={step:'bree',bree:{location:'inn',task:'rested'}};saved.position={x:-4,z:12};
+  const context=await browser.newContext({viewport:{width,height},hasTouch:name==='mobile',isMobile:name==='mobile',recordVideo:{dir:out,size:{width,height}}});await context.addInitScript(({key,state})=>{if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(state));},{key:SAVE_KEY,state:saved});const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));const snap=()=>page.evaluate(()=>window.__SHIRE__.snapshot());
+  const ready=async()=>{await page.locator('#start').waitFor({state:'visible',timeout:120000});await page.locator('#start').click();};
+  const still=async label=>{const f=(await snap()).telemetry.frames;await page.waitForFunction(n=>window.__SHIRE__.snapshot().telemetry.frames>n+2,f,{timeout:60000});await page.locator('#qa-diagnostics').evaluate(el=>el.hidden=true);await page.screenshot({path:resolve(out,name+'-'+label+'.png'),timeout:90000});};
+  const walkTo=async(x,z)=>{const start=Date.now();while(Date.now()-start<150000){const p=(await snap()).position,dx=x-p.x,dz=z-p.z;if(Math.hypot(dx,dz)<.7)return;const key=Math.abs(dx)>Math.abs(dz)?(dx>0?'d':'a'):(dz>0?'w':'s');await page.keyboard.down('Shift');await page.keyboard.down(key);await page.waitForTimeout(Math.min(700,Math.max(100,Math.max(Math.abs(dx),Math.abs(dz))*200)));await page.keyboard.up(key);await page.keyboard.up('Shift');}await still('walk-failure');throw Error('Natural walk failed '+JSON.stringify({x,z,at:(await snap()).position}));};
+  await page.goto('http://127.0.0.1:'+server.address().port+'/?qa=1');await ready();if(process.env.EXPECTED_COMMIT_SHA)assert.equal((await snap()).commit,process.env.EXPECTED_COMMIT_SHA);
+  await page.locator('#inspect-ring').waitFor({state:'visible',timeout:30000});
+  if(name==='mobile')await page.locator('#inspect-ring').tap();else await page.keyboard.press('KeyR');
+  await page.waitForFunction(()=>window.__SHIRE__.snapshot().ringInspection?.active);const held=await snap();assert.equal(held.ringInspection.actor,'frodo');await still('held-ring');
+  const position=held.position;await page.keyboard.down('w');await page.waitForTimeout(700);await page.keyboard.up('w');const stopped=await snap();assert.ok(Math.hypot(stopped.position.x-position.x,stopped.position.z-position.z)<.02,'inspecting pauses locomotion');
+  if(name==='mobile')await page.locator('#inspect-ring').tap();else await page.keyboard.press('Escape');assert.equal((await snap()).ringInspection.active,false);assert.equal((await snap()).state.ringInspections,0,'cancel has no saved completion');
+  if(name==='mobile')await page.locator('#inspect-ring').tap();else await page.keyboard.press('KeyR');await page.waitForFunction(()=>window.__SHIRE__.snapshot().state.ringInspections===1,null,{timeout:45000});await still('stowed-ring');
+  await page.reload();await ready();assert.equal((await snap()).state.ringInspections,1);assert.equal((await snap()).ringInspection.active,false);await still('saved-inspection');report.views.push({name,naturalCompletion:true,cancelRestores:true,movementPaused:true,saved:await snap()});await context.close();
+ }
+ assert.deepEqual(report.errors,[]);report.status='PASS';
+}finally{await writeFile(resolve(out,'report.json'),JSON.stringify(report,null,2));await browser?.close();server.close();}
