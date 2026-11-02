@@ -40,3 +40,18 @@ Do not replace the existing permanent URL or overwrite user saves without migrat
 
 ## Mobile control update — 2026-11-02
 A dedicated hold-to-sprint touch button is being added beside (above) the movement joystick. Desktop Shift remains supported. The touch control must release on pointer-up/cancel and browser focus loss; mobile browser QA compares actual walking and sprint distance over equal timed joystick movement. Do not merge until exact-head browser QA passes.
+
+## B8 Weathertop playable candidate — 2026-11-02
+
+Candidate branch: `feature/weathertop-playable-01`
+Features:
+- Rested Bree unlocks the eastern-road Weathertop region.
+- New colliding hillside terrain, climbable slate path, broken watchtower pillars and fire-light set.
+- Three mounted wraith silhouettes using one shared thin-instanced mesh.
+- Saved chapter stages: climb → summit → defend → escape → complete.
+- Fire defence requires staying close and still for six seconds; moving or leaving resets progress; paused scenes do not advance.
+- Return-to-Bree path and saved resume after reload.
+- Separate map rendering, native Babylon tests and desktop/mobile Chromium playback.
+
+Exact-head tests must pass before merge. SwiftShader browser evidence is not physical device FPS. B9 Rivendell and B10 later campaign remain open.
+Permanent Pages URL: https://4youbabee-tech.github.io/shire-journey-3d/
