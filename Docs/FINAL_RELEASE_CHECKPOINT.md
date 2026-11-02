@@ -37,3 +37,6 @@
 7. Only then tag and announce the final release.
 
 Do not replace the existing permanent URL or overwrite user saves without migration.
+
+## Mobile control update — 2026-11-02
+A dedicated hold-to-sprint touch button is being added beside (above) the movement joystick. Desktop Shift remains supported. The touch control must release on pointer-up/cancel and browser focus loss; mobile browser QA compares actual walking and sprint distance over equal timed joystick movement. Do not merge until exact-head browser QA passes.

@@ -65,6 +65,12 @@ async function realWalk(page){
 
 async function talk(page){await page.keyboard.press('e');await page.locator('#dialogue:not([hidden])').waitFor({timeout:5000});}
 async function chooseFirst(page){await page.locator('#choices button').first().click();}
+async function mobileSprintHold(cdp,runX,runY,joyX,joyY,ms){
+ const point=(x,y,id)=>({x,y,id,radiusX:1,radiusY:1,force:1});
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point(runX,runY,1),point(joyX,joyY,2)]});
+ try{for(let i=1;i<=3;i++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[point(runX,runY,1),point(joyX,joyY-32*i/3,2)]});await new Promise(r=>setTimeout(r,55));}await new Promise(r=>setTimeout(r,ms));}
+ finally{await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
+}
 async function mobileHold(cdp,x,y,dx,dy,ms){
  const point=(px,py)=>({x:px,y:py,id:1,radiusX:1,radiusY:1,force:1});
  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point(x,y)]});
@@ -175,6 +181,12 @@ try{
  const cdp=await mobile.newCDPSession(touch),cx=joy.x+joy.width/2,cy=joy.y+joy.height/2;
  const before=await snap(touch);assert.equal(before.quality.mode,'auto');assert.ok(before.renderSize.scale>=1&&before.renderSize.scale<=2.25,'High-first quality stays within safe adaptive bounds');await mobileHold(cdp,cx,cy,0,-32,2400);const moved=await snap(touch);
  assert.ok(moved.position.z-before.position.z>.1,'Touch joystick must move character forward');
+  const runBox=await touch.locator('#run-button').boundingBox();assert.ok(runBox,'Dedicated mobile sprint button must be visible');assert.equal((await snap(touch)).controls.touchSprintHeld,false);
+  const normalStart=(await snap(touch)).position;await mobileHold(cdp,cx,cy,0,-32,900);const normalStep=(await snap(touch)).position.z-normalStart.z;
+  const runStart=(await snap(touch)).position;await mobileSprintHold(cdp,runBox.x+runBox.width/2,runBox.y+runBox.height/2,cx,cy,900);const sprintResult=await snap(touch),sprintStep=sprintResult.position.z-runStart.z;
+  assert.ok(sprintStep>normalStep*1.45,'Holding the separate run button must make the character substantially faster than walking');
+  assert.equal(sprintResult.controls.touchSprintHeld,false,'Sprint must release when the finger lifts');
+  await still(touch,'mobile-sprint-button.png');
  await still(touch,'mobile-joystick.png');await still(touch,'mobile-natural-meadow-0.7.png');
  // Check the B4 inn from a narrow touch viewport as well.
  await qaReposition(touch,29,-35);await touch.evaluate(()=>window.__SHIRE__.qaView(0,.28,5.6));await touch.waitForTimeout(900);await touch.locator('#qa-diagnostics').evaluate(el=>el.hidden=true);
