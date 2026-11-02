@@ -2,7 +2,7 @@ import {dressMaterials} from './surface-art.mjs';
 import {BREE_POINTS as P,breeInteraction,actBree,breeObjective} from './bree-state.mjs';
 import {createTownResident} from './town-resident.mjs';
 // Streamed compact Bree: all architecture and dialogue are originally authored.
-export function createBree(B,scene,world,{onChange=()=>{},onMessage=()=>{},onGate=()=>{},onInterior=()=>{},onTransition=()=>{}}={}){
+export function createBree(B,scene,world,{onChange=()=>{},onMessage=()=>{},onGate=()=>{},onEast=()=>{},onInterior=()=>{},onTransition=()=>{}}={}){
  const V=B.Vector3,M=B.MeshBuilder,town=new B.TransformNode('Bree town',scene),inn=new B.TransformNode('Prancing Pony rooms',scene),materials=[],actors=[],lights=[],cameraMeshes=[],batches=new Map(),townColliders=[],innColliders=[];
  let state=null,active=false,clock=0,current=null;
  const mat=(name,color,emissive=false)=>{const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(color);m.specularColor.set(.03,.03,.03);if(emissive)m.emissiveColor=m.diffuseColor.scale(.55);materials.push(m);return m;};
@@ -46,12 +46,12 @@ export function createBree(B,scene,world,{onChange=()=>{},onMessage=()=>{},onGat
  town.setEnabled(false);inn.setEnabled(false);
  function switchPlace({resume=false}={}){current=state.location==='inn'?inn:town;town.setEnabled(current===town);inn.setEnabled(current===inn);world.colliders=current===town?townColliders:innColliders;world.ground=current===town?townGround:innGround;if(!resume){const p=current===inn?P.exit:P.inn;world.body.position.set(p.x,.72,p.z+(current===inn?1:-1));}onInterior(current===inn);onTransition();onChange();}
  function activate(s,{resume=false,fromGate=false}={}){state=s;active=true;switchPlace({resume});if(fromGate)world.body.position.set(P.gate.x,.72,P.gate.z+2);onChange();}
- function interact(){const item=breeInteraction(state,world.body.position);if(!item)return false;if(item.id==='bree-gate'){onGate();return true;}const previous=state.location,changed=actBree(state,item.id,world.body.position);if(previous!==state.location){switchPlace();return true;}
+ function interact(){const item=breeInteraction(state,world.body.position);if(!item)return false;if(item.id==='bree-gate'){onGate();return true;}if(item.id==='bree-east'){if(state.task==='rested'){onEast();return true;}onMessage('الطريق الشرقي لا يزال خطرًا. احصل على غرفة آمنة وتحدّث مع الجوال قبل الرحيل.');return true;}const previous=state.location,changed=actBree(state,item.id,world.body.position);if(previous!==state.location){switchPlace();return true;}
  const lines={
  'bree-keeper':'باتربر: أهلاً بالمسافرين. لديّ غرفتان في الخلف، بعيداً عن ضجيج القاعة. إن كنت تنتظر غاندالف فلم يصلني خبر جديد منه؛ انتبه لمن يسأل عن اسمك.',
  'bree-strider':state.task==='arrival'?'الجوال: اسأل صاحب النزل عن مأواك أولاً. يمكننا الحديث حين تهدأ القاعة.':'الجوال: الطريق خلفكم لم يعد آمناً. لا تبيتوا قرب النوافذ، وابقوا معاً. أعرف الدروب التي تتجنب العيون؛ سنتحدث عن الرحيل مع أول ضوء.',
  'bree-rest':state.task==='rested'?'تجتمع الرفقة في الغرفة الداخلية. يضع سام المؤن قرب الباب، ويبقى الخاتم مع فرودو. تمرّ الليلة، ويحفظ تقدم الرحلة.':'لم يحن وقت النوم؛ تحدّث مع صاحب النزل والجوال أولاً.',
- 'bree-east':state.task==='rested'?'ينتهي نطاق بري عند الطريق الشرقي حالياً. مرحلة ويذرتوب التالية لم تُفتح بعد.':'الطريق الشرقي مظلم. أمّن غرفة واجمع رفاقك قبل الرحيل.'};onMessage(lines[item.id]);if(changed)onChange();return true;}
+ };onMessage(lines[item.id]);if(changed)onChange();return true;}
  function update(dt,{paused=false}={}){if(!active||paused)return;clock+=dt;for(const [i,a]of actors.entries()){if(a.parent!==current)continue;const walking=a.parent===town&&!a.work&&a.id!=='bree-gatekeeper';if(walking){a.root.position.x=a.x+Math.sin(clock*.22+i)*1.4;a.root.rotation.y=Math.cos(clock*.22+i)>0?-Math.PI/2:Math.PI/2;}a.update(clock+i*1.9,{walk:walking,work:a.work});}if(current===inn)lights[3].intensity=.85+Math.sin(clock*13)*.035;}
  function deactivate(){active=false;town.setEnabled(false);inn.setEnabled(false);onInterior(false);}
  return {activate,deactivate,interact,update,interactable:p=>breeInteraction(state,p),get objective(){return breeObjective(state);},get active(){return active;},snapshot(){return {active,location:state?.location,task:state?.task,buildings:13,residents:actors.length,activeMeshes:current?.getChildMeshes().length||0};},dispose(){deactivate();world.cameraBlockers=(world.cameraBlockers||[]).filter(m=>!cameraMeshes.includes(m));for(const a of actors)a.dispose();town.dispose(false);inn.dispose(false);for(const m of materials)m.dispose();}};
