@@ -6,7 +6,7 @@ import {ROAD_POINTS as P,advanceRoad,coverProgress,roadObjective,nearRoadPoint} 
 // A separate streamed region reuses sealed nature, humanoid and horse resources.
 export function createShireRoad(B,scene,world,{nature,createHorse,onMessage=()=>{},onChange=()=>{},onInterior=()=>{},onTransition=()=>{}}={}){
  const M=B.MeshBuilder,V=B.Vector3,root=new B.TransformNode('Shire roads and Brandywine region',scene),statics=[],colliders=[];
- let town=null;let active=false,road=null,cover=0,clock=0,crossing=0,hidden=[],oldColliders,oldGround,lighting,trail=[],lastStep=null,night=0;
+ let town=null,weather=null;let active=false,road=null,cover=0,clock=0,crossing=0,hidden=[],oldColliders,oldGround,lighting,trail=[],lastStep=null,night=0;
  const mat=(name,color)=>{const m=new B.StandardMaterial(name,scene);m.diffuseColor=B.Color3.FromHexString(color);m.specularColor.set(.05,.05,.05);return m;};
  const green=mat('road meadow grass','#638247'),soil=mat('woodland earth','#7b7050'),wood=mat('aged ferry oak','#65513a'),bark=mat('root bark','#514b35'),stone=mat('Bree grey stone','#737a70'),plaster=mat('Bree lime plaster','#c6bb9a'),roof=mat('Bree dark roof','#494944'),black=mat('unmarked rider cloth','#151c21'),brass=mat('lantern brass','#b6a26a'),water=mat('Brandywine river','#406c70'),glow=mat('warm gate windows','#e7ad58');glow.emissiveColor=B.Color3.FromHexString('#ad6525');water.alpha=.94;
  function finish(m,material,x,y,z,{solid=false,batch=true,parent=root}={}){m.material=material;m.parent=parent;m.position.set(x,y,z);m.receiveShadows=true;m.isPickable=false;if(solid){m.checkCollisions=true;colliders.push(m);}if(batch)statics.push(m);return m;}
