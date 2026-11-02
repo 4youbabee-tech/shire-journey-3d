@@ -79,3 +79,13 @@
 :root{--shire-dialogue-height:55vh}
 #dialogue{max-height:var(--shire-dialogue-height)}
 @media(max-width:600px){:root{--shire-dialogue-height:58dvh}#dialogue{max-height:var(--shire-dialogue-height)!important}#dialogue .portrait{width:48px!important;height:52px!important;min-width:48px!important}}
+
+/* Hold-to-sprint touch control: separate from the movement joystick for two-thumb play. */
+@media(pointer:coarse){
+ #touch-controls{position:fixed;inset:0;z-index:4;pointer-events:none}
+ #touch-controls #joystick{pointer-events:auto}
+ #run-button{position:absolute;left:43px;bottom:168px;z-index:5;pointer-events:auto;touch-action:none;-webkit-user-select:none;user-select:none;display:flex;align-items:center;justify-content:center;gap:7px;min-width:94px;min-height:48px;padding:9px 13px;border:1px solid #f0d59a99;border-radius:15px;background:linear-gradient(145deg,#293f2ddf,#172b22e8);color:#fff0c9;box-shadow:0 4px 16px #14291d66;font:600 13px Tahoma,Arial,sans-serif}
+ #run-button span:first-child{font-size:19px;line-height:1}
+ #run-button.is-held{background:linear-gradient(145deg,#e8c477,#c69a4c);color:#263b2b;border-color:#fff0c5;box-shadow:0 0 0 3px #f4d89555,0 2px 9px #17291e88;transform:scale(.96)}
+}
+@media(max-width:600px) and (pointer:coarse){#run-button{left:38px;bottom:166px;min-width:90px;min-height:46px;font-size:12px}}
