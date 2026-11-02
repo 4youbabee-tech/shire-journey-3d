@@ -208,3 +208,29 @@ jobs:
           name: shire-living-world
           path: qa-evidence/living-world/
           retention-days: 90
+
+
+  weathertop-playback:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci && npm run check && npm test
+      - run: npm install --no-save --no-package-lock --ignore-scripts playwright@1.56.1 && npx playwright install --with-deps chromium
+      - name: Play Weathertop summit, fire defence, escape and save restoration on desktop and mobile
+        env:
+          EXPECTED_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          QA_OUT: qa-evidence/weathertop
+        run: node tests/weathertop-playback.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shire-weathertop-playback
+          path: qa-evidence/weathertop/
+          retention-days: 90
